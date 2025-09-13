@@ -7,16 +7,29 @@ document.addEventListener('DOMContentLoaded', () => {
     let conversationHistory = [];
     const placeId = 'ChIJk8TcKznF1EARfDUKY8D6pgw'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
+    const avatarUrl = 'https://ucarecdn.com/2008f119-a819-4d18-8fb4-1236ca14b8b8/ChatGPTImageMay22202502_03_10PMezgifcomresize.png';
     let selectedKeywords = [];
+
+    // UPDATED: Now adds the avatar for the concierge
     function addMessage(sender, text, isHtml = false) {
         const wrapper = document.createElement('div');
         wrapper.className = `message-wrapper ${sender}`;
+
+        if (sender === 'concierge') {
+            const avatarImg = document.createElement('img');
+            avatarImg.src = avatarUrl;
+            avatarImg.className = 'chat-avatar';
+            avatarImg.alt = 'Alex the Concierge';
+            wrapper.appendChild(avatarImg);
+        }
+
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
         if (isHtml) { bubble.innerHTML = text; } else { bubble.innerText = text; }
         wrapper.appendChild(bubble);
         chatBody.prepend(wrapper);
     }
+
     async function sendMessage(content, isSilent = false) {
         if (!isSilent) { addMessage('user', content); }
         conversationHistory.push({ role: 'user', content });
@@ -38,17 +51,22 @@ document.addEventListener('DOMContentLoaded', () => {
             processAIResponse('Sorry, I seem to be having trouble connecting. Please try again later.');
         }
     }
+
+    // UPDATED: Now shows the avatar next to the typing indicator
     function showTypingIndicator() {
         if (document.querySelector('.typing-indicator')) return;
         const wrapper = document.createElement('div');
         wrapper.className = 'message-wrapper concierge typing-indicator';
-        wrapper.innerHTML = `<div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
+        wrapper.innerHTML = `
+            <img src="${avatarUrl}" class="chat-avatar" alt="Alex typing">
+            <div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
         chatBody.prepend(wrapper);
     }
     function removeTypingIndicator() {
         const indicator = document.querySelector('.typing-indicator');
         if (indicator) indicator.remove();
     }
+
     function processAIResponse(text, isInitialGreeting = false) {
         removeTypingIndicator();
         if (isInitialGreeting) {
@@ -153,7 +171,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { sendMessage(chatInput.value); chatInput.value = ''; } });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
-    const initialGreeting = "Hi! I'm Alex, your digital concierge. How was your visit today?";
-    setTimeout(() => { processAIResponse(initialGreeting, true); }, 1000);
+    
+    // Initial greeting
+    setTimeout(() => {
+        const initialGreeting = "Hi! I'm Alex, your digital concierge. How was your visit today?";
+        processAIResponse(initialGreeting, true); 
+    }, 1000);
     showTypingIndicator();
 });
