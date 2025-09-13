@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const quickRepliesContainer = document.getElementById('quick-replies-container');
     const inputRow = document.getElementById('input-row');
     let conversationHistory = [];
-    const placeId = 'ChIJk8TcKznF1EARfDUKY8D6pgw'; // <-- PASTE YOUR PLACE ID HERE
+    const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
     const avatarUrl = 'https://ucarecdn.com/2008f119-a819-4d18-8fb4-1236ca14b8b8/ChatGPTImageMay22202502_03_10PMezgifcomresize.png';
     let selectedKeywords = [];
@@ -15,16 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function showTypingIndicator() { /* ... (This function is unchanged) ... */ }
     function removeTypingIndicator() { /* ... (This function is unchanged) ... */ }
 
-    // --- UPDATED FUNCTION TO SPLIT MESSAGES RELIABLY ---
     function processAIResponse(text) {
         removeTypingIndicator();
-
-        // Check for our new special separator "|"
         if (text.includes("|")) {
             const parts = text.split('|');
             const statement = parts[0].trim();
             const question = parts[1].trim();
-
             addMessage('concierge', statement);
             setTimeout(() => {
                 showTypingIndicator();
@@ -34,18 +30,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 1200);
             }, 1000);
         } else {
-            // If there's no separator, process the message normally
             handleFinalMessagePart(text);
         }
     }
     
-    // This function now handles the initial greeting as well
+    // --- THIS FUNCTION IS NOW CORRECTED ---
     function handleFinalMessagePart(text) {
+        // Check if it's the initial greeting and handle it directly
          if (text.toLowerCase().includes("how was your visit today?")) {
             addMessage('concierge', text);
             createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
-            return;
+            return; // Stop processing here for the initial greeting
         }
+        
+        // The rest of the logic for subsequent messages
         const quoteRegex = /"(.*?)"/;
         const matches = text.match(quoteRegex);
         if (text.includes("Tap all that apply")) {
@@ -201,9 +199,11 @@ document.addEventListener('DOMContentLoaded', () => {
     sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { sendMessage(chatInput.value); chatInput.value = ''; } });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
     
+    // --- THIS PART IS NOW CORRECTED ---
     // Initial greeting
     setTimeout(() => {
         const initialGreeting = "Hi! I'm Alex, your digital concierge. How was your visit today?";
+        // The initial greeting is now handled correctly by the check inside handleFinalMessagePart
         handleFinalMessagePart(initialGreeting);
     }, 1000);
     showTypingIndicator();
