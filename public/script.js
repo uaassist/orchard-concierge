@@ -7,9 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let conversationHistory = [];
     // IMPORTANT: Replace with your actual Google Place ID.
-    const placeId = 'ChIJ_XvUSvXN1EARf1iO9YzU0SY'; 
+    const placeId = 'Your_Google_Place_ID_Here'; 
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
-    let selectedKeywords = []; // NEW: Array to hold multiple selections
+    let selectedKeywords = [];
 
     // Add a message to the chat UI
     function addMessage(sender, text, isHtml = false) {
@@ -54,8 +54,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Show a "typing..." indicator
-    function showTypingIndicator() { /* ... same as before ... */ }
-    function removeTypingIndicator() { /* ... same as before ... */ }
+    function showTypingIndicator() {
+        if (document.querySelector('.typing-indicator')) return;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'message-wrapper concierge typing-indicator';
+        wrapper.innerHTML = `<div class="bubble">...</div>`;
+        chatBody.prepend(wrapper);
+    }
+
+    function removeTypingIndicator() {
+        const indicator = document.querySelector('.typing-indicator');
+        if (indicator) indicator.remove();
+    }
 
     // Process the AI's response to show buttons or special actions
     function processAIResponse(text, isInitialGreeting = false) {
@@ -69,7 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const quoteRegex = /"(.*?)"/;
         const matches = text.match(quoteRegex);
         
-        // UPDATED: Now calls createMultiSelectButtons
         if (text.includes("Tap all that apply")) {
             addMessage('concierge', text);
             createMultiSelectButtons(["✨ Friendly Staff", "🦷 Gentle Hygienist", "👍 Dr. Evans' Care", "🏢 Clean Office", "🕒 On-Time Appointment", "💬 Clear Explanations", "Other"]);
@@ -87,69 +96,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Creates the editable textarea
-    function createEditableDraft(reviewText) { /* ... same as before ... */ }
-
-    // Creates single-tap buttons
-    function createQuickReplies(replies) {
+    function createEditableDraft(reviewText) {
         clearQuickReplies();
-        inputRow.style.display = 'none';
-        replies.forEach(replyText => {
-            const button = document.createElement('button');
-            button.className = 'quick-reply-btn';
-            button.innerText = replyText;
-            button.onclick = () => { sendMessage(replyText); };
-            quickRepliesContainer.appendChild(button);
-        });
-    }
-    
-    // NEW: Creates multi-select buttons
-    function createMultiSelectButtons(options) {
-        clearQuickReplies();
-        inputRow.style.display = 'none';
-        selectedKeywords = []; // Reset selections
-
-        options.forEach(optionText => {
-            const button = document.createElement('button');
-            button.className = 'quick-reply-btn';
-            button.innerText = optionText;
-            button.onclick = () => {
-                button.classList.toggle('selected'); // Toggle a 'selected' style
-                if (selectedKeywords.includes(optionText)) {
-                    selectedKeywords = selectedKeywords.filter(k => k !== optionText);
-                } else {
-                    selectedKeywords.push(optionText);
-                }
-            };
-            quickRepliesContainer.appendChild(button);
-        });
-        
-        const continueButton = document.createElement('button');
-        continueButton.className = 'quick-reply-btn continue-btn';
-        continueButton.innerText = 'Continue';
-        continueButton.onclick = () => {
-            const combinedMessage = selectedKeywords.join(', ');
-            sendMessage(combinedMessage);
-        };
-        quickRepliesContainer.appendChild(continueButton);
-    }
-
-    // Creates the final post buttons
-    function createPostButtons() { /* ... same as before ... */ }
-
-    // Clears the buttons
-    function clearQuickReplies() {
-        quickRepliesContainer.innerHTML = '';
-        inputRow.style.display = 'flex';
-    }
-
-    // Event listeners for sending message
-    sendButton.addEventListener('click', () => { /* ... same as before ... */ });
-    chatInput.addEventListener('keypress', (e) => { /* ... same as before ... */ });
-    
-    // Initial greeting
-    const initialGreeting = "Hi! I'm Alex, your digital concierge. How was your visit today?";
-    setTimeout(() => {
-        processAIResponse(initialGreeting, true); 
-    }, 1000);
-    showTypingIndicator();
-});
+        const oldDraft = document.getElementById('review-draft-wrapper');
+        if(oldDraft) oldDraft.remove();
+        const wrapper = document.createElement('div');
+        wrapper.id = 'revi
