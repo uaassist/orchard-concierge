@@ -13,10 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function addMessage(sender, text, isHtml = false) { /* ... (This function is unchanged) ... */ }
     async function sendMessage(content, isSilent = false) { /* ... (This function is unchanged) ... */ }
     function showTypingIndicator() { /* ... (This function is unchanged) ... */ }
-    function removeTypingIndicator() { /* ... (This function is unchanged) ... */ }
+    function removeTypingIndicator() { /* ... (This in unchanged) ... */ }
 
+    // --- THIS FUNCTION IS NOW CORRECTED ---
     function processAIResponse(text) {
         removeTypingIndicator();
+
         if (text.includes("|")) {
             const parts = text.split('|');
             const statement = parts[0].trim();
@@ -34,19 +36,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // --- THIS FUNCTION IS NOW CORRECTED ---
     function handleFinalMessagePart(text) {
-        // Check if it's the initial greeting and handle it directly
-         if (text.toLowerCase().includes("how was your visit today?")) {
-            addMessage('concierge', text);
-            createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
-            return; // Stop processing here for the initial greeting
-        }
-        
-        // The rest of the logic for subsequent messages
         const quoteRegex = /"(.*?)"/;
         const matches = text.match(quoteRegex);
-        if (text.includes("Tap all that apply")) {
+        if (text.toLowerCase().includes("how was your visit today?")) {
+            addMessage('concierge', text);
+            createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
+        } else if (text.includes("Tap all that apply")) {
             addMessage('concierge', text);
             createMultiSelectButtons(["✨ Friendly Staff", "🦷 Gentle Hygienist", "👍 Dr. Evans' Care", "🏢 Clean Office", "🕒 On-Time Appointment", "💬 Clear Explanations", "Other"]);
         } else if (text.includes("draft a 5-star review")) {
@@ -199,12 +195,11 @@ document.addEventListener('DOMContentLoaded', () => {
     sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { sendMessage(chatInput.value); chatInput.value = ''; } });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
     
-    // --- THIS PART IS NOW CORRECTED ---
     // Initial greeting
     setTimeout(() => {
-        const initialGreeting = "Hi! I'm Alex, your digital concierge. How was your visit today?";
-        // The initial greeting is now handled correctly by the check inside handleFinalMessagePart
-        handleFinalMessagePart(initialGreeting);
-    }, 1000);
+        // Send a "silent" message to the AI to get the initial greeting
+        // The user won't see this message, but it starts the conversation
+        sendMessage("Hello", true);
+    }, 500);
     showTypingIndicator();
 });
