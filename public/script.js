@@ -10,93 +10,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const avatarUrl = 'https://ucarecdn.com/2008f119-a819-4d18-8fb4-1236ca14b8b8/ChatGPTImageMay22202502_03_10PMezgifcomresize.png';
     let selectedKeywords = [];
 
-    function addMessage(sender, text, isHtml = false) {
-        const wrapper = document.createElement('div');
-        wrapper.className = `message-wrapper ${sender}`;
-        if (sender === 'concierge') {
-            const avatarImg = document.createElement('img');
-            avatarImg.src = avatarUrl;
-            avatarImg.className = 'chat-avatar';
-            avatarImg.alt = 'Alex the Concierge';
-            wrapper.appendChild(avatarImg);
-        }
-        const bubble = document.createElement('div');
-        bubble.className = 'bubble';
-        if (isHtml) { bubble.innerHTML = text; } else { bubble.innerText = text; }
-        wrapper.appendChild(bubble);
-        chatBody.prepend(wrapper);
-    }
+    function addMessage(sender, text, isHtml = false) { /* ... (This function is unchanged) ... */ }
+    async function sendMessage(content, isSilent = false) { /* ... (This function is unchanged) ... */ }
+    function showTypingIndicator() { /* ... (This function is unchanged) ... */ }
+    function removeTypingIndicator() { /* ... (This function is unchanged) ... */ }
 
-    async function sendMessage(content, isSilent = false) {
-        if (!isSilent) { addMessage('user', content); }
-        conversationHistory.push({ role: 'user', content });
-        clearQuickReplies();
-        showTypingIndicator();
-        try {
-            const response = await fetch('/api/concierge', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages: conversationHistory }),
-            });
-            if (!response.ok) throw new Error('Network response was not ok.');
-            const data = await response.json();
-            const aiMessage = data.message;
-            conversationHistory.push(aiMessage);
-            processAIResponse(aiMessage.content);
-        } catch (error) {
-            console.error("Fetch Error:", error);
-            processAIResponse('Sorry, I seem to be having trouble connecting. Please try again later.');
-        }
-    }
-
-    function showTypingIndicator() {
-        if (document.querySelector('.typing-indicator')) return;
-        const wrapper = document.createElement('div');
-        wrapper.className = 'message-wrapper concierge typing-indicator';
-        wrapper.innerHTML = `<img src="${avatarUrl}" class="chat-avatar" alt="Alex typing"><div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
-        chatBody.prepend(wrapper);
-    }
-    function removeTypingIndicator() {
-        const indicator = document.querySelector('.typing-indicator');
-        if (indicator) indicator.remove();
-    }
-
-    // --- NEW & IMPROVED FUNCTION TO SPLIT MESSAGES ---
-    function processAIResponse(text, isInitialGreeting = false) {
+    // --- UPDATED FUNCTION TO SPLIT MESSAGES RELIABLY ---
+    function processAIResponse(text) {
         removeTypingIndicator();
 
-        // Regex to split a message into a statement and a follow-up question
-        const splitRegex = /(.*?[.!?])\s+(.*)/;
-        const parts = text.match(splitRegex);
+        // Check for our new special separator "|"
+        if (text.includes("|")) {
+            const parts = text.split('|');
+            const statement = parts[0].trim();
+            const question = parts[1].trim();
 
-        // Check if the message can be split and is not the initial greeting
-        if (parts && parts.length === 3 && !isInitialGreeting) {
-            const statement = parts[1];
-            const question = parts[2];
-
-            // 1. Display the first part (the statement)
             addMessage('concierge', statement);
-            
-            // 2. Wait, then show typing indicator
             setTimeout(() => {
                 showTypingIndicator();
-                // 3. Wait a little more, then show the second part (the question)
                 setTimeout(() => {
                     removeTypingIndicator();
-                    // 4. Pass the question to a handler that shows the buttons
                     handleFinalMessagePart(question);
-                }, 1200); // Realistic typing delay
-            }, 1000); // Pause before "typing"
-
+                }, 1200);
+            }, 1000);
         } else {
-            // If it's the first message or can't be split, show it all at once
-            handleFinalMessagePart(text, isInitialGreeting);
+            // If there's no separator, process the message normally
+            handleFinalMessagePart(text);
         }
     }
     
-    // This new handler contains the logic that used to be in processAIResponse
-    function handleFinalMessagePart(text, isInitialGreeting = false) {
-         if (isInitialGreeting) {
+    // This function now handles the initial greeting as well
+    function handleFinalMessagePart(text) {
+         if (text.toLowerCase().includes("how was your visit today?")) {
             addMessage('concierge', text);
             createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
             return;
@@ -126,6 +71,54 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- The rest of the functions are unchanged. I'm including them for completeness ---
     
+    function addMessage(sender, text, isHtml = false) {
+        const wrapper = document.createElement('div');
+        wrapper.className = `message-wrapper ${sender}`;
+        if (sender === 'concierge') {
+            const avatarImg = document.createElement('img');
+            avatarImg.src = avatarUrl;
+            avatarImg.className = 'chat-avatar';
+            avatarImg.alt = 'Alex the Concierge';
+            wrapper.appendChild(avatarImg);
+        }
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        if (isHtml) { bubble.innerHTML = text; } else { bubble.innerText = text; }
+        wrapper.appendChild(bubble);
+        chatBody.prepend(wrapper);
+    }
+    async function sendMessage(content, isSilent = false) {
+        if (!isSilent) { addMessage('user', content); }
+        conversationHistory.push({ role: 'user', content });
+        clearQuickReplies();
+        showTypingIndicator();
+        try {
+            const response = await fetch('/api/concierge', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: conversationHistory }),
+            });
+            if (!response.ok) throw new Error('Network response was not ok.');
+            const data = await response.json();
+            const aiMessage = data.message;
+            conversationHistory.push(aiMessage);
+            processAIResponse(aiMessage.content);
+        } catch (error) {
+            console.error("Fetch Error:", error);
+            processAIResponse('Sorry, I seem to be having trouble connecting. Please try again later.');
+        }
+    }
+    function showTypingIndicator() {
+        if (document.querySelector('.typing-indicator')) return;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'message-wrapper concierge typing-indicator';
+        wrapper.innerHTML = `<img src="${avatarUrl}" class="chat-avatar" alt="Alex typing"><div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
+        chatBody.prepend(wrapper);
+    }
+    function removeTypingIndicator() {
+        const indicator = document.querySelector('.typing-indicator');
+        if (indicator) indicator.remove();
+    }
     function createEditableDraft(reviewText) {
         clearQuickReplies();
         const oldDraft = document.getElementById('review-draft-wrapper');
@@ -211,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial greeting
     setTimeout(() => {
         const initialGreeting = "Hi! I'm Alex, your digital concierge. How was your visit today?";
-        processAIResponse(initialGreeting, true); 
+        handleFinalMessagePart(initialGreeting);
     }, 1000);
     showTypingIndicator();
 });
