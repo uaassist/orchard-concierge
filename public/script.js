@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function renderMultiSelectStep() {
         updateProgress();
+        // We get the AI's question first
         const aiResponse = await getAIResponse(conversationHistory[conversationHistory.length - 1].content);
         const keywords = ["✨ Friendly Staff", "🦷 Gentle Hygienist", "👍 Dr. Evans' Care", "🏢 Clean Office", "🕒 On-Time Appointment", "💬 Clear Explanations", "Other"];
         const optionsHtml = keywords.map(kw => 
@@ -78,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     async function renderUniqueSparkStep(keywords) {
         updateProgress();
+        // Then we get the AI's follow-up question
         const aiResponse = await getAIResponse(keywords);
         const optionsHtml = `
             <input type="text" id="unique-spark-input" class="survey-text-input" placeholder="Type your response here...">
@@ -102,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             renderStep("Here's a draft based on your feedback. Feel free to edit it!", optionsHtml);
         } else {
+            // This is the fallback you are seeing
             renderStep("Sorry, I had a little trouble creating a draft. Please let us know what you thought privately.", '<input type="text" class="survey-text-input" placeholder="Type your feedback here..."><button class="action-button">Submit</button>');
         }
     }
@@ -109,6 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Event Handlers (exposed to global scope) ---
     
     window.handlePulseCheck = (choice) => {
+        // Add the user's choice to the history before asking the AI for the next step
+        conversationHistory.push({ role: 'user', content: choice });
         if (choice.includes("great")) {
             renderMultiSelectStep();
         } else {
@@ -137,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     window.handlePostToGoogle = () => {
         const draftText = document.getElementById('review-draft-textarea').value;
-        navigator.clipboard.writeText(draftText).then(() => {
+        navigator.clipboard.writeText(draftТext).then(() => {
             window.open(googleReviewUrl, '_blank');
             renderStep("Thank you for sharing! Your feedback helps other patients find us.", '');
         });
@@ -145,9 +150,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Initial Load ---
     function startSurvey() {
-        const initialPrompt = "Hi! I'm Alex, your digital concierge. How was your visit today?";
-        conversationHistory.push({ role: 'system', content: initialPrompt });
-        renderPulseCheckStep(initialPrompt);
+        // We only need the system prompt in the history, the AI will provide the first message
+        conversationHistory.push({ role: 'system', content: "Start the conversation." }); 
+        renderPulseCheckStep("Hi! I'm Alex, your digital concierge. How was your visit today?");
     }
     
     startSurvey();
