@@ -1,26 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-A">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orchard Dental Care - Feedback Concierge</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- This is the main container for the chat widget -->
     <div id="chat-container">
+        <!-- Simplified Header -->
         <div id="chat-header">
-            <div class="avatar">A</div>
-            <div>
-                <strong>Alex</strong>
-                <div>Orchard Dental Concierge</div>
-            </div>
+            <h1>Orchard Dental Concierge</h1>
+            <p>Powered by AI</p>
         </div>
+
+        <!-- Messages will be injected here by script.js -->
         <div id="chat-body"></div>
+
+        <!-- Redesigned Input Area -->
         <div id="chat-input-area">
             <div id="quick-replies-container"></div>
             <div id="input-row">
-                <input type="text" id="chat-input" placeholder="Type your message..." autocomplete="off">
-                <button id="send-button">➤</button>
+                <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off">
+                <!-- SVG Icon for the send button -->
+                <button id="send-button" aria-label="Send Message">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
+                    </svg>
+                </button>
+            </div>
+            <div id="chat-footer">
+                Powered by Alex AI
             </div>
         </div>
     </div>
