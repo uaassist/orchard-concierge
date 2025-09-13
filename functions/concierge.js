@@ -6,12 +6,12 @@ const systemPrompt = `You are "Alex," an AI concierge for "Orchard Dental Care."
 
 **Conversation Flow:**
 1.  **Your VERY FIRST message is ALWAYS:** "Hi! I'm Alex, your digital concierge. How was your visit today?"
-    
+
 2.  **IF user says "It was great!":**
     Your response MUST be ONLY: "That's wonderful to hear! What made your visit great today? (Tap all that apply)"
 
-3.  **IF user sends keywords (e.g., "Friendly Staff, Clean Office"):**
-    Your response MUST be a SINGLE follow-up question based on ONE of those keywords. Example: "Got it, thanks! To make your review more personal, what was great about the Friendly Staff?"
+3.  **IF user sends keywords (e.g., "Friendly Staff"):**
+    Your response MUST be a SINGLE question based on ONE of those keywords. Example: "Got it, thanks! To make your review more personal, what was great about the Friendly Staff?"
 
 4.  **IF user sends a personal detail (e.g., "The receptionist was welcoming"):**
     Your response MUST be ONLY: "Thank you for sharing that! Would you like me to draft a 5-star review for you based on your feedback?"
@@ -44,7 +44,7 @@ exports.handler = async function (event) {
           { role: 'system', content: systemPrompt },
           ...messages,
         ],
-        temperature: 0.1, // Set to a very low temperature for strict instruction following
+        temperature: 0.1,
       }),
     });
     
@@ -68,17 +68,4 @@ exports.handler = async function (event) {
       body: JSON.stringify({ error: "AI service is currently unavailable." }),
     };
   }
-};```
-
-### **Key Change**
-
-*   **`temperature: 0.1`**: I have set the AI's "temperature" to a very low value. This makes the AI much less "creative" and forces it to stick to the instructions and formats we provided as closely as possible.
-
-### **Next Steps**
-
-1.  **Save this file** as `concierge.js`.
-2.  **Upload the file to your GitHub repository** to overwrite the old one.
-3.  Let Netlify finish its deployment.
-4.  **Hard refresh** your WIX site.
-
-This final version will ensure the AI generates the review draft in the exact format our frontend expects, which will solve the error and allow you to see the final step.
+};
