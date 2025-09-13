@@ -1,26 +1,28 @@
 const fetch = require('node-fetch');
 
-const systemPrompt = `You are "Alex," a friendly and professional AI concierge for "Orchard Dental Care." Your job is to guide a patient through a feedback survey one step at a time. Be concise and helpful.
+const systemPrompt = `You are "Alex," an AI concierge for "Orchard Dental Care." You follow instructions precisely.
 
-**RULE: ONLY RESPOND FOR THE IMMEDIATE NEXT STEP. DO NOT JUMP AHEAD.**
+**CRITICAL RULE: YOUR ENTIRE RESPONSE MUST BE ONLY WHAT IS SPECIFIED IN THE FLOW. DO NOT ADD EXTRA WORDS OR DEVIATE.**
 
 **Conversation Flow:**
-1.  **Your VERY FIRST message is ALWAYS:** "Hi! I'm Alex, your digital concierge. How was your visit today?" The user will be shown buttons: "It was great!", "It was okay.", "It wasn't good."
+1.  **Your VERY FIRST message is ALWAYS:** "Hi! I'm Alex, your digital concierge. How was your visit today?"
+    
+2.  **IF user says "It was great!":**
+    Your response MUST be ONLY: "That's wonderful to hear! What made your visit great today? (Tap all that apply)"
 
-2.  **IF the user replies "It was great!":**
-    Your response MUST be ONLY this: "That's wonderful to hear! What made your visit great today? (Tap all that apply)". The UI will show the keyword buttons.
+3.  **IF user sends keywords (e.g., "Friendly Staff, Clean Office"):**
+    Your response MUST be a SINGLE follow-up question based on ONE of those keywords. Example: "Got it, thanks! To make your review more personal, what was great about the Friendly Staff?"
 
-3.  **IF the user replies with a list of keywords (e.g., "Friendly Staff, Clean Office"):**
-    Your response MUST be a SINGLE follow-up question based on ONE of those keywords. For example: "Got it, thanks! To make your review more personal, what was great about the Friendly Staff?"
+4.  **IF user sends a personal detail (e.g., "The receptionist was welcoming"):**
+    Your response MUST be ONLY: "Thank you for sharing that! Would you like me to draft a 5-star review for you based on your feedback?"
 
-4.  **IF the user replies with their personal detail (e.g., "The receptionist was so welcoming"):**
-    Your response MUST be ONLY this: "Thank you for sharing that! Would you like me to draft a 5-star review for you based on your feedback?"
+5.  **IF user says "Yes, draft it for me!":**
+    Your response MUST START WITH "Here's a draft:" AND the review itself MUST be enclosed in double quotes.
+    **EXAMPLE FORMAT:** Here's a draft: "The staff was so welcoming and the office was very clean. A great experience!"
+    **DO NOT FORGET THE DOUBLE QUOTES AROUND THE REVIEW TEXT.**
 
-5.  **IF the user replies "Yes, draft it for me!":**
-    Your response MUST be a unique, positive review draft enclosed in double quotes. For example: "Here's a draft: \"The staff was so welcoming and the office was very clean. A great experience!\""
-
-6.  **IF the user replies "It wasn't good.":**
-    Your response MUST be ONLY this: "Oh no, I'm very sorry to hear that. Your feedback is important. Could you please tell me a bit about what happened?"`;
+6.  **IF user says "It wasn't good.":**
+    Your response MUST be ONLY: "Oh no, I'm very sorry to hear that. Your feedback is important. Could you please tell me a bit about what happened?"`;
 
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
@@ -42,7 +44,7 @@ exports.handler = async function (event) {
           { role: 'system', content: systemPrompt },
           ...messages,
         ],
-        temperature: 0.2, // Lower temperature for more predictable, instruction-following behavior
+        temperature: 0.1, // Set to a very low temperature for strict instruction following
       }),
     });
     
@@ -66,4 +68,17 @@ exports.handler = async function (event) {
       body: JSON.stringify({ error: "AI service is currently unavailable." }),
     };
   }
-};
+};```
+
+### **Key Change**
+
+*   **`temperature: 0.1`**: I have set the AI's "temperature" to a very low value. This makes the AI much less "creative" and forces it to stick to the instructions and formats we provided as closely as possible.
+
+### **Next Steps**
+
+1.  **Save this file** as `concierge.js`.
+2.  **Upload the file to your GitHub repository** to overwrite the old one.
+3.  Let Netlify finish its deployment.
+4.  **Hard refresh** your WIX site.
+
+This final version will ensure the AI generates the review draft in the exact format our frontend expects, which will solve the error and allow you to see the final step.
