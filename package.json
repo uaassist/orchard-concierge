@@ -1,7 +1,7 @@
 {
-  "name": "orchard-concierge-openai",
+  "name": "orchard-concierge",
   "version": "1.0.0",
-  "description": "AI Chat for WIX site using OpenAI",
+  "description": "AI Chat for WIX site",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,6 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "node-fetch": "^2.6.1"
+    "@google/generative-ai": "^0.1.3"
   }
 }
