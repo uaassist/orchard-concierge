@@ -1,4 +1,4 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai"); // Assuming you are back on Google, change if needed
+const fetch = require('node-fetch');
 
 const systemPrompt = `You are "Alex," a friendly and professional AI concierge for "Orchard Dental Care." Your job is to guide a patient through a feedback survey one step at a time. Be concise and helpful.
 
@@ -6,7 +6,7 @@ const systemPrompt = `You are "Alex," a friendly and professional AI concierge f
 
 **Conversation Flow:**
 1.  **Your VERY FIRST message is ALWAYS:** "Hi! I'm Alex, your digital concierge. How was your visit today?" The user will be shown buttons: "It was great!", "It was okay.", "It wasn't good."
-    
+
 2.  **IF the user replies "It was great!":**
     Your response MUST be ONLY this: "That's wonderful to hear! What made your visit great today? (Tap all that apply)". The UI will show the keyword buttons.
 
@@ -26,41 +26,41 @@ exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
-  
-  // This part is for Google Gemini. If you are using OpenAI, you will need the OpenAI version.
-  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
 
   const { messages } = JSON.parse(event.body);
 
-  // The first message should just be the system prompt, not the whole history for the initial prompt.
-  const history = messages.map(msg => ({
-    role: msg.role === 'user' ? 'user' : 'model',
-    parts: [{ text: msg.content }],
-  }));
-  
-  // The user's latest message is what we'll send.
-  const lastMessage = history.pop(); 
-
   try {
-    const chat = model.startChat({
-      history: history,
-      generationConfig: {
-        temperature: 0.2, // Lower temperature for more predictable, instruction-following behavior
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
       },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...messages,
+        ],
+        temperature: 0.2, // Lower temperature for more predictable, instruction-following behavior
+      }),
     });
+    
+    if (!response.ok) {
+        const errorData = await response.json();
+        console.error("OpenAI API Error:", errorData);
+        throw new Error("OpenAI API request failed.");
+    }
 
-    const result = await chat.sendMessage(lastMessage.parts[0].text);
-    const response = result.response;
-    const aiText = response.text();
-    const aiMessage = { role: 'model', content: aiText };
+    const data = await response.json();
+    const aiMessage = data.choices[0].message;
 
     return {
       statusCode: 200,
       body: JSON.stringify({ message: aiMessage }),
     };
   } catch (error) {
-    console.error("Error calling Gemini API:", error);
+    console.error("Error calling OpenAI API:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "AI service is currently unavailable." }),
