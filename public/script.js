@@ -48,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
             processAIResponse(aiMessage.content);
         } catch (error) {
             console.error("Fetch Error:", error);
-            // This is the error message the user sees
             processAIResponse('Sorry, I seem to be having trouble connecting. Please try again later.');
         }
     }
@@ -74,10 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isInitialGreeting) {
             addMessage('concierge', text);
             createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
-            return; // Stop here for the initial greeting
+            return;
         }
         
-        // This part handles all subsequent messages from the AI
         const quoteRegex = /"(.*?)"/;
         const matches = text.match(quoteRegex);
 
@@ -89,19 +87,40 @@ document.addEventListener('DOMContentLoaded', () => {
              createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
         } else if (matches && matches[1].length > 10) { // Found a review draft
             const reviewText = matches[1];
-            const htmlText = `Here's a draft based on your feedback:<br><br><i>"${reviewText}"</i><br><br>Feel free to edit it. When you're ready, just tap below.`;
-            addMessage('concierge', htmlText, true);
-            createPostButtons(reviewText);
+            addMessage('concierge', "Here's a draft based on your feedback:");
+            createEditableDraft(reviewText); // <<-- NEW FUNCTION CALL
         }
          else {
             addMessage('concierge', text);
         }
     }
+    
+    // NEW FUNCTION: Creates the editable textarea
+    function createEditableDraft(reviewText) {
+        clearQuickReplies(); // Clear any old buttons
+        // Remove any old draft if it exists
+        const oldDraft = document.getElementById('review-draft-wrapper');
+        if(oldDraft) oldDraft.remove();
+
+        const wrapper = document.createElement('div');
+        wrapper.id = 'review-draft-wrapper'; // Give it an ID so we can find it
+        
+        const textArea = document.createElement('textarea');
+        textArea.id = 'review-draft-textarea'; // Give the textarea an ID
+        textArea.className = 'review-draft-textarea';
+        textArea.value = reviewText;
+        
+        wrapper.appendChild(textArea);
+        chatBody.prepend(wrapper);
+        
+        addMessage('concierge', 'Feel free to edit it. When you\'re ready, just tap below.');
+        createPostButtons();
+    }
 
     // Create tappable buttons in the UI
     function createQuickReplies(replies) {
-        quickRepliesContainer.innerHTML = '';
-        inputRow.style.display = 'none'; // Hide text input when buttons are shown
+        clearQuickReplies();
+        inputRow.style.display = 'none';
         replies.forEach(replyText => {
             const button = document.createElement('button');
             button.className = 'quick-reply-btn';
@@ -113,7 +132,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-     function createPostButtons(reviewText) {
+     // UPDATED FUNCTION: Now reads from the textarea
+     function createPostButtons() {
         quickRepliesContainer.innerHTML = '';
         inputRow.style.display = 'none';
         
@@ -121,7 +141,8 @@ document.addEventListener('DOMContentLoaded', () => {
         postButton.className = 'quick-reply-btn';
         postButton.innerText = '✅ Post to Google';
         postButton.onclick = () => {
-            navigator.clipboard.writeText(reviewText).then(() => {
+            const draftText = document.getElementById('review-draft-textarea').value; // Read the current text
+            navigator.clipboard.writeText(draftText).then(() => {
                 window.open(googleReviewUrl, '_blank');
                 addMessage('concierge', 'Great! I\'ve copied the text and opened the Google review page for you. Just paste the text and click post!');
             });
@@ -159,9 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial greeting from Alex
     const initialGreeting = "Hi! I'm Alex, your digital concierge. How was your visit today?";
     setTimeout(() => {
-        // We now pass 'true' to tell the function this is the first message
         processAIResponse(initialGreeting, true); 
     }, 1000);
     showTypingIndicator();
 });
-
