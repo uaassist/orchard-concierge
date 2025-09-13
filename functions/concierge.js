@@ -1,4 +1,4 @@
-const { VertexAI } = require('@google-cloud/vertexai');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const systemPrompt = `You are "Alex," a friendly and professional digital concierge for a dental practice named "Orchard Dental Care." Your goal is to provide excellent customer service and guide the user through a feedback process using a specific, conversational flow.
 
@@ -16,44 +16,45 @@ const systemPrompt = `You are "Alex," a friendly and professional digital concie
 4.  **Tone:** Be concise, friendly, and always helpful. Do not deviate from these flows.`;
 
 exports.handler = async function (event) {
-    if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, body: 'Method Not Allowed' };
-    }
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, body: 'Method Not Allowed' };
+  }
+  
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+  // Using the stable, standard model name
+  const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
 
-    try {
-        // Initialize Vertex with your project details
-        const vertex_ai = new VertexAI({
-            project: process.env.GOOGLE_PROJECT_ID,
-            location: 'us-central1'
-        });
+  const { messages } = JSON.parse(event.body);
 
-        const model = 'gemini-1.0-pro'; // The model name for Vertex AI
+  const history = messages.map(msg => ({
+    role: msg.role === 'user' ? 'user' : 'model',
+    parts: [{ text: msg.content }],
+  }));
+  
+  const lastMessage = history.pop();
 
-        // CORRECTED LINE:
-        const generativeModel = vertex_ai.getGenerativeModel({ model: model });
+  try {
+    const chat = model.startChat({
+      history: history,
+      generationConfig: {
+        temperature: 0.8,
+      },
+    });
 
-        const { messages } = JSON.parse(event.body);
+    const result = await chat.sendMessage(lastMessage.parts[0].text);
+    const response = result.response;
+    const aiText = response.text();
+    const aiMessage = { role: 'model', content: aiText };
 
-        // Convert message history to the format Vertex AI expects
-        const history = messages.map(msg => ({
-            role: msg.role === 'user' ? 'user' : 'model',
-            parts: [{ text: msg.content }],
-        }));
-        const lastMessage = history.pop();
-
-        const chat = generativeModel.startChat({ history: history });
-        const result = await chat.sendMessage(lastMessage.parts[0].text);
-        
-        const aiText = result.response.candidates[0].content.parts[0].text;
-        const aiMessage = { role: 'model', content: aiText };
-
-        return { statusCode: 200, body: JSON.stringify({ message: aiMessage }), };
-    } catch (error) {
-        console.error("Error calling Vertex AI API:", error);
-        // Return the full error to the log for better debugging
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: "AI service failed.", details: error.message }),
-        };
-    }
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: aiMessage }),
+    };
+  } catch (error) {
+    console.error("Error calling Gemini API:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "AI service is currently unavailable." }),
+    };
+  }
 };
