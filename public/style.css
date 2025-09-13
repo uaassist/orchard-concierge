@@ -19,4 +19,18 @@ body { font-family: var(--font-family); margin: 0; padding: 0; }
 .user .bubble { background: var(--primary-color); color: white; border-bottom-right-radius: 5px; }
 #quick-replies-container { display: flex; flex-wrap: wrap; justify-content: flex-end; margin-bottom: 10px; }
 .quick-reply-btn { margin: 3px; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--primary-color); background: white; color: var(--primary-color); cursor: pointer; transition: background-color 0.2s; font-size: 0.9em; }
+
 .quick-reply-btn:hover { background-color: #f0f0f0; }
+/* Style for the editable review draft box */
+.review-draft-textarea {
+    width: 95%; /* Make it almost full width */
+    height: 120px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    font-family: var(--font-family);
+    font-size: 1em;
+    resize: vertical; /* Allows user to resize it vertically */
+}
