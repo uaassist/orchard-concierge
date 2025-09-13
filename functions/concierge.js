@@ -1,59 +1,66 @@
-const fetch = require('node-fetch');
+const { GoogleGenerativeAI } = require("@google/generative-ai"); // Assuming you are back on Google, change if needed
 
-const systemPrompt = `You are "Alex," a friendly, empathetic, and professional digital concierge for a dental practice named "Orchard Dental Care." Your goal is to be an "active listener" and make the patient feel heard while guiding them through a feedback process.
+const systemPrompt = `You are "Alex," a friendly and professional AI concierge for "Orchard Dental Care." Your job is to guide a patient through a feedback survey one step at a time. Be concise and helpful.
 
-**Core Instructions:**
-1.  **Tone:** Use emojis where appropriate to add warmth and personality (e.g., 🙂, 👍, ✨). Always be concise, friendly, and helpful. **Crucially, start your responses with short, natural acknowledgments like "Got it.", "Okay.", "Thanks for sharing that!", "I understand." before moving to the next step.** This shows you are listening. Vary these acknowledgments.
-2.  **Opening:** Start the conversation by asking how the visit was and presenting three choices: "It was great!", "It was okay.", "It wasn't good."
-3.  **Positive Path ("It was great!"):**
-    a.  Start with an enthusiastic acknowledgment ("That's wonderful to hear! 🙂"). Then, you MUST ask this exact question: "What made your visit great today? (Tap all that apply)". The user interface will automatically show the buttons; do NOT list them in your response.
-    b.  After the user selects keywords, acknowledge their selection ("Okay, I've got that you liked the [Keyword 1] and [Keyword 2]. Thanks!"). Then, ask a SINGLE, specific follow-up question based on ONE of their selections to get a unique detail.
-    c.  After they provide the unique detail, thank them and then offer to draft a 5-star review using their feedback.
-    d.  If they agree, create a unique, positive review incorporating BOTH the keywords and their unique detail. The review MUST be enclosed in double quotes. For example: "Here is your draft: \"This is the review text.\"".
-4.  **Negative Path ("It wasn't good."):**
-    a.  Start with empathy ("Oh no, I'm very sorry to hear that."). Ask what happened.
-    b.  After they explain, acknowledge and validate their feelings ("I understand why that would be frustrating. Thank you for letting us know."). Your PRIMARY goal is to offer a live chat handoff to a human manager.
-    c.  Your SECONDARY options are to leave a private message or, as the final, compliant choice, post a public review on Google.`;
+**RULE: ONLY RESPOND FOR THE IMMEDIATE NEXT STEP. DO NOT JUMP AHEAD.**
+
+**Conversation Flow:**
+1.  **Your VERY FIRST message is ALWAYS:** "Hi! I'm Alex, your digital concierge. How was your visit today?" The user will be shown buttons: "It was great!", "It was okay.", "It wasn't good."
+    
+2.  **IF the user replies "It was great!":**
+    Your response MUST be ONLY this: "That's wonderful to hear! What made your visit great today? (Tap all that apply)". The UI will show the keyword buttons.
+
+3.  **IF the user replies with a list of keywords (e.g., "Friendly Staff, Clean Office"):**
+    Your response MUST be a SINGLE follow-up question based on ONE of those keywords. For example: "Got it, thanks! To make your review more personal, what was great about the Friendly Staff?"
+
+4.  **IF the user replies with their personal detail (e.g., "The receptionist was so welcoming"):**
+    Your response MUST be ONLY this: "Thank you for sharing that! Would you like me to draft a 5-star review for you based on your feedback?"
+
+5.  **IF the user replies "Yes, draft it for me!":**
+    Your response MUST be a unique, positive review draft enclosed in double quotes. For example: "Here's a draft: \"The staff was so welcoming and the office was very clean. A great experience!\""
+
+6.  **IF the user replies "It wasn't good.":**
+    Your response MUST be ONLY this: "Oh no, I'm very sorry to hear that. Your feedback is important. Could you please tell me a bit about what happened?"`;
 
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
+  
+  // This part is for Google Gemini. If you are using OpenAI, you will need the OpenAI version.
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+  const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
 
   const { messages } = JSON.parse(event.body);
 
-  try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...messages,
-        ],
-        temperature: 0.7,
-      }),
-    });
-    
-    if (!response.ok) {
-        const errorData = await response.json();
-        console.error("OpenAI API Error:", errorData);
-        throw new Error("OpenAI API request failed.");
-    }
+  // The first message should just be the system prompt, not the whole history for the initial prompt.
+  const history = messages.map(msg => ({
+    role: msg.role === 'user' ? 'user' : 'model',
+    parts: [{ text: msg.content }],
+  }));
+  
+  // The user's latest message is what we'll send.
+  const lastMessage = history.pop(); 
 
-    const data = await response.json();
-    const aiMessage = data.choices[0].message;
+  try {
+    const chat = model.startChat({
+      history: history,
+      generationConfig: {
+        temperature: 0.2, // Lower temperature for more predictable, instruction-following behavior
+      },
+    });
+
+    const result = await chat.sendMessage(lastMessage.parts[0].text);
+    const response = result.response;
+    const aiText = response.text();
+    const aiMessage = { role: 'model', content: aiText };
 
     return {
       statusCode: 200,
       body: JSON.stringify({ message: aiMessage }),
     };
   } catch (error) {
-    console.error("Error calling OpenAI API:", error);
+    console.error("Error calling Gemini API:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "AI service is currently unavailable." }),
