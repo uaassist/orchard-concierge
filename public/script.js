@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // State Management
     let conversationHistory = [];
     let currentStep = 0;
-    const totalSteps = 4; // Approximate number of steps for progress bar
+    const totalSteps = 4;
 
     // IMPORTANT: Replace with your actual Google Place ID.
     const placeId = 'ChIJk8TcKznF1EARfDUKY8D6pgw'; 
@@ -14,9 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Core Functions ---
 
-    // Sends conversation history to the AI backend
     async function getAIResponse(userMessage) {
-        conversationHistory.push({ role: 'user', content: userMessage });
+        stepContainer.innerHTML = `<div class="prompt-text">Alex is thinking...</div>`; // Loading state
+        if (userMessage) {
+            conversationHistory.push({ role: 'user', content: userMessage });
+        }
         try {
             const response = await fetch('/api/concierge', {
                 method: 'POST',
@@ -36,20 +38,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Step Rendering Engine ---
 
-    // Fades out the old step, updates content, and fades in the new one
     function renderStep(prompt, optionsHtml) {
         stepContainer.classList.add('fade-out');
-        
         setTimeout(() => {
             stepContainer.innerHTML = `
                 <div class="prompt-text">${prompt}</div>
                 <div class="options-container">${optionsHtml}</div>
             `;
             stepContainer.classList.remove('fade-out');
-        }, 300); // Match this with CSS transition time
+        }, 300);
     }
 
-    // Updates the progress bar
     function updateProgress() {
         currentStep++;
         const progress = (currentStep / totalSteps) * 100;
@@ -58,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Specific Step Renderers ---
 
-    // Step 1: Initial Pulse Check
     function renderPulseCheckStep(prompt) {
         updateProgress();
         const options = ["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."];
@@ -68,18 +66,17 @@ document.addEventListener('DOMContentLoaded', () => {
         renderStep(prompt, optionsHtml);
     }
 
-    // Step 2: Multi-select keywords
-    function renderMultiSelectStep(prompt) {
+    async function renderMultiSelectStep() {
         updateProgress();
+        const aiResponse = await getAIResponse(conversationHistory[conversationHistory.length - 1].content);
         const keywords = ["✨ Friendly Staff", "🦷 Gentle Hygienist", "👍 Dr. Evans' Care", "🏢 Clean Office", "🕒 On-Time Appointment", "💬 Clear Explanations", "Other"];
         const optionsHtml = keywords.map(kw => 
             `<button class="survey-button" data-keyword="${kw}" onclick="toggleKeyword(this)">${kw}</button>`
         ).join('') + `<button class="action-button" onclick="handleMultiSelect()">Continue</button>`;
-        renderStep(prompt, optionsHtml);
+        renderStep(aiResponse, optionsHtml);
     }
     
-    // Step 3: Unique Spark Text Input
-    async function renderUniqueSparkStep(prompt, keywords) {
+    async function renderUniqueSparkStep(keywords) {
         updateProgress();
         const aiResponse = await getAIResponse(keywords);
         const optionsHtml = `
@@ -89,12 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
         renderStep(aiResponse, optionsHtml);
     }
 
-    // Step 4: Final AI Draft and Actions
     async function renderFinalDraftStep(spark) {
         updateProgress();
-        renderStep("Just a moment, I'm drafting your review... ✨", ''); // Loading state
         const aiResponse = await getAIResponse(spark);
-        
         const quoteRegex = /"(.*?)"/;
         const matches = aiResponse.match(quoteRegex);
         if (matches) {
@@ -108,18 +102,16 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             renderStep("Here's a draft based on your feedback. Feel free to edit it!", optionsHtml);
         } else {
-            renderStep("I had a little trouble creating a draft. Please try again.", '');
+            renderStep("Sorry, I had a little trouble creating a draft. Please let us know what you thought privately.", '<input type="text" class="survey-text-input" placeholder="Type your feedback here..."><button class="action-button">Submit</button>');
         }
     }
     
-    // --- Event Handlers (called from onclick in HTML) ---
+    // --- Event Handlers (exposed to global scope) ---
     
-    window.handlePulseCheck = async (choice) => {
-        const aiResponse = await getAIResponse(choice);
+    window.handlePulseCheck = (choice) => {
         if (choice.includes("great")) {
-            renderMultiSelectStep(aiResponse);
+            renderMultiSelectStep();
         } else {
-            // Handle neutral/negative paths here
             renderStep("Thank you for your feedback. We'll use it to improve.", '');
         }
     };
@@ -131,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.handleMultiSelect = () => {
         const selectedButtons = document.querySelectorAll('.survey-button.selected');
         const keywords = Array.from(selectedButtons).map(btn => btn.dataset.keyword).join(', ');
-        renderUniqueSparkStep(null, keywords);
+        renderUniqueSparkStep(keywords || "No specific highlights given");
     };
 
     window.handleUniqueSpark = () => {
@@ -147,11 +139,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const draftText = document.getElementById('review-draft-textarea').value;
         navigator.clipboard.writeText(draftText).then(() => {
             window.open(googleReviewUrl, '_blank');
-            renderStep("Thank you! I've copied the text and opened the Google review page for you.", '');
+            renderStep("Thank you for sharing! Your feedback helps other patients find us.", '');
         });
     };
 
     // --- Initial Load ---
-    conversationHistory.push({ role: 'model', content: "Hi! I'm Alex, your digital concierge. How was your visit today?" });
-    renderPulseCheckStep(conversationHistory[0].content);
+    function startSurvey() {
+        const initialPrompt = "Hi! I'm Alex, your digital concierge. How was your visit today?";
+        conversationHistory.push({ role: 'system', content: initialPrompt });
+        renderPulseCheckStep(initialPrompt);
+    }
+    
+    startSurvey();
 });
