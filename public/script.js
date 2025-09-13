@@ -4,37 +4,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendButton = document.getElementById('send-button');
     const quickRepliesContainer = document.getElementById('quick-replies-container');
     const inputRow = document.getElementById('input-row');
-
     let conversationHistory = [];
-    // IMPORTANT: Replace with your actual Google Place ID.
-    const placeId = 'ChIJk8TcKznF1EARfDUKY8D6pgw'; 
+    const placeId = 'ChIJk8TcKznF1EARfDUKY8D6pgw'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
     let selectedKeywords = [];
-
-    // Add a message to the chat UI
     function addMessage(sender, text, isHtml = false) {
         const wrapper = document.createElement('div');
         wrapper.className = `message-wrapper ${sender}`;
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
-        if (isHtml) {
-            bubble.innerHTML = text;
-        } else {
-            bubble.innerText = text;
-        }
+        if (isHtml) { bubble.innerHTML = text; } else { bubble.innerText = text; }
         wrapper.appendChild(bubble);
         chatBody.prepend(wrapper);
     }
-
-    // Send message to the AI backend
     async function sendMessage(content, isSilent = false) {
-        if (!isSilent) {
-            addMessage('user', content);
-        }
+        if (!isSilent) { addMessage('user', content); }
         conversationHistory.push({ role: 'user', content });
         clearQuickReplies();
         showTypingIndicator();
-
         try {
             const response = await fetch('/api/concierge', {
                 method: 'POST',
@@ -44,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('Network response was not ok.');
             const data = await response.json();
             const aiMessage = data.message;
-            
             conversationHistory.push(aiMessage);
             processAIResponse(aiMessage.content);
         } catch (error) {
@@ -52,22 +38,17 @@ document.addEventListener('DOMContentLoaded', () => {
             processAIResponse('Sorry, I seem to be having trouble connecting. Please try again later.');
         }
     }
-    
-    // Show a "typing..." indicator
     function showTypingIndicator() {
         if (document.querySelector('.typing-indicator')) return;
         const wrapper = document.createElement('div');
         wrapper.className = 'message-wrapper concierge typing-indicator';
-        wrapper.innerHTML = `<div class="bubble">...</div>`;
+        wrapper.innerHTML = `<div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
         chatBody.prepend(wrapper);
     }
-
     function removeTypingIndicator() {
         const indicator = document.querySelector('.typing-indicator');
         if (indicator) indicator.remove();
     }
-
-    // Process the AI's response to show buttons or special actions
     function processAIResponse(text, isInitialGreeting = false) {
         removeTypingIndicator();
         if (isInitialGreeting) {
@@ -75,10 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
             createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
             return;
         }
-        
         const quoteRegex = /"(.*?)"/;
         const matches = text.match(quoteRegex);
-        
         if (text.includes("Tap all that apply")) {
             addMessage('concierge', text);
             createMultiSelectButtons(["✨ Friendly Staff", "🦷 Gentle Hygienist", "👍 Dr. Evans' Care", "🏢 Clean Office", "🕒 On-Time Appointment", "💬 Clear Explanations", "Other"]);
@@ -89,13 +68,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const reviewText = matches[1];
             addMessage('concierge', "Here's a draft based on your feedback:");
             createEditableDraft(reviewText);
-        }
-         else {
+        } else {
             addMessage('concierge', text);
         }
     }
-    
-    // Creates the editable textarea
     function createEditableDraft(reviewText) {
         clearQuickReplies();
         const oldDraft = document.getElementById('review-draft-wrapper');
@@ -111,8 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessage('concierge', 'Feel free to edit it. When you\'re ready, just tap below.');
         createPostButtons();
     }
-
-    // Creates single-tap buttons
     function createQuickReplies(replies) {
         clearQuickReplies();
         inputRow.style.display = 'none';
@@ -124,13 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
             quickRepliesContainer.appendChild(button);
         });
     }
-    
-    // Creates multi-select buttons
     function createMultiSelectButtons(options) {
         clearQuickReplies();
         inputRow.style.display = 'none';
         selectedKeywords = [];
-
         options.forEach(optionText => {
             const button = document.createElement('button');
             button.className = 'quick-reply-btn';
@@ -145,7 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             quickRepliesContainer.appendChild(button);
         });
-        
         const continueButton = document.createElement('button');
         continueButton.className = 'quick-reply-btn continue-btn';
         continueButton.innerText = 'Continue';
@@ -155,8 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         quickRepliesContainer.appendChild(continueButton);
     }
-
-    // Creates the final post buttons
     function createPostButtons() {
         quickRepliesContainer.innerHTML = '';
         inputRow.style.display = 'none';
@@ -179,31 +147,13 @@ document.addEventListener('DOMContentLoaded', () => {
         quickRepliesContainer.appendChild(regenerateButton);
         quickRepliesContainer.appendChild(postButton);
     }
-
-    // Clear all quick reply buttons
     function clearQuickReplies() {
         quickRepliesContainer.innerHTML = '';
         inputRow.style.display = 'flex';
     }
-
-    // Event listeners for sending message
-    sendButton.addEventListener('click', () => {
-        if (chatInput.value.trim()) {
-            sendMessage(chatInput.value);
-            chatInput.value = '';
-        }
-    });
-    chatInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && chatInput.value.trim()) {
-            sendButton.click();
-        }
-    });
-    
-    // Initial greeting
+    sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { sendMessage(chatInput.value); chatInput.value = ''; } });
+    chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
     const initialGreeting = "Hi! I'm Alex, your digital concierge. How was your visit today?";
-    setTimeout(() => {
-        processAIResponse(initialGreeting, true); 
-    }, 1000);
+    setTimeout(() => { processAIResponse(initialGreeting, true); }, 1000);
     showTypingIndicator();
 });
-
