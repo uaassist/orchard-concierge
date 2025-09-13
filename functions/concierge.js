@@ -23,12 +23,13 @@ exports.handler = async function (event) {
     try {
         // Initialize Vertex with your project details
         const vertex_ai = new VertexAI({
-            project: process.env.GOOGLE_PROJECT_ID, // You will need to add this to Netlify
+            project: process.env.GOOGLE_PROJECT_ID,
             location: 'us-central1'
         });
 
         const model = 'gemini-1.0-pro'; // The model name for Vertex AI
 
+        // CORRECTED LINE:
         const generativeModel = vertex_ai.getGenerativeModel({ model: model });
 
         const { messages } = JSON.parse(event.body);
