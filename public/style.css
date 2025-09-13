@@ -34,3 +34,22 @@ body { font-family: var(--font-family); margin: 0; padding: 0; }
     font-size: 1em;
     resize: vertical; /* Allows user to resize it vertically */
 }
+/* Style for the multi-select buttons */
+.quick-reply-btn.selected {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+}
+
+/* Style for the new "Continue" button */
+.continue-btn {
+    margin: 10px 3px 3px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: none;
+    background: #28a745; /* A nice green color */
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    width: calc(100% - 6px); /* Make it full-width */
+}
