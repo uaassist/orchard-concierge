@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let conversationHistory = [];
     // IMPORTANT: Replace with your actual Google Place ID.
-    const placeId = 'Your_Google_Place_ID_Here'; 
+    const placeId = 'ChIJk8TcKznF1EARfDUKY8D6pgw'; 
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
     let selectedKeywords = [];
 
@@ -206,3 +206,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1000);
     showTypingIndicator();
 });
+
