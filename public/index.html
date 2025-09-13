@@ -7,31 +7,23 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- This is the main container for the chat widget -->
-    <div id="chat-container">
-        <!-- Simplified Header -->
-        <div id="chat-header">
-            <h1>Orchard Dental Concierge</h1>
-            <p>Powered by AI</p>
+    <!-- The main container now uses the "onboarding-container" class for the new style -->
+    <div class="onboarding-container">
+        <!-- This is our version of the persona header -->
+        <div class="persona-header">
+            <img src="https://ucarecdn.com/2008f119-a819-4d18-8fb4-1236ca14b8b8/ChatGPTImageMay22202502_03_10PMezgifcomresize.png" alt="Alex the Concierge" class="avatar">
+            <h2>Orchard Dental Concierge</h2>
         </div>
 
-        <!-- Messages will be injected here by script.js -->
-        <div id="chat-body"></div>
+        <!-- The chat body for messages -->
+        <div id="chat-body" class="chat-body-styled"></div>
 
-        <!-- Redesigned Input Area -->
-        <div id="chat-input-area">
+        <!-- The input area -->
+        <div id="chat-input-area" class="chat-input-area-styled">
             <div id="quick-replies-container"></div>
             <div id="input-row">
-                <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off">
-                <!-- SVG Icon for the send button -->
-                <button id="send-button" aria-label="Send Message">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
-                    </svg>
-                </button>
-            </div>
-            <div id="chat-footer">
-                Powered by Alex AI
+                <input type="text" id="chat-input" placeholder="Type a message..." class="input-field">
+                <button id="send-button" class="button primary" aria-label="Send Message">➤</button>
             </div>
         </div>
     </div>
