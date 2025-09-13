@@ -10,11 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const avatarUrl = 'https://ucarecdn.com/2008f119-a819-4d18-8fb4-1236ca14b8b8/ChatGPTImageMay22202502_03_10PMezgifcomresize.png';
     let selectedKeywords = [];
 
-    // UPDATED: Now adds the avatar for the concierge
     function addMessage(sender, text, isHtml = false) {
         const wrapper = document.createElement('div');
         wrapper.className = `message-wrapper ${sender}`;
-
         if (sender === 'concierge') {
             const avatarImg = document.createElement('img');
             avatarImg.src = avatarUrl;
@@ -22,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
             avatarImg.alt = 'Alex the Concierge';
             wrapper.appendChild(avatarImg);
         }
-
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
         if (isHtml) { bubble.innerHTML = text; } else { bubble.innerText = text; }
@@ -52,14 +49,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // UPDATED: Now shows the avatar next to the typing indicator
     function showTypingIndicator() {
         if (document.querySelector('.typing-indicator')) return;
         const wrapper = document.createElement('div');
         wrapper.className = 'message-wrapper concierge typing-indicator';
-        wrapper.innerHTML = `
-            <img src="${avatarUrl}" class="chat-avatar" alt="Alex typing">
-            <div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
+        wrapper.innerHTML = `<img src="${avatarUrl}" class="chat-avatar" alt="Alex typing"><div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
         chatBody.prepend(wrapper);
     }
     function removeTypingIndicator() {
@@ -67,9 +61,42 @@ document.addEventListener('DOMContentLoaded', () => {
         if (indicator) indicator.remove();
     }
 
+    // --- NEW & IMPROVED FUNCTION TO SPLIT MESSAGES ---
     function processAIResponse(text, isInitialGreeting = false) {
         removeTypingIndicator();
-        if (isInitialGreeting) {
+
+        // Regex to split a message into a statement and a follow-up question
+        const splitRegex = /(.*?[.!?])\s+(.*)/;
+        const parts = text.match(splitRegex);
+
+        // Check if the message can be split and is not the initial greeting
+        if (parts && parts.length === 3 && !isInitialGreeting) {
+            const statement = parts[1];
+            const question = parts[2];
+
+            // 1. Display the first part (the statement)
+            addMessage('concierge', statement);
+            
+            // 2. Wait, then show typing indicator
+            setTimeout(() => {
+                showTypingIndicator();
+                // 3. Wait a little more, then show the second part (the question)
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    // 4. Pass the question to a handler that shows the buttons
+                    handleFinalMessagePart(question);
+                }, 1200); // Realistic typing delay
+            }, 1000); // Pause before "typing"
+
+        } else {
+            // If it's the first message or can't be split, show it all at once
+            handleFinalMessagePart(text, isInitialGreeting);
+        }
+    }
+    
+    // This new handler contains the logic that used to be in processAIResponse
+    function handleFinalMessagePart(text, isInitialGreeting = false) {
+         if (isInitialGreeting) {
             addMessage('concierge', text);
             createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
             return;
@@ -90,6 +117,15 @@ document.addEventListener('DOMContentLoaded', () => {
             addMessage('concierge', text);
         }
     }
+    
+    function createEditableDraft(reviewText) { /* ... (This function is unchanged) ... */ }
+    function createQuickReplies(replies) { /* ... (This function is unchanged) ... */ }
+    function createMultiSelectButtons(options) { /* ... (This function is unchanged) ... */ }
+    function createPostButtons() { /* ... (This function is unchanged) ... */ }
+    function clearQuickReplies() { /* ... (This function is unchanged) ... */ }
+    
+    // --- The rest of the functions are unchanged. I'm including them for completeness ---
+    
     function createEditableDraft(reviewText) {
         clearQuickReplies();
         const oldDraft = document.getElementById('review-draft-wrapper');
@@ -144,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         quickRepliesContainer.appendChild(continueButton);
     }
     function createPostButtons() {
-        quickRepliesContainer.innerHTML = '';
+        clearQuickReplies();
         inputRow.style.display = 'none';
         const postButton = document.createElement('button');
         postButton.className = 'quick-reply-btn';
