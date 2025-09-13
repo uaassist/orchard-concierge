@@ -20,7 +20,7 @@ exports.handler = async function (event) {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
   const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
   const { messages } = JSON.parse(event.body);
   const history = messages.map(msg => ({
     role: msg.role === 'user' ? 'user' : 'model',
@@ -41,4 +41,5 @@ exports.handler = async function (event) {
     console.error("Error calling Gemini API:", error);
     return { statusCode: 500, body: JSON.stringify({ error: "AI service is currently unavailable." }) };
   }
+
 };
