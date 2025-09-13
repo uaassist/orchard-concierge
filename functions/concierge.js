@@ -20,7 +20,7 @@ exports.handler = async function (event) {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
   const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
   const { messages } = JSON.parse(event.body);
   const history = messages.map(msg => ({
     role: msg.role === 'user' ? 'user' : 'model',
@@ -43,3 +43,4 @@ exports.handler = async function (event) {
   }
 
 };
+
