@@ -101,4 +101,108 @@ document.addEventListener('DOMContentLoaded', () => {
         const oldDraft = document.getElementById('review-draft-wrapper');
         if(oldDraft) oldDraft.remove();
         const wrapper = document.createElement('div');
-        wrapper.id = 'revi
+        wrapper.id = 'review-draft-wrapper';
+        const textArea = document.createElement('textarea');
+        textArea.id = 'review-draft-textarea';
+        textArea.className = 'review-draft-textarea';
+        textArea.value = reviewText;
+        wrapper.appendChild(textArea);
+        chatBody.prepend(wrapper);
+        addMessage('concierge', 'Feel free to edit it. When you\'re ready, just tap below.');
+        createPostButtons();
+    }
+
+    // Creates single-tap buttons
+    function createQuickReplies(replies) {
+        clearQuickReplies();
+        inputRow.style.display = 'none';
+        replies.forEach(replyText => {
+            const button = document.createElement('button');
+            button.className = 'quick-reply-btn';
+            button.innerText = replyText;
+            button.onclick = () => { sendMessage(replyText); };
+            quickRepliesContainer.appendChild(button);
+        });
+    }
+    
+    // Creates multi-select buttons
+    function createMultiSelectButtons(options) {
+        clearQuickReplies();
+        inputRow.style.display = 'none';
+        selectedKeywords = [];
+
+        options.forEach(optionText => {
+            const button = document.createElement('button');
+            button.className = 'quick-reply-btn';
+            button.innerText = optionText;
+            button.onclick = () => {
+                button.classList.toggle('selected');
+                if (selectedKeywords.includes(optionText)) {
+                    selectedKeywords = selectedKeywords.filter(k => k !== optionText);
+                } else {
+                    selectedKeywords.push(optionText);
+                }
+            };
+            quickRepliesContainer.appendChild(button);
+        });
+        
+        const continueButton = document.createElement('button');
+        continueButton.className = 'quick-reply-btn continue-btn';
+        continueButton.innerText = 'Continue';
+        continueButton.onclick = () => {
+            const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No specific highlights";
+            sendMessage(combinedMessage);
+        };
+        quickRepliesContainer.appendChild(continueButton);
+    }
+
+    // Creates the final post buttons
+    function createPostButtons() {
+        quickRepliesContainer.innerHTML = '';
+        inputRow.style.display = 'none';
+        const postButton = document.createElement('button');
+        postButton.className = 'quick-reply-btn';
+        postButton.innerText = '✅ Post to Google';
+        postButton.onclick = () => {
+            const draftText = document.getElementById('review-draft-textarea').value;
+            navigator.clipboard.writeText(draftText).then(() => {
+                window.open(googleReviewUrl, '_blank');
+                addMessage('concierge', 'Great! I\'ve copied the text and opened the Google review page for you. Just paste the text and click post!');
+            });
+        };
+        const regenerateButton = document.createElement('button');
+        regenerateButton.className = 'quick-reply-btn';
+        regenerateButton.innerText = '🔄 Try another version';
+        regenerateButton.onclick = () => {
+             sendMessage("That wasn't quite right, please try another version.", true);
+        };
+        quickRepliesContainer.appendChild(regenerateButton);
+        quickRepliesContainer.appendChild(postButton);
+    }
+
+    // Clear all quick reply buttons
+    function clearQuickReplies() {
+        quickRepliesContainer.innerHTML = '';
+        inputRow.style.display = 'flex';
+    }
+
+    // Event listeners for sending message
+    sendButton.addEventListener('click', () => {
+        if (chatInput.value.trim()) {
+            sendMessage(chatInput.value);
+            chatInput.value = '';
+        }
+    });
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && chatInput.value.trim()) {
+            sendButton.click();
+        }
+    });
+    
+    // Initial greeting
+    const initialGreeting = "Hi! I'm Alex, your digital concierge. How was your visit today?";
+    setTimeout(() => {
+        processAIResponse(initialGreeting, true); 
+    }, 1000);
+    showTypingIndicator();
+});
