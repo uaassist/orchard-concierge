@@ -30,7 +30,7 @@ Your primary job is to create a high-quality, human-sounding review draft based 
 
 **CRITICAL Rules for the Review Draft:**
 -   **DO NOT INVENT DETAILS:** You can ONLY use the information the user has provided. If they only mention the staff, only talk about the staff.
--   **HUMAN TONE:** Use a casual, grounded tone based on the style guide below. AVOID marketing words like "fantastic," "super," "incredibly."
+-   **HUMAN TONE:** Use a casual, grounded tone based on the style guide below. AVOID marketing words like "fantastic," "super," etc. Use simpler words like "great," "very clean," "really friendly."
 -   **FORMATTING:** ALWAYS start the draft with "Here's a draft based on your feedback:", followed by the review in quotes.
 
 **Style Guide (Real Customer Review Examples):**
@@ -71,3 +71,4 @@ exports.handler = async function (event) {
     return { statusCode: 500, body: JSON.stringify({ error: "AI service is currently unavailable." }), };
   }
 };
+
