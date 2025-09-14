@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
-
 :root {
     --primary-color: #6C309C;      /* Your brand's purple */
     --secondary-color: #F0F2F5;   /* Light grey for secondary buttons/backgrounds */
@@ -8,92 +7,32 @@
     --background-color: #F9FAFB;   /* Background of the chat body */
     --border-color: #DDE2E7;       /* Border color */
 }
-
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: #E5E7EB;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    color: var(--text-dark);
-}
-
-/* --- Main Container --- */
-.onboarding-container {
-    max-width: 420px;
-    width: 100%;
-    height: 85vh;
-    max-height: 750px;
-    background-color: #fff;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-/* --- NEW: Company Logo Styling --- */
-.company-logo-container {
-    padding: 24px 24px 0 24px; /* Padding on top, none on bottom */
-    text-align: center;
-    border-bottom: 1px solid var(--border-color);
-}
-.company-logo {
-    max-height: 40px; /* Control the logo height */
-    width: auto;
-}
-
-/* --- Header Styling (Avatar is gone, so we adjust padding) --- */
-.persona-header {
-    text-align: center;
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--border-color);
-}
-.persona-header h2 {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0;
-    color: var(--text-dark);
-}
-
-/* --- Chat Body & Message Styling --- */
+body { font-family: 'Inter', sans-serif; background-color: #E5E7EB; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: var(--text-dark); }
+.onboarding-container { max-width: 420px; width: 100%; height: 85vh; max-height: 750px; background-color: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08); display: flex; flex-direction: column; overflow: hidden; }
+.company-logo-container { padding: 24px 24px 0 24px; text-align: center; border-bottom: 1px solid var(--border-color); }
+.company-logo { max-height: 40px; width: auto; }
+.persona-header { text-align: center; padding: 16px 24px; border-bottom: 1px solid var(--border-color); }
+.persona-header h2 { font-size: 18px; font-weight: 600; margin: 0; color: var(--text-dark); }
 .chat-body-styled { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column-reverse; background-color: var(--background-color); }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.message-wrapper { margin-bottom: 12px; display: flex; max-width: 100%; animation: fadeIn 0.3s ease-out; align-items: flex-end; /* Align avatar and bubble bottom */ }
+.message-wrapper { margin-bottom: 12px; display: flex; max-width: 100%; animation: fadeIn 0.3s ease-out; align-items: flex-end; }
 .concierge { justify-content: flex-start; }
 .user { justify-content: flex-end; }
-
-/* NEW: Chat Avatar Styling */
-.chat-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    margin-right: 12px;
-    flex-shrink: 0; /* Prevents avatar from shrinking */
-}
-
+.chat-avatar { width: 36px; height: 36px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
 .bubble { padding: 12px 16px; border-radius: 20px; max-width: 80%; line-height: 1.6; font-size: 16px; }
 .concierge .bubble { background: #E5E7EB; color: var(--text-dark); border-bottom-left-radius: 6px; }
 .user .bubble { background: var(--primary-color); color: white; border-bottom-right-radius: 6px; }
-
-/* --- Input Area Styling --- */
 .chat-input-area-styled { padding: 16px; border-top: 1px solid var(--border-color); background: #fff; }
 #input-row { display: flex; align-items: center; }
 .input-field { flex: 1; width: 100%; padding: 14px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; transition: border-color 0.2s, box-shadow 0.2s; }
 .input-field:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(108, 48, 156, 0.1); }
 #send-button { width: 48px; height: 48px; margin-left: 12px; border-radius: 8px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5em; background-color: var(--primary-color); color: #fff; border: none; cursor: pointer; }
 #send-button:hover { background-color: #59277d; }
-
-/* --- Button Styling (for Quick Replies) --- */
 #quick-replies-container { display: flex; flex-wrap: wrap; justify-content: flex-end; margin-bottom: 12px; }
 .quick-reply-btn { margin: 4px; padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); background: white; color: var(--text-dark); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
 .quick-reply-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
 .quick-reply-btn.selected { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 .continue-btn { background-color: var(--primary-color); color: white; font-weight: 600; flex-basis: 100%; margin-top: 8px; padding: 12px; font-size: 16px; border-radius: 8px; }
-
-/* --- Other --- */
 .review-draft-textarea { width: 100%; box-sizing: border-box; height: 120px; margin: 10px 0; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color); font-family: 'Inter', sans-serif; font-size: 16px; resize: vertical; }
 .typing-indicator .bubble { display: flex; align-items: center; padding: 12px 15px; }
 .dot { width: 8px; height: 8px; margin: 0 2px; background-color: #9CA3AF; border-radius: 50%; animation: bounce 1.3s infinite ease-in-out; }
