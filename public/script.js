@@ -16,17 +16,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function removeTypingIndicator() { /* ... (This function is unchanged) ... */ }
     function processAIResponse(text) { /* ... (This function is unchanged) ... */ }
     
-    // --- THIS FUNCTION IS NOW UPDATED ---
+    // --- THIS FUNCTION IS NOW CORRECTED ---
     function handleFinalMessagePart(text) {
          if (text.toLowerCase().includes("how was your visit today?")) {
             addMessage('concierge', text);
             createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
-         } else if (text.includes("Tap all that apply)")) { // For Tier 1 buttons
+         } else if (text.includes("What made your visit great today?")) { // TIER 1 TRIGGER
             addMessage('concierge', text);
-            createMultiSelectButtons(["✨ Friendly Staff", "🦷 Gentle Hygienist", "👍 Dr. Evans' Care", "🏢 Clean Office", "🕒 On-Time Appointment", "💬 Clear Explanations", "Other"]);
-         } else if (text.includes("what else stood out?")) { // For Tier 2 buttons
+            const tier1Options = ["✨ Friendly Staff", "🦷 Gentle Hygienist", "👍 Dr. Evans' Care", "🏢 Clean Office", "🕒 On-Time Appointment", "💬 Clear Explanations", "Other"];
+            createMultiSelectButtons(tier1Options);
+         } else if (text.includes("what else stood out?")) { // TIER 2 TRIGGER
             addMessage('concierge', text);
-            createMultiSelectButtons(["Advanced Technology", "Comfortable Environment", "Billing Was Easy", "Great with Kids"]);
+            const tier2Options = ["Advanced Technology", "Comfortable Environment", "Billing Was Easy", "Great with Kids", "No Other Highlights"];
+            createMultiSelectButtons(tier2Options);
          } else if (text.includes("draft a 5-star review")) {
              addMessage('concierge', text);
              createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
