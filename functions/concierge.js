@@ -4,12 +4,11 @@ const fetch = require('node-fetch');
 // IMPORTANT: Replace the text inside the backticks ` ` with your own 5-7 curated reviews.
 // Keep the formatting with a hyphen "-" before each review.
 const reviewExamples = `
-- "I get my cleanings done here and got a filling also. Always have such a great experience. Location is central, the facility is very nice and clean. The team is always welcoming and they clearly care about their patients. I definitely recommend!"
-- "Had a great experience. The facility is calm and pleasant. The staff are welcoming and professional. Treatment wise and with contacting the insurance. Went much better than I expected in every sense. Consider me a regular from now on"
-- "Everyone is very professional and friendly. Dentists and hygienists explain everything that’s happening and their causes. Assistants and receptionists are great and know how to navigate through your appointments. The clinic is super nice and clean. I moved to other side of the city and yet I keep coming back for appointments!"
-- "Alex has been my dental hygienist for many years now and she's been friendly, approachable, and professional every time I come in for a cleaning. I've got no complaints and only good things to say about the level of service I've received from everyone working here. The space itself always looks clean, they've got big TVs for when you're sitting in the chair (even affixed to the ceilings). Someone there decorated their window with a Raptors plush so whoever that is get bonus points from me."
-- "I would like to preface the following by stating that this is an honest, heartfelt and sincere review.
-I have walked passed 2000 Yonge Dental 100s of times as I only live 15 minutes away from the office. I always thought the office was beautiful and taken aback at how immaculate everything was at all times.
+1. "I get my cleanings done here and got a filling also. Always have such a great experience. Location is central, the facility is very nice and clean. The team is always welcoming and they clearly care about their patients. I definitely recommend!"
+2. "Had a great experience. The facility is calm and pleasant. The staff are welcoming and professional. Treatment wise and with contacting the insurance. Went much better than I expected in every sense. Consider me a regular from now on"
+3. "Everyone is very professional and friendly. Dentists and hygienists explain everything that’s happening and their causes. Assistants and receptionists are great and know how to navigate through your appointments. The clinic is super nice and clean. I moved to other side of the city and yet I keep coming back for appointments!"
+4. "Alex has been my dental hygienist for many years now and she's been friendly, approachable, and professional every time I come in for a cleaning. I've got no complaints and only good things to say about the level of service I've received from everyone working here. The space itself always looks clean, they've got big TVs for when you're sitting in the chair (even affixed to the ceilings). Someone there decorated their window with a Raptors plush so whoever that is get bonus points from me."
+5. "I would like to preface the following by stating that this is an honest, heartfelt and sincere review.I have walked passed 2000 Yonge Dental 100s of times as I only live 15 minutes away from the office. I always thought the office was beautiful and taken aback at how immaculate everything was at all times.
 My teeth used to be my crowning glory until 2 accidents knocked out my 2 teeth on top and then 2 teeth on the bottom. My teeth started to shift so severely due to the missing teeth. As well, due to several rounds of chemotherapy, a multitude of medications and unfortunately 30 years of anorexia my oral health was in extremely bad shape. I had an upper and bottom plate made quickly by another dentist to replace my 4 missing teeth. I had completely lost all self confidence and I was in a lot of pain.
 One day I decided to walk into 2000 Yonge Dental to inquire about their services. The receptionist is an absolute delight and I made an appointment for a consultation. This is when I met the outstanding Dr. Cott.
 From the very first consultation up to and including the extensive work I had done, Dr. Cott explained in detail every procedure. While the work was being done Dr. Cott described
@@ -21,32 +20,20 @@ I highly and wholeheartedly recommend 2000 Yonge Dental for any and all your den
 Thank you Dr. Cott et al for giving me back my life. I am forever grateful."
 `;
 
-// --- FINAL, CORRECTED SYSTEM PROMPT WITH A HUMAN PERSONA & STYLE GUIDE ---
-const systemPrompt = `You are "Alex," a friendly and helpful digital concierge for "Orchard Dental Care."
+// --- THE NEW SYSTEM PROMPT ---
+const systemPrompt = `You are "Alex," a friendly and professional digital concierge for "Orchard Dental Care." You have two modes: Analysis Mode and Conversation Mode.
 
-**Your Persona & Style Guide:**
-- Act like a real person writing a helpful review, not a robot or a marketer.
-- Your primary goal is to match the style, tone, and vocabulary of the real customer reviews provided below. This is your style guide. Use it as inspiration for sentence structure and word choice.
-- Use a casual, friendly, and authentic tone. Be sincere.
-- Use contractions like "it's" and "I'd".
+**Analysis Mode:**
+If the user's message is "INITIATE_ANALYSIS", your ONLY job is to analyze the following 5 real customer reviews. Extract the 6 most common positive themes. Your response MUST be a single line of text containing exactly 6 themes, separated by a pipe character "|". Add a relevant emoji to the start of each theme.
+Example Response: ✨ Friendly Staff|🏢 Clean & Modern Office|🕒 On-Time Appointment|🦷 Gentle Cleaning|💬 Clear Explanations|😌 Felt Comfortable
 
-**Real Customer Review Examples (Your Style Guide):**
-${reviewExamples}
+**Real Customer Reviews for Analysis:**
+${curatedReviews}
 
-**Your Task:**
-When a user provides you with positive keywords (like "Friendly Staff, Gentle Hygienist") and a specific detail (like "Dr. Evans was very reassuring"), your ONLY job is to combine these points into a short, natural-sounding review draft that perfectly matches the style of the examples provided.
-
-**CRITICAL Rules for the Review Draft:**
--   **DO NOT** use overly formal or "marketing" words like "immaculately," "exceptional," "top-notch," "additionally," or "ensuring."
--   **ALWAYS** start the review draft with "Here's a draft based on your feedback:", followed by the review in quotes. For example: Here's a draft based on your feedback: "This place was great..."
-
-**Your Conversational Flow (DO NOT change this):**
-You also have a secondary job of guiding the user. Follow this flow precisely:
-1.  **Opening:** Start with: "Hi! I'm Alex, your digital concierge.|How was your visit today?"
-2.  **Positive Path:** If the user says their visit was great, respond with: "That's great to hear! 🙂|What made your visit great today? (Tap all that apply)"
-3.  **Acknowledge Keywords & Ask for Detail:** After they select keywords, acknowledge them and ask for a detail. Example: "Okay, got it. Friendly Staff and Dr. Evans' Care. Thanks!|To make the draft more personal, what stood out about Dr. Evans' care?"
-4.  **Offer to Draft:** After they give the detail, respond with: "Perfect, thank you for sharing that!|Would you like me to draft a review for you based on your feedback?"
-5.  **Negative Path:** If the visit was not good, respond with empathy and offer to connect them to a manager, always using the "|" separator before the question.`;
+**Conversation Mode (Default):**
+This is your normal mode. Your goal is to be an "active listener" and guide the user through a feedback process. Follow the conversational flow and formatting rules precisely.
+- **CRITICAL FORMATTING RULE:** Separate statements from questions with a pipe character "|".
+- **FLOW:** Start with the opening, then follow the positive or negative path based on user input. Acknowledge their selected keywords (pillars), ask for a specific detail, and then offer to draft a review.`;
 
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
@@ -58,9 +45,9 @@ exports.handler = async function (event) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, },
       body: JSON.stringify({
-        model: 'gpt-4-turbo',
+        model: 'gpt-4-turbo', // A powerful model is needed for the analysis task
         messages: [ { role: 'system', content: systemPrompt }, ...messages, ],
-        temperature: 0.8,
+        temperature: 0.5, // Lower temperature for more consistent analysis
       }),
     });
     if (!response.ok) { const errorData = await response.json(); console.error("OpenAI API Error:", errorData); throw new Error("OpenAI API request failed."); }
