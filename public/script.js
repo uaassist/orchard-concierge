@@ -10,37 +10,64 @@ document.addEventListener('DOMContentLoaded', () => {
     const avatarUrl = 'https://ucarecdn.com/2008f119-a819-4d18-8fb4-1236ca14b8b8/ChatGPTImageMay22202502_03_10PMezgifcomresize.png';
     let selectedKeywords = [];
 
-    // --- THIS FUNCTION IS NOW CORRECTED ---
-    function handleFinalMessagePart(text) {
-         if (text.toLowerCase().includes("how was your visit today?")) {
-            addMessage('concierge', text);
-            createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
-         } else if (text.includes("What made your visit great today?")) {
-            addMessage('concierge', text);
-            const tier1Options = ["✨ Friendly Staff", "🦷 Gentle Hygienist", "👍 Dr. Evans' Care", "🏢 Clean Office", "🕒 On-Time Appointment", "💬 Clear Explanations", "Other"];
-            createMultiSelectButtons(tier1Options);
-         } else if (text.includes("what else stood out?")) {
-            addMessage('concierge', text);
-            // THIS LINE IS NOW CORRECTED WITH EMOJIS
-            const tier2Options = ["🤖 Advanced Technology", "🛋️ Comfortable Environment", "💳 Billing Was Easy", "🧸 Great with Kids", "👍 No Other Highlights"];
-            createMultiSelectButtons(tier2Options);
-         } else if (text.includes("draft a 5-star review")) {
-             addMessage('concierge', text);
-             createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
-         } else {
-            const quoteRegex = /"(.*?)"/;
-            const matches = text.match(quoteRegex);
-            if (matches && matches[1].length > 10) {
-                const reviewText = matches[1];
-                addMessage('concierge', "Here's a draft based on your feedback:");
-                createEditableDraft(reviewText);
-            } else {
-                addMessage('concierge', text);
-            }
-        }
-    }
+    function addMessage(sender, text, isHtml = false) { /* ... (This function is unchanged) ... */ }
+    async function sendMessage(content, isSilent = false) { /* ... (This function is unchanged) ... */ }
+    function showTypingIndicator() { /* ... (This function is unchanged) ... */ }
+    function removeTypingIndicator() { /* ... (This function is unchanged) ... */ }
+    function processAIResponse(text) { /* ... (This function is unchanged) ... */ }
+    function handleFinalMessagePart(text) { /* ... (This function is unchanged) ... */ }
+    function createEditableDraft(reviewText) { /* ... (This function is unchanged) ... */ }
+    
+    // --- THIS FUNCTION IS NOW UPDATED ---
+    function createMultiSelectButtons(options) {
+        clearQuickReplies();
+        inputRow.style.display = 'none';
+        selectedKeywords = [];
 
-    // --- The rest of the file is unchanged. I'm including it for completeness ---
+        options.forEach(optionText => {
+            const button = document.createElement('button');
+            button.className = 'quick-reply-btn';
+            button.innerText = optionText;
+            button.onclick = () => {
+                // NEW: Special handling for the "Other" button
+                if (optionText === "Other") {
+                    addMessage('user', 'Other'); // Show user's tap in the chat
+                    // Immediately show the next set of options without contacting the AI
+                    const tier2Options = ["🤖 Advanced Technology", "🛋️ Comfortable Environment", "💳 Billing Was Easy", "🧸 Great with Kids", "👍 No Other Highlights"];
+                    createMultiSelectButtons(tier2Options);
+                    return; // Stop further execution
+                }
+
+                button.classList.toggle('selected');
+                if (selectedKeywords.includes(optionText)) {
+                    selectedKeywords = selectedKeywords.filter(k => k !== optionText);
+                } else {
+                    selectedKeywords.push(optionText);
+                }
+            };
+            quickRepliesContainer.appendChild(button);
+        });
+        
+        const continueButton = document.createElement('button');
+        continueButton.className = 'quick-reply-btn continue-btn';
+        continueButton.innerText = 'Continue';
+        continueButton.onclick = () => {
+            const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No Other Highlights";
+            // If the user selected "No Other Highlights", send that message and skip to the draft offer
+            if (combinedMessage === "No Other Highlights") {
+                sendMessage("Okay, just those highlights then.", true); // Send silent message to advance AI state
+            } else {
+                sendMessage(combinedMessage);
+            }
+        };
+        quickRepliesContainer.appendChild(continueButton);
+    }
+    
+    function createQuickReplies(replies) { /* ... (This function is unchanged) ... */ }
+    function createPostButtons() { /* ... (This function is unchanged) ... */ }
+    function clearQuickReplies() { /* ... (This function is unchanged) ... */ }
+    
+    // --- The rest of the functions are unchanged. I'm including them for completeness ---
     
     function addMessage(sender, text, isHtml = false) {
         const wrapper = document.createElement('div');
@@ -108,6 +135,33 @@ document.addEventListener('DOMContentLoaded', () => {
             handleFinalMessagePart(text);
         }
     }
+    function handleFinalMessagePart(text) {
+         if (text.toLowerCase().includes("how was your visit today?")) {
+            addMessage('concierge', text);
+            createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
+         } else if (text.includes("What made your visit great today?")) {
+            addMessage('concierge', text);
+            const tier1Options = ["✨ Friendly Staff", "🦷 Gentle Hygienist", "👍 Dr. Evans' Care", "🏢 Clean Office", "🕒 On-Time Appointment", "💬 Clear Explanations", "Other"];
+            createMultiSelectButtons(tier1Options);
+         } else if (text.includes("what else stood out?")) {
+            addMessage('concierge', text);
+            const tier2Options = ["🤖 Advanced Technology", "🛋️ Comfortable Environment", "💳 Billing Was Easy", "🧸 Great with Kids", "👍 No Other Highlights"];
+            createMultiSelectButtons(tier2Options);
+         } else if (text.includes("draft a 5-star review")) {
+             addMessage('concierge', text);
+             createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
+         } else {
+            const quoteRegex = /"(.*?)"/;
+            const matches = text.match(quoteRegex);
+            if (matches && matches[1].length > 10) {
+                const reviewText = matches[1];
+                addMessage('concierge', "Here's a draft based on your feedback:");
+                createEditableDraft(reviewText);
+            } else {
+                addMessage('concierge', text);
+            }
+        }
+    }
     function createEditableDraft(reviewText) {
         clearQuickReplies();
         const oldDraft = document.getElementById('review-draft-wrapper');
@@ -133,37 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
             button.onclick = () => { sendMessage(replyText); };
             quickRepliesContainer.appendChild(button);
         });
-    }
-    function createMultiSelectButtons(options) {
-        clearQuickReplies();
-        inputRow.style.display = 'none';
-        selectedKeywords = [];
-        options.forEach(optionText => {
-            const button = document.createElement('button');
-            button.className = 'quick-reply-btn';
-            button.innerText = optionText;
-            button.onclick = () => {
-                if (optionText === "Other") {
-                    sendMessage("Other");
-                    return;
-                }
-                button.classList.toggle('selected');
-                if (selectedKeywords.includes(optionText)) {
-                    selectedKeywords = selectedKeywords.filter(k => k !== optionText);
-                } else {
-                    selectedKeywords.push(optionText);
-                }
-            };
-            quickRepliesContainer.appendChild(button);
-        });
-        const continueButton = document.createElement('button');
-        continueButton.className = 'quick-reply-btn continue-btn';
-        continueButton.innerText = 'Continue';
-        continueButton.onclick = () => {
-            const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No Other Highlights";
-            sendMessage(combinedMessage);
-        };
-        quickRepliesContainer.appendChild(continueButton);
     }
     function createPostButtons() {
         clearQuickReplies();
@@ -193,6 +216,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { sendMessage(chatInput.value); chatInput.value = ''; } });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
+    
+    // Initial greeting
     setTimeout(() => {
         sendMessage("Hello", true);
     }, 500);
