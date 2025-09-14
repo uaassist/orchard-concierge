@@ -5,20 +5,51 @@ document.addEventListener('DOMContentLoaded', () => {
     const quickRepliesContainer = document.getElementById('quick-replies-container');
     const inputRow = document.getElementById('input-row');
     let conversationHistory = [];
-    const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
+    const placeId = 'ChIJk8TcKznF1EARfDUKY8D6pgw'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
     const avatarUrl = 'https://ucarecdn.com/2008f119-a819-4d18-8fb4-1236ca14b8b8/ChatGPTImageMay22202502_03_10PMezgifcomresize.png';
     let selectedKeywords = [];
 
-    function addMessage(sender, text, isHtml = false) { /* ... (This function is unchanged) ... */ }
-    async function sendMessage(content, isSilent = false) { /* ... (This function is unchanged) ... */ }
-    function showTypingIndicator() { /* ... (This function is unchanged) ... */ }
-    function removeTypingIndicator() { /* ... (This in unchanged) ... */ }
+    function addMessage(sender, text, isHtml = false) { /* ... (Unchanged) ... */ }
+    async function sendMessage(content, isSilent = false) { /* ... (Unchanged) ... */ }
+    function showTypingIndicator() { /* ... (Unchanged) ... */ }
+    function removeTypingIndicator() { /* ... (Unchanged) ... */ }
+    function createEditableDraft(reviewText) { /* ... (Unchanged) ... */ }
+    function createQuickReplies(replies) { /* ... (Unchanged) ... */ }
+    function createMultiSelectButtons(options) { /* ... (Unchanged) ... */ }
+    function createPostButtons() { /* ... (Unchanged) ... */ }
+    function clearQuickReplies() { /* ... (Unchanged) ... */ }
 
-    // --- THIS FUNCTION IS NOW CORRECTED ---
-    function processAIResponse(text) {
+    // --- UPDATED LOGIC FOR DYNAMIC PILLARS ---
+    async function initiateConversation() {
+        showTypingIndicator();
+        try {
+            // Step 1: Secretly ask the AI to perform the analysis
+            const analysisResponse = await fetch('/api/concierge', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messages: [{ role: 'user', content: 'INITIATE_ANALYSIS' }]
+                }),
+            });
+            if (!analysisResponse.ok) throw new Error('Analysis request failed.');
+            const analysisData = await analysisResponse.json();
+            const pillars = analysisData.message.content.split('|').map(p => p.trim());
+
+            // Step 2: Now, start the actual conversation with the user
+            const initialGreeting = "Hi! I'm Alex, your digital concierge.|How was your visit today?";
+            conversationHistory.push({ role: 'model', content: initialGreeting });
+            processAIResponse(initialGreeting, pillars); // Pass the pillars to the processor
+
+        } catch (error) {
+            console.error("Initiation Error:", error);
+            removeTypingIndicator();
+            addMessage('concierge', 'Sorry, I\'m having a little trouble getting started. Please try refreshing the page.');
+        }
+    }
+    
+    function processAIResponse(text, pillars = null) {
         removeTypingIndicator();
-
         if (text.includes("|")) {
             const parts = text.split('|');
             const statement = parts[0].trim();
@@ -28,15 +59,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 showTypingIndicator();
                 setTimeout(() => {
                     removeTypingIndicator();
-                    handleFinalMessagePart(question);
+                    handleFinalMessagePart(question, pillars);
                 }, 1200);
             }, 1000);
         } else {
-            handleFinalMessagePart(text);
+            handleFinalMessagePart(text, pillars);
         }
     }
     
-    function handleFinalMessagePart(text) {
+    function handleFinalMessagePart(text, pillars = null) {
         const quoteRegex = /"(.*?)"/;
         const matches = text.match(quoteRegex);
         if (text.toLowerCase().includes("how was your visit today?")) {
@@ -44,7 +75,12 @@ document.addEventListener('DOMContentLoaded', () => {
             createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
         } else if (text.includes("Tap all that apply")) {
             addMessage('concierge', text);
-            createMultiSelectButtons(["✨ Friendly Staff", "🦷 Gentle Hygienist", "👍 Dr. Evans' Care", "🏢 Clean Office", "🕒 On-Time Appointment", "💬 Clear Explanations", "Other"]);
+            if (pillars) {
+                createMultiSelectButtons(pillars); // Use the dynamically generated pillars
+            } else {
+                // Fallback in case analysis fails
+                createMultiSelectButtons(["✨ Friendly Staff", "🦷 Gentle Cleaning", "Other"]);
+            }
         } else if (text.includes("draft a 5-star review")) {
              addMessage('concierge', text);
              createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
@@ -56,12 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
             addMessage('concierge', text);
         }
     }
-    
-    function createEditableDraft(reviewText) { /* ... (This function is unchanged) ... */ }
-    function createQuickReplies(replies) { /* ... (This function is unchanged) ... */ }
-    function createMultiSelectButtons(options) { /* ... (This function is unchanged) ... */ }
-    function createPostButtons() { /* ... (This function is unchanged) ... */ }
-    function clearQuickReplies() { /* ... (This function is unchanged) ... */ }
     
     // --- The rest of the functions are unchanged. I'm including them for completeness ---
     
@@ -195,11 +225,6 @@ document.addEventListener('DOMContentLoaded', () => {
     sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { sendMessage(chatInput.value); chatInput.value = ''; } });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
     
-    // Initial greeting
-    setTimeout(() => {
-        // Send a "silent" message to the AI to get the initial greeting
-        // The user won't see this message, but it starts the conversation
-        sendMessage("Hello", true);
-    }, 500);
-    showTypingIndicator();
+    // --- UPDATED INITIALIZATION ---
+    initiateConversation();
 });
