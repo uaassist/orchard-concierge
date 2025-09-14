@@ -28,23 +28,48 @@ document.addEventListener('DOMContentLoaded', () => {
             const button = document.createElement('button');
             button.className = 'quick-reply-btn';
             button.innerText = optionText;
-            button.onclick = () => {
-                // NEW: Special handling for the "Other" button
-                if (optionText === "Other") {
+            
+            // NEW: Special handling for the "Other" button
+            if (optionText === "Other") {
+                button.onclick = () => {
                     addMessage('user', 'Other'); // Show user's tap in the chat
-                    // Immediately show the next set of options without contacting the AI
-                    const tier2Options = ["🤖 Advanced Technology", "🛋️ Comfortable Environment", "💳 Billing Was Easy", "🧸 Great with Kids", "👍 No Other Highlights"];
-                    createMultiSelectButtons(tier2Options);
-                    return; // Stop further execution
-                }
+                    button.style.display = 'none'; // Hide the "Other" button
+                    
+                    showTypingIndicator(); // Show "thinking" animation
 
-                button.classList.toggle('selected');
-                if (selectedKeywords.includes(optionText)) {
-                    selectedKeywords = selectedKeywords.filter(k => k !== optionText);
-                } else {
-                    selectedKeywords.push(optionText);
-                }
-            };
+                    setTimeout(() => {
+                        removeTypingIndicator();
+                        const tier2Options = ["🤖 Advanced Technology", "🛋️ Comfortable Environment", "💳 Billing Was Easy", "🧸 Great with Kids"];
+                        const continueButton = document.querySelector('.continue-btn');
+
+                        tier2Options.forEach(tier2Text => {
+                            const newButton = document.createElement('button');
+                            newButton.className = 'quick-reply-btn';
+                            newButton.innerText = tier2Text;
+                            newButton.onclick = () => {
+                                newButton.classList.toggle('selected');
+                                if (selectedKeywords.includes(tier2Text)) {
+                                    selectedKeywords = selectedKeywords.filter(k => k !== tier2Text);
+                                } else {
+                                    selectedKeywords.push(tier2Text);
+                                }
+                            };
+                            // Insert the new buttons before the "Continue" button
+                            quickRepliesContainer.insertBefore(newButton, continueButton);
+                        });
+                    }, 800); // A short delay to simulate thinking
+                };
+            } else {
+                // Standard logic for all other buttons
+                button.onclick = () => {
+                    button.classList.toggle('selected');
+                    if (selectedKeywords.includes(optionText)) {
+                        selectedKeywords = selectedKeywords.filter(k => k !== optionText);
+                    } else {
+                        selectedKeywords.push(optionText);
+                    }
+                };
+            }
             quickRepliesContainer.appendChild(button);
         });
         
@@ -52,13 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
         continueButton.className = 'quick-reply-btn continue-btn';
         continueButton.innerText = 'Continue';
         continueButton.onclick = () => {
-            const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No Other Highlights";
-            // If the user selected "No Other Highlights", send that message and skip to the draft offer
-            if (combinedMessage === "No Other Highlights") {
-                sendMessage("Okay, just those highlights then.", true); // Send silent message to advance AI state
-            } else {
-                sendMessage(combinedMessage);
-            }
+            const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No specific highlights";
+            sendMessage(combinedMessage);
         };
         quickRepliesContainer.appendChild(continueButton);
     }
@@ -143,10 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
             addMessage('concierge', text);
             const tier1Options = ["✨ Friendly Staff", "🦷 Gentle Hygienist", "👍 Dr. Evans' Care", "🏢 Clean Office", "🕒 On-Time Appointment", "💬 Clear Explanations", "Other"];
             createMultiSelectButtons(tier1Options);
-         } else if (text.includes("what else stood out?")) {
-            addMessage('concierge', text);
-            const tier2Options = ["🤖 Advanced Technology", "🛋️ Comfortable Environment", "💳 Billing Was Easy", "🧸 Great with Kids", "👍 No Other Highlights"];
-            createMultiSelectButtons(tier2Options);
          } else if (text.includes("draft a 5-star review")) {
              addMessage('concierge', text);
              createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
