@@ -10,15 +10,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const avatarUrl = 'https://ucarecdn.com/2008f119-a819-4d18-8fb4-1236ca14b8b8/ChatGPTImageMay22202502_03_10PMezgifcomresize.png';
     let selectedKeywords = [];
 
-    function addMessage(sender, text, isHtml = false) { /* ... (This function is unchanged) ... */ }
-    async function sendMessage(content, isSilent = false) { /* ... (This function is unchanged) ... */ }
-    function showTypingIndicator() { /* ... (This function is unchanged) ... */ }
-    function removeTypingIndicator() { /* ... (This function is unchanged) ... */ }
-    function processAIResponse(text) { /* ... (This function is unchanged) ... */ }
-    function handleFinalMessagePart(text) { /* ... (This function is unchanged) ... */ }
-    function createEditableDraft(reviewText) { /* ... (This function is unchanged) ... */ }
-    
-    // --- THIS FUNCTION IS NOW UPDATED ---
+    // --- THIS FUNCTION IS NOW CORRECTED ---
+    function handleFinalMessagePart(text) {
+         if (text.toLowerCase().includes("how was your visit today?")) {
+            addMessage('concierge', text);
+            createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
+         } else if (text.includes("What made your visit great today?")) {
+            addMessage('concierge', text);
+            // THIS LINE IS NOW CORRECTED WITH "More options"
+            const tier1Options = ["✨ Friendly Staff", "🦷 Gentle Hygienist", "👍 Dr. Evans' Care", "🏢 Clean Office", "🕒 On-Time Appointment", "💬 Clear Explanations", "➡️ More options"];
+            createMultiSelectButtons(tier1Options);
+         } else if (text.includes("what else stood out?")) {
+            addMessage('concierge', text);
+            const tier2Options = ["🤖 Advanced Technology", "🛋️ Comfortable Environment", "💳 Billing Was Easy", "🧸 Great with Kids", "👍 No Other Highlights"];
+            createMultiSelectButtons(tier2Options);
+         } else if (text.includes("draft a 5-star review")) {
+             addMessage('concierge', text);
+             createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
+         } else {
+            const quoteRegex = /"(.*?)"/;
+            const matches = text.match(quoteRegex);
+            if (matches && matches[1].length > 10) {
+                const reviewText = matches[1];
+                addMessage('concierge', "Here's a draft based on your feedback:");
+                createEditableDraft(reviewText);
+            } else {
+                addMessage('concierge', text);
+            }
+        }
+    }
+
+    // --- UPDATED to handle the new button text ---
     function createMultiSelectButtons(options) {
         clearQuickReplies();
         inputRow.style.display = 'none';
@@ -29,19 +51,16 @@ document.addEventListener('DOMContentLoaded', () => {
             button.className = 'quick-reply-btn';
             button.innerText = optionText;
             
-            // NEW: Special handling for the "Other" button
-            if (optionText === "Other") {
+            // This now checks for the new button text
+            if (optionText === "➡️ More options") {
                 button.onclick = () => {
-                    addMessage('user', 'Other'); // Show user's tap in the chat
-                    button.style.display = 'none'; // Hide the "Other" button
-                    
-                    showTypingIndicator(); // Show "thinking" animation
-
+                    addMessage('user', 'More options'); 
+                    button.style.display = 'none'; 
+                    showTypingIndicator(); 
                     setTimeout(() => {
                         removeTypingIndicator();
                         const tier2Options = ["🤖 Advanced Technology", "🛋️ Comfortable Environment", "💳 Billing Was Easy", "🧸 Great with Kids"];
                         const continueButton = document.querySelector('.continue-btn');
-
                         tier2Options.forEach(tier2Text => {
                             const newButton = document.createElement('button');
                             newButton.className = 'quick-reply-btn';
@@ -54,13 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                     selectedKeywords.push(tier2Text);
                                 }
                             };
-                            // Insert the new buttons before the "Continue" button
                             quickRepliesContainer.insertBefore(newButton, continueButton);
                         });
-                    }, 800); // A short delay to simulate thinking
+                    }, 800);
                 };
             } else {
-                // Standard logic for all other buttons
                 button.onclick = () => {
                     button.classList.toggle('selected');
                     if (selectedKeywords.includes(optionText)) {
@@ -77,15 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
         continueButton.className = 'quick-reply-btn continue-btn';
         continueButton.innerText = 'Continue';
         continueButton.onclick = () => {
-            const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No specific highlights";
+            const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No Other Highlights";
             sendMessage(combinedMessage);
         };
         quickRepliesContainer.appendChild(continueButton);
     }
-    
-    function createQuickReplies(replies) { /* ... (This function is unchanged) ... */ }
-    function createPostButtons() { /* ... (This function is unchanged) ... */ }
-    function clearQuickReplies() { /* ... (This function is unchanged) ... */ }
     
     // --- The rest of the functions are unchanged. I'm including them for completeness ---
     
@@ -155,29 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
             handleFinalMessagePart(text);
         }
     }
-    function handleFinalMessagePart(text) {
-         if (text.toLowerCase().includes("how was your visit today?")) {
-            addMessage('concierge', text);
-            createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
-         } else if (text.includes("What made your visit great today?")) {
-            addMessage('concierge', text);
-            const tier1Options = ["✨ Friendly Staff", "🦷 Gentle Hygienist", "👍 Dr. Evans' Care", "🏢 Clean Office", "🕒 On-Time Appointment", "💬 Clear Explanations", "Other"];
-            createMultiSelectButtons(tier1Options);
-         } else if (text.includes("draft a 5-star review")) {
-             addMessage('concierge', text);
-             createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
-         } else {
-            const quoteRegex = /"(.*?)"/;
-            const matches = text.match(quoteRegex);
-            if (matches && matches[1].length > 10) {
-                const reviewText = matches[1];
-                addMessage('concierge', "Here's a draft based on your feedback:");
-                createEditableDraft(reviewText);
-            } else {
-                addMessage('concierge', text);
-            }
-        }
-    }
     function createEditableDraft(reviewText) {
         clearQuickReplies();
         const oldDraft = document.getElementById('review-draft-wrapper');
@@ -232,8 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { sendMessage(chatInput.value); chatInput.value = ''; } });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
-    
-    // Initial greeting
     setTimeout(() => {
         sendMessage("Hello", true);
     }, 500);
