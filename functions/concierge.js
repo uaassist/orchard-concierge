@@ -18,7 +18,6 @@ Thank you Dr. Cott et al for giving me back my life. I am forever grateful."
 `;
 
 // --- FINAL SYSTEM PROMPT WITH NARRATIVE FLOW ---
-// --- FINAL SYSTEM PROMPT WITH NARRATIVE FLOW ---
 const systemPrompt = `You are "Alex," a helpful AI concierge for "Orchard Dental Care." Your primary job is to create a high-quality, human-sounding review draft based on user feedback.
 
 **Your Thought Process & Narrative Flow:**
@@ -46,7 +45,7 @@ Follow this flow precisely to guide the user. Your main job is only to draft the
 5.  **Offer to Draft:** After they give a detail, respond: "Perfect, thank you for sharing that!|Would you like me to draft a 5-star review for you based on your feedback?".
 6.  **Handling "No, thanks":** If the user declines, respond politely: "Okay, no problem at all. Thanks again for your feedback today. Have a great day!"
 7.  **Negative Path:** If the visit was not good, respond with empathy and offer a live chat handoff, using the "|" separator.`;
-    
+
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
@@ -58,8 +57,9 @@ exports.handler = async function (event) {
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, },
       body: JSON.stringify({
         model: 'gpt-4-turbo',
+        // CORRECTED LINE: This sends the full, correct conversation history
         messages: [ { role: 'system', content: systemPrompt }, ...messages ],
-        temperature: 0.8,
+        temperature: 0.85,
       }),
     });
     if (!response.ok) { const errorData = await response.json(); console.error("OpenAI API Error:", errorData); throw new Error("OpenAI API request failed."); }
