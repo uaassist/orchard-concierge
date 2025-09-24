@@ -9,12 +9,26 @@
 <body>
     <div class="onboarding-container">
         <div class="company-logo-container">
-            <img src="https://ucarecdn.com/2ea8ce37-554c-4ae9-9e69-2e928f2bb9f1/calligraphytoothbluecolourezgifcomresize.png" alt="Orchard Dental Care Logo" class="company-logo">
+            <img src="https://ucarecdn.com/2ea8ce37-554c-4ae9-9e69-2e928f2bb9f1/calligraphytoothbluecolourezgifcomresize.png"">
         </div>
         <div class="persona-header">
             <h2>Orchard Dental Concierge</h2>
         </div>
+
+        <!-- The chat body for messages -->
         <div id="chat-body" class="chat-body-styled"></div>
+
+        <!-- NEW: The hidden "Thank You" screen -->
+        <div id="thank-you-screen" class="thank-you-screen hidden">
+            <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+            </svg>
+            <h3>Thank You!</h3>
+            <p>Your feedback is incredibly valuable.</p>
+        </div>
+
+        <!-- The input area -->
         <div id="chat-input-area" class="chat-input-area-styled">
             <div id="quick-replies-container"></div>
             <div id="input-row">
@@ -26,3 +40,10 @@
     <script src="script.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
