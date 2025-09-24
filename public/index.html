@@ -3,31 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orchard Dental Care - Feedback</title>
+    <title>Orchard Dental Care - Feedback Concierge</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="chat-app-container">
-        <div class="chat-header">
-            <img src="https://image.llm.app/liketome/liketome_logo.png" alt="Orchard Dental Care" class="company-logo">
-            <h1>Orchard Dental Care</h1>
-        </div>
-        <div class="avatar-container">
-            <img src="https://ucarecdn.com/2008f119-a819-4d18-8fb4-1236ca14b8b8/ChatGPTImageMay22202502_03_10PMezgifcomresize.png" alt="Alex" class="concierge-avatar">
-            <div class="avatar-name">Alex</div>
-        </div>
-        
-        <div id="chat-body" class="chat-body"></div>
-        
-        <div id="quick-replies-container" class="quick-replies-container"></div>
-        
-        <div id="input-area" class="input-area">
-            <textarea id="chat-input" placeholder="Type your message..." rows="1"></textarea>
-            <button id="send-button" aria-label="Send Message">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
-                </svg>
-            </button>
+    <div class="onboarding-container">
+        <!-- This container holds both the welcome screen and the chat -->
+        <div id="main-content-wrapper">
+
+            <!-- NEW: The Welcome Screen -->
+            <div id="welcome-screen">
+                <div class="welcome-header">
+                    <img src="https://image.llm.app/liketome/liketome_logo.png" alt="Orchard Dental Care Logo" class="company-logo">
+                    <img src="https://ucarecdn.com/2008f119-a819-4d18-8fb4-1236ca14b8b8/ChatGPTImageMay22202502_03_10PMezgifcomresize.png" alt="Alex the Concierge" class="welcome-avatar">
+                    <p class="concierge-name-tag">Alex</p>
+                </div>
+                <div class="initial-bubble">
+                    Hi! Welcome to Orchard Dental Care. I'm your digital concierge. To start, could you quickly tell me how your visit was today?
+                </div>
+                <div id="initial-choices" class="initial-choices">
+                    <button class="choice-button">🙂 It was great!</button>
+                    <button class="choice-button">😐 It was okay.</button>
+                    <button class="choice-button">🙁 It wasn't good.</button>
+                </div>
+            </div>
+
+            <!-- The Conversational Chat (Initially hidden) -->
+            <div id="chat-view" class="hidden">
+                <div id="chat-body" class="chat-body-styled"></div>
+                <div id="chat-input-area" class="chat-input-area-styled">
+                    <div id="quick-replies-container"></div>
+                    <div id="input-row">
+                        <input type="text" id="chat-input" placeholder="Type a message..." class="input-field">
+                        <button id="send-button" class="button primary" aria-label="Send Message">➤</button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
     <script src="script.js"></script>
