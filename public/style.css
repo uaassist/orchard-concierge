@@ -29,101 +29,63 @@ body {
     overflow: hidden;
 }
 
-#main-content-wrapper {
+/* --- NEW: Simplified Header Styling --- */
+.simple-header {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0; /* Prevents header from shrinking */
+}
+.header-icon {
+    height: 28px;
+    width: auto;
+    fill: #9CA3AF; /* A soft grey for the icon */
+    margin-bottom: 8px;
+}
+.simple-header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-dark);
+}
+
+/* --- Content Area Wrapper --- */
+#content-area {
+    flex: 1;
+    position: relative; /* Needed for positioning the views */
+    overflow: hidden; /* Hide overflow during transitions */
+}
+
+#welcome-screen, #chat-view {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
     display: flex;
     flex-direction: column;
-    height: 100%;
 }
 
 /* --- Welcome Screen Styling --- */
 #welcome-screen {
     padding: 30px 20px;
     text-align: center;
-    display: flex;
-    flex-direction: column;
     animation: fadeIn 0.5s ease-out;
+    box-sizing: border-box;
 }
+.welcome-header { margin-bottom: 20px; }
+.welcome-avatar { width: 90px; height: 90px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+.concierge-name-tag { margin-top: 10px; font-weight: 600; color: var(--text-dark); }
+.initial-bubble { background: #F0F2F5; color: var(--text-dark); padding: 15px 20px; border-radius: 20px; border-bottom-left-radius: 6px; max-width: 90%; margin: 0 auto; line-height: 1.6; font-size: 16px; text-align: center; }
+.initial-choices { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; }
+.choice-button { width: 100%; padding: 18px; border-radius: 12px; border: 1px solid var(--border-color); background-color: #fff; font-size: 16px; font-weight: 500; color: var(--text-dark); cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
+.choice-button:hover { border-color: var(--primary-color); box-shadow: 0 4px 15px rgba(108, 48, 156, 0.1); transform: translateY(-2px); }
 
-/* --- UPDATED: Header Styling --- */
-.welcome-header {
-    margin-bottom: 20px;
-    position: relative; /* Needed for positioning the logo */
-}
-.company-logo {
-    max-height: 20px; /* Smaller logo */
-    margin-bottom: 10px;
-}
-.welcome-avatar {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-.concierge-name-tag {
-    margin-top: 10px;
-    font-weight: 600;
-    color: var(--text-dark);
-}
+/* --- Chat View Styling (Unchanged from previous versions) --- */
+#chat-body-styled { /* ... same as before ... */ }
+/* ... (all other chat styles) ... */
 
-.initial-bubble {
-    background: #F0F2F5;
-    color: var(--text-dark);
-    padding: 15px 20px;
-    border-radius: 20px;
-    border-bottom-left-radius: 6px;
-    max-width: 90%;
-    margin: 0 auto;
-    line-height: 1.6;
-    font-size: 16px;
-    text-align: center;
-}
-
-.initial-choices {
-    margin-top: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.choice-button {
-    width: 100%;
-    padding: 18px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    background-color: #fff;
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--text-dark);
-    cursor: pointer;
-    text-align: left;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: all 0.2s;
-}
-.choice-button:hover {
-    border-color: var(--primary-color);
-    box-shadow: 0 4px 15px rgba(108, 48, 156, 0.1);
-    transform: translateY(-2px);
-}
-
-/* --- Chat View Styling (Unchanged) --- */
-#chat-view {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-.chat-body-styled { /* ... same as before ... */ }
-.message-wrapper { /* ... same as before ... */ }
-/* ... (all other chat styles from the previous version) ... */
-
-.hidden {
-    display: none !important;
-}
-
+.hidden { display: none !important; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* Duplicating chat styles here for completeness */
+/* Duplicating chat styles for completeness */
 .chat-body-styled { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column-reverse; background-color: #F9FAFB; }
 .message-wrapper { margin-bottom: 12px; display: flex; max-width: 100%; align-items: flex-end; }
 .concierge { justify-content: flex-start; }
