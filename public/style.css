@@ -25,7 +25,7 @@ body {
     max-width: 400px;
     height: 85vh;
     max-height: 800px;
-    background-color: var(--background-color);
+    background-color: #fff; /* Changed to white for the main container */
     border-radius: 24px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
     display: flex;
@@ -40,7 +40,8 @@ body {
     justify-content: center;
     align-items: center;
     gap: 8px;
-    background-color: #fff; /* Give header a solid background */
+    background-color: #fff;
+    flex-shrink: 0; /* Prevent header from shrinking */
 }
 .company-logo { max-height: 24px; width: auto; }
 .chat-header h1 { font-size: 18px; font-weight: 700; margin: 0; }
@@ -49,9 +50,9 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px 20px 20px;
-    background-color: #fff; /* Give avatar area a solid background */
-    border-bottom: 1px solid var(--border-color);
+    padding: 20px;
+    background-color: #fff;
+    flex-shrink: 0; /* Prevent avatar from shrinking */
 }
 .concierge-avatar { width: 80px; height: 80px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
 .avatar-name { margin-top: 8px; font-weight: 500; }
@@ -59,11 +60,11 @@ body {
 /* --- THIS IS THE CORRECTED SECTION --- */
 .chat-body {
     flex: 1;
-    padding: 20px 20px 0; /* Reduced bottom padding */
+    padding: 0 20px; /* Removed top padding */
     overflow-y: auto;
     display: flex;
-    flex-direction: column; /* Changed to column to start from top */
-    justify-content: flex-start; /* Aligns content to the top */
+    flex-direction: column-reverse; /* Keep this to show newest messages at the bottom */
+    background-color: #fff; /* Match the container background */
 }
 
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -74,7 +75,7 @@ body {
 .concierge .bubble { background: var(--bubble-light-color); color: var(--text-dark); border-bottom-left-radius: 6px; }
 .user .bubble { background: var(--primary-color); color: white; border-bottom-right-radius: 6px; }
 
-.quick-replies-container { padding: 10px 20px 20px; display: flex; flex-direction: column; gap: 10px; } /* Added more bottom padding */
+.quick-replies-container { padding: 10px 20px 20px; display: flex; flex-direction: column; gap: 10px; background-color: #fff; }
 .quick-reply-btn {
     width: 100%;
     box-sizing: border-box;
@@ -95,7 +96,7 @@ body {
 .quick-reply-btn:hover { border-color: var(--primary-color); }
 .quick-reply-btn.primary { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-.input-area { display: flex; align-items: center; padding: 20px; border-top: 1px solid var(--border-color); }
+.input-area { display: flex; align-items: center; padding: 20px; border-top: 1px solid var(--border-color); background-color: #fff; }
 #chat-input { flex: 1; border: none; background: transparent; padding: 10px; font-size: 16px; font-family: 'Plus Jakarta Sans', sans-serif; resize: none; overflow-y: hidden; }
 #chat-input:focus { outline: none; }
 #send-button { width: 44px; height: 44px; border-radius: 50%; background-color: var(--primary-color); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
