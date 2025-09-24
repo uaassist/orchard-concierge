@@ -126,11 +126,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleFinalMessagePart(text) {
          if (text.includes("What made your visit great today?")) {
             addMessage('concierge', text);
-            const tier1Options = ["✨ Friendly Staff", "🦷 Gentle Hygienist", "👍 Dr. Evans' Care", "🏢 Clean Office", "🕒 On-Time Appointment", "💬 Clear Explanations", "➡️ More options"];
-            createMultiSelectButtons(tier1Options);
+            const tier1Options = ["⭐ Helpful Staff", "💨 Fast Service", "👍 Easy Process", "🤝 Problem Solved", "💬 Clear Explanations", "💳 Billing Was Easy", "➡️ More options"];            createMultiSelectButtons(tier1Options);
          } else if (text.includes("what else stood out?")) {
             addMessage('concierge', text);
-            const tier2Options = ["🤖 Advanced Technology", "🛋️ Comfortable Environment", "💳 Billing Was Easy", "🧸 Great with Kids", "👍 No Other Highlights"];
+            const tier2Options = ["🤖 Advanced Technology", "🛋️ Comfortable Environment", "🏬 Clean Store", "🧸 Great with Kids", "👍 No Other Highlights"];
             createMultiSelectButtons(tier2Options);
          } else if (text.toLowerCase().includes("would you like me to draft")) {
              addMessage('concierge', text);
@@ -254,3 +253,4 @@ document.addEventListener('DOMContentLoaded', () => {
     sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { getAIResponse(chatInput.value); chatInput.value = ''; } });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
 });
+
