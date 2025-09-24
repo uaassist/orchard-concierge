@@ -1,34 +1,51 @@
+
 document.addEventListener('DOMContentLoaded', () => {
+    // --- NEW: Element selectors for the two views ---
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const chatView = document.getElementById('chat-view');
+    
     const chatBody = document.getElementById('chat-body');
     const chatInput = document.getElementById('chat-input');
     const sendButton = document.getElementById('send-button');
     const quickRepliesContainer = document.getElementById('quick-replies-container');
     const inputRow = document.getElementById('input-row');
+    
+    // --- NEW: Event listeners for the initial choice buttons ---
+    const initialChoiceButtons = document.querySelectorAll('.choice-button');
+    initialChoiceButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const userChoice = button.innerText.trim();
+            startConversation(userChoice);
+        });
+    });
+
+    // --- NEW: Function to transition from welcome to chat view ---
+    function startConversation(firstMessage) {
+        welcomeScreen.style.display = 'none'; // Hide the welcome screen
+        chatView.classList.remove('hidden');   // Show the chat view
+        
+        // Add the user's first choice to the chat history and UI
+        addMessage('user', firstMessage);
+        conversationHistory.push({ role: 'user', content: firstMessage });
+        
+        // Start the AI conversation
+        getAIResponse();
+    }
+
     let conversationHistory = [];
-    const placeId = 'Your_Vodafone_Store_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
+    const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
     const avatarUrl = 'https://ucarecdn.com/2008f119-a819-4d18-8fb4-1236ca14b8b8/ChatGPTImageMay22202502_03_10PMezgifcomresize.png';
     let selectedKeywords = [];
 
-    function addMessage(sender, text, isHtml = false) {
-        const wrapper = document.createElement('div');
-        wrapper.className = `message-wrapper ${sender}`;
-        if (sender === 'concierge') {
-            const avatarImg = document.createElement('img');
-            avatarImg.src = avatarUrl;
-            avatarImg.className = 'chat-avatar';
-            avatarImg.alt = 'Alex the Concierge';
-            wrapper.appendChild(avatarImg);
+    function addMessage(sender, text, isHtml = false) { /* ... same as before ... */ }
+
+    // RENAMED for clarity, now called by startConversation and other actions
+    async function getAIResponse(content, isSilent = false) {
+        if (content) {
+            if (!isSilent) { addMessage('user', content); }
+            conversationHistory.push({ role: 'user', content });
         }
-        const bubble = document.createElement('div');
-        bubble.className = 'bubble';
-        if (isHtml) { bubble.innerHTML = text; } else { bubble.innerText = text; }
-        wrapper.appendChild(bubble);
-        chatBody.prepend(wrapper);
-    }
-    async function sendMessage(content, isSilent = false) {
-        if (!isSilent) { addMessage('user', content); }
-        conversationHistory.push({ role: 'user', content });
         clearQuickReplies();
         showTypingIndicator();
         try {
@@ -46,6 +63,36 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Fetch Error:", error);
             processAIResponse('Sorry, I seem to be having trouble connecting. Please try again later.');
         }
+    }
+    
+    function showTypingIndicator() { /* ... same as before ... */ }
+    function removeTypingIndicator() { /* ... same as before ... */ }
+    function processAIResponse(text) { /* ... same as before ... */ }
+    function handleFinalMessagePart(text) { /* ... same as before ... */ }
+    function createEditableDraft(reviewText) { /* ... same as before ... */ }
+    function createQuickReplies(replies) { /* ... same as before ... */ }
+    function createMultiSelectButtons(options) { /* ... same as before ... */ }
+    function createPostButtons() { /* ... same as before ... */ }
+    function clearQuickReplies() { /* ... same as before ... */ }
+    
+    // The rest of the functions are unchanged
+    // I'm pasting them here again for absolute completeness
+    
+    function addMessage(sender, text, isHtml = false) {
+        const wrapper = document.createElement('div');
+        wrapper.className = `message-wrapper ${sender}`;
+        if (sender === 'concierge') {
+            const avatarImg = document.createElement('img');
+            avatarImg.src = avatarUrl;
+            avatarImg.className = 'chat-avatar';
+            avatarImg.alt = 'Alex the Concierge';
+            wrapper.appendChild(avatarImg);
+        }
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        if (isHtml) { bubble.innerHTML = text; } else { bubble.innerText = text; }
+        wrapper.appendChild(bubble);
+        chatBody.prepend(wrapper);
     }
     function showTypingIndicator() {
         if (document.querySelector('.typing-indicator')) return;
@@ -77,16 +124,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     function handleFinalMessagePart(text) {
-         if (text.toLowerCase().includes("how was your visit to our vodafone store today?")) {
+         if (text.includes("What made your visit great today?")) {
             addMessage('concierge', text);
-            createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
-         } else if (text.includes("main reason for your visit today?")) {
-            addMessage('concierge', text);
-            const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"];
+            const tier1Options = ["✨ Friendly Staff", "🦷 Gentle Hygienist", "👍 Dr. Evans' Care", "🏢 Clean Office", "🕒 On-Time Appointment", "💬 Clear Explanations", "➡️ More options"];
             createMultiSelectButtons(tier1Options);
          } else if (text.includes("what else stood out?")) {
             addMessage('concierge', text);
-            const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved", "👍 No Other Highlights"];
+            const tier2Options = ["🤖 Advanced Technology", "🛋️ Comfortable Environment", "💳 Billing Was Easy", "🧸 Great with Kids", "👍 No Other Highlights"];
             createMultiSelectButtons(tier2Options);
          } else if (text.toLowerCase().includes("would you like me to draft")) {
              addMessage('concierge', text);
@@ -125,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const button = document.createElement('button');
             button.className = 'quick-reply-btn';
             button.innerText = replyText;
-            button.onclick = () => { sendMessage(replyText); };
+            button.onclick = () => { getAIResponse(replyText); };
             quickRepliesContainer.appendChild(button);
         });
     }
@@ -141,7 +185,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (optionText === "➡️ More options") {
                     addMessage('user', 'More options');
                     button.style.display = 'none';
-                    sendMessage("Show me the other options", true);
+                    showTypingIndicator();
+                    setTimeout(() => {
+                        removeTypingIndicator();
+                        const tier2Options = ["🤖 Advanced Technology", "🛋️ Comfortable Environment", "💳 Billing Was Easy", "🧸 Great with Kids"];
+                        const continueButton = document.querySelector('.continue-btn');
+                        tier2Options.forEach(tier2Text => {
+                            const newButton = document.createElement('button');
+                            newButton.className = 'quick-reply-btn';
+                            newButton.innerText = tier2Text;
+                            newButton.onclick = () => {
+                                newButton.classList.toggle('selected');
+                                if (selectedKeywords.includes(tier2Text)) {
+                                    selectedKeywords = selectedKeywords.filter(k => k !== tier2Text);
+                                } else {
+                                    selectedKeywords.push(tier2Text);
+                                }
+                            };
+                            quickRepliesContainer.insertBefore(newButton, continueButton);
+                        });
+                    }, 800);
                     return;
                 }
                 button.classList.toggle('selected');
@@ -158,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
         continueButton.innerText = 'Continue';
         continueButton.onclick = () => {
             const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No Other Highlights";
-            sendMessage(combinedMessage);
+            getAIResponse(combinedMessage);
         };
         quickRepliesContainer.appendChild(continueButton);
     }
@@ -172,14 +235,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const draftText = document.getElementById('review-draft-textarea').value;
             navigator.clipboard.writeText(draftText).then(() => {
                 window.open(googleReviewUrl, '_blank');
-                // showThankYouScreen(); // You can re-enable this if you add the thank you screen HTML back
+                // showThankYouScreen(); // This logic needs to be added back if desired
             });
         };
         const regenerateButton = document.createElement('button');
         regenerateButton.className = 'quick-reply-btn';
         regenerateButton.innerText = '🔄 Try another version';
         regenerateButton.onclick = () => {
-             sendMessage("That wasn't quite right, please try another version.", true);
+             getAIResponse("That wasn't quite right, please try another version.", true);
         };
         quickRepliesContainer.appendChild(regenerateButton);
         quickRepliesContainer.appendChild(postButton);
@@ -188,10 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
         quickRepliesContainer.innerHTML = '';
         inputRow.style.display = 'flex';
     }
-    sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { sendMessage(chatInput.value); chatInput.value = ''; } });
+    sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { getAIResponse(chatInput.value); chatInput.value = ''; } });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
-    setTimeout(() => {
-        sendMessage("Hello", true);
-    }, 500);
-    showTypingIndicator();
 });
