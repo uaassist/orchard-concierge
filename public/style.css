@@ -1,93 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
-
 :root {
-    --primary-color: #E60000;      /* The official Vodafone Red */
+    --primary-color: #E60000; /* Vodafone Red */
     --text-dark: #1D2B3A;
     --border-color: #DDE2E7;
 }
-
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: #E5E7EB;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
-
-.onboarding-container {
-    max-width: 420px;
-    width: 100%;
-    height: 85vh;
-    max-height: 750px;
-    background-color: #fff;
-    border-radius: 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-/* --- NEW: Simplified Header Styling --- */
-.simple-header {
-    text-align: center;
-    padding: 20px;
-    border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0; /* Prevents header from shrinking */
-}
-.header-icon {
-    height: 28px;
-    width: auto;
-    fill: #9CA3AF; /* A soft grey for the icon */
-    margin-bottom: 8px;
-}
-.simple-header h1 {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0;
-    color: var(--text-dark);
-}
-
-/* --- Content Area Wrapper --- */
-#content-area {
-    flex: 1;
-    position: relative; /* Needed for positioning the views */
-    overflow: hidden; /* Hide overflow during transitions */
-}
-
-#welcome-screen, #chat-view {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-/* --- Welcome Screen Styling --- */
-#welcome-screen {
-    padding: 30px 20px;
-    text-align: center;
-    animation: fadeIn 0.5s ease-out;
-    box-sizing: border-box;
-}
-.welcome-header { margin-bottom: 20px; }
-.welcome-avatar { width: 90px; height: 90px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-.concierge-name-tag { margin-top: 10px; font-weight: 600; color: var(--text-dark); }
-.initial-bubble { background: #F0F2F5; color: var(--text-dark); padding: 15px 20px; border-radius: 20px; border-bottom-left-radius: 6px; max-width: 90%; margin: 0 auto; line-height: 1.6; font-size: 16px; text-align: center; }
-.initial-choices { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; }
-.choice-button { width: 100%; padding: 18px; border-radius: 12px; border: 1px solid var(--border-color); background-color: #fff; font-size: 16px; font-weight: 500; color: var(--text-dark); cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
-.choice-button:hover { border-color: var(--primary-color); box-shadow: 0 4px 15px rgba(108, 48, 156, 0.1); transform: translateY(-2px); }
-
-/* --- Chat View Styling (Unchanged from previous versions) --- */
-#chat-body-styled { /* ... same as before ... */ }
-/* ... (all other chat styles) ... */
-
-.hidden { display: none !important; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-/* Duplicating chat styles for completeness */
+body { font-family: 'Inter', sans-serif; background-color: #E5E7EB; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+.onboarding-container { max-width: 420px; width: 100%; height: 85vh; max-height: 750px; background-color: #fff; border-radius: 24px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08); display: flex; flex-direction: column; overflow: hidden; }
+.simple-header { text-align: center; padding: 20px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+.header-icon { height: 28px; width: auto; fill: var(--primary-color); margin-bottom: 8px; }
+.simple-header h1 { font-size: 18px; font-weight: 600; margin: 0; color: var(--text-dark); }
+#content-area { flex: 1; position: relative; overflow: hidden; }
+#chat-view { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; }
 .chat-body-styled { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column-reverse; background-color: #F9FAFB; }
-.message-wrapper { margin-bottom: 12px; display: flex; max-width: 100%; align-items: flex-end; }
+.message-wrapper { margin-bottom: 12px; display: flex; max-width: 100%; align-items: flex-end; animation: fadeInUp 0.4s ease-out; }
 .concierge { justify-content: flex-start; }
 .user { justify-content: flex-end; }
 .chat-avatar { width: 36px; height: 36px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
@@ -99,7 +24,8 @@ body {
 .input-field { flex: 1; width: 100%; padding: 14px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; }
 #send-button { width: 48px; height: 48px; margin-left: 12px; border-radius: 8px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5em; background-color: var(--primary-color); color: #fff; border: none; cursor: pointer; }
 #quick-replies-container { display: flex; flex-wrap: wrap; justify-content: flex-end; margin-bottom: 12px; }
-.quick-reply-btn { margin: 4px; padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); background: white; color: var(--text-dark); cursor: pointer; font-size: 14px; font-weight: 500; }
+.quick-reply-btn { margin: 4px; padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); background: white; color: var(--text-dark); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+.quick-reply-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
 .quick-reply-btn.selected { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 .continue-btn { background-color: var(--primary-color); color: white; font-weight: 600; flex-basis: 100%; margin-top: 8px; padding: 12px; font-size: 16px; border-radius: 8px; }
 .review-draft-textarea { width: 100%; box-sizing: border-box; height: 120px; margin: 10px 0; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color); font-family: 'Inter', sans-serif; font-size: 16px; resize: vertical; }
@@ -108,4 +34,4 @@ body {
 .dot:nth-child(2) { animation-delay: -1.1s; }
 .dot:nth-child(3) { animation-delay: -0.9s; }
 @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
-
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
