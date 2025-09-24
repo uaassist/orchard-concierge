@@ -4,13 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendButton = document.getElementById('send-button');
     const quickRepliesContainer = document.getElementById('quick-replies-container');
     const inputRow = document.getElementById('input-row');
-    const thankYouScreen = document.getElementById('thank-you-screen');
-    const chatInputArea = document.getElementById('chat-input-area');
-
     let conversationHistory = [];
-    const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR VODAFONE STORE'S PLACE ID HERE
+    const placeId = 'Your_Vodafone_Store_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
-    const avatarUrl = 'https://ucarecdn.com/2008f119-a819-4d18-8fb4-1236ca14b8b8/ChatGPTImageMay22202502_03_10PMezgifcomresize.png'; // You can change this to a Vodafone-branded avatar if you wish
+    const avatarUrl = 'https://ucarecdn.com/2008f119-a819-4d18-8fb4-1236ca14b8b8/ChatGPTImageMay22202502_03_10PMezgifcomresize.png';
     let selectedKeywords = [];
 
     function addMessage(sender, text, isHtml = false) {
@@ -29,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.appendChild(bubble);
         chatBody.prepend(wrapper);
     }
-
     async function sendMessage(content, isSilent = false) {
         if (!isSilent) { addMessage('user', content); }
         conversationHistory.push({ role: 'user', content });
@@ -51,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
             processAIResponse('Sorry, I seem to be having trouble connecting. Please try again later.');
         }
     }
-
     function showTypingIndicator() {
         if (document.querySelector('.typing-indicator')) return;
         const wrapper = document.createElement('div');
@@ -59,12 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.innerHTML = `<img src="${avatarUrl}" class="chat-avatar" alt="Alex typing"><div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
         chatBody.prepend(wrapper);
     }
-
     function removeTypingIndicator() {
         const indicator = document.querySelector('.typing-indicator');
         if (indicator) indicator.remove();
     }
-
     function processAIResponse(text) {
         removeTypingIndicator();
         if (text.includes("|")) {
@@ -83,7 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
             handleFinalMessagePart(text);
         }
     }
-
     function handleFinalMessagePart(text) {
          if (text.toLowerCase().includes("how was your visit to our vodafone store today?")) {
             addMessage('concierge', text);
@@ -111,7 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-
     function createEditableDraft(reviewText) {
         clearQuickReplies();
         const oldDraft = document.getElementById('review-draft-wrapper');
@@ -127,7 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessage('concierge', 'Feel free to edit it. When you\'re ready, just tap below.');
         createPostButtons();
     }
-
     function createQuickReplies(replies) {
         clearQuickReplies();
         inputRow.style.display = 'none';
@@ -139,7 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
             quickRepliesContainer.appendChild(button);
         });
     }
-
     function createMultiSelectButtons(options) {
         clearQuickReplies();
         inputRow.style.display = 'none';
@@ -152,8 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (optionText === "➡️ More options") {
                     addMessage('user', 'More options');
                     button.style.display = 'none';
-                    // The AI will now respond with the next question, which our handleFinalMessagePart function will catch.
-                    sendMessage("Show me the other options", true); 
+                    sendMessage("Show me the other options", true);
                     return;
                 }
                 button.classList.toggle('selected');
@@ -174,7 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         quickRepliesContainer.appendChild(continueButton);
     }
-
     function createPostButtons() {
         clearQuickReplies();
         inputRow.style.display = 'none';
@@ -185,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const draftText = document.getElementById('review-draft-textarea').value;
             navigator.clipboard.writeText(draftText).then(() => {
                 window.open(googleReviewUrl, '_blank');
-                showThankYouScreen();
+                // showThankYouScreen(); // You can re-enable this if you add the thank you screen HTML back
             });
         };
         const regenerateButton = document.createElement('button');
@@ -197,25 +184,12 @@ document.addEventListener('DOMContentLoaded', () => {
         quickRepliesContainer.appendChild(regenerateButton);
         quickRepliesContainer.appendChild(postButton);
     }
-
-    function showThankYouScreen() {
-        chatBody.style.opacity = '0';
-        chatInputArea.style.opacity = '0';
-        setTimeout(() => {
-            chatBody.style.display = 'none';
-            chatInputArea.style.display = 'none';
-            thankYouScreen.classList.remove('hidden');
-        }, 400);
-    }
-
     function clearQuickReplies() {
         quickRepliesContainer.innerHTML = '';
         inputRow.style.display = 'flex';
     }
-
     sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { sendMessage(chatInput.value); chatInput.value = ''; } });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
-
     setTimeout(() => {
         sendMessage("Hello", true);
     }, 500);
