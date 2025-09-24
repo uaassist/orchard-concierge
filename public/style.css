@@ -3,7 +3,6 @@
 :root {
     --primary-color: #6C309C;      /* Your brand's purple */
     --text-dark: #1D2B3A;
-    --text-light: #6B7A8C;
     --border-color: #DDE2E7;
 }
 
@@ -45,12 +44,14 @@ body {
     animation: fadeIn 0.5s ease-out;
 }
 
+/* --- UPDATED: Header Styling --- */
 .welcome-header {
     margin-bottom: 20px;
+    position: relative; /* Needed for positioning the logo */
 }
 .company-logo {
-    max-height: 30px;
-    margin-bottom: 20px;
+    max-height: 20px; /* Smaller logo */
+    margin-bottom: 10px;
 }
 .welcome-avatar {
     width: 90px;
@@ -106,7 +107,7 @@ body {
     transform: translateY(-2px);
 }
 
-/* --- Chat View Styling (Mostly unchanged) --- */
+/* --- Chat View Styling (Unchanged) --- */
 #chat-view {
     display: flex;
     flex-direction: column;
