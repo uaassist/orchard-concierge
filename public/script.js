@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const chatBody = document.getElementById('chat-body');
     const quickRepliesContainer = document.getElementById('quick-replies-container');
-    const inputRow = document.getElementById('input-row');
-    
     let conversationHistory = [];
     const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
@@ -95,11 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (question.toLowerCase().includes("how was your visit")) {
             createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."], true);
         } else if (question.includes("main reason for your visit today?")) {
-            const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"];
-            createMultiSelectButtons(tier1Options);
+            createMultiSelectButtons(["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"]);
         } else if (question.includes("what else stood out?")) {
-            const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved", "👍 No Other Highlights"];
-            createMultiSelectButtons(tier2Options, true);
+            createMultiSelectButtons(["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved", "👍 No Other Highlights"], true);
         } else if (question.toLowerCase().includes("would you like me to draft")) {
              createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
         }
@@ -207,16 +203,10 @@ document.addEventListener('DOMContentLoaded', () => {
         quickRepliesContainer.appendChild(regenerateButton);
         quickRepliesContainer.appendChild(postButton);
     }
-
-    // UPDATED: This is now hidden from the UI
+    
     function clearQuickReplies() {
         quickRepliesContainer.innerHTML = '';
-        if (inputRow) {
-            inputRow.style.display = 'none';
-        }
     }
 
-    // We no longer need the event listeners for the text input
-    
     getAIResponse("Hello", true);
 });
