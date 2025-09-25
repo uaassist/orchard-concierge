@@ -15,7 +15,36 @@ document.addEventListener('DOMContentLoaded', () => {
     function showTypingIndicator() { /* ... same as before ... */ }
     function removeTypingIndicator() { /* ... same as before ... */ }
     function processAIResponse(text) { /* ... same as before ... */ }
-    function handleFinalMessagePart(text) { /* ... same as before ... */ }
+    
+    // --- THIS IS THE FULLY CORRECTED FUNCTION ---
+    function handleFinalMessagePart(text) {
+         if (text.toLowerCase().includes("how was your visit") || text.toLowerCase().includes("share your feedback")) {
+            addMessage('concierge', text);
+            createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
+         } else if (text.includes("main reason for your visit today?")) {
+            addMessage('concierge', text);
+            const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"];
+            createMultiSelectButtons(tier1Options);
+         } else if (text.includes("what else stood out?")) {
+            addMessage('concierge', text);
+            const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved", "👍 No Other Highlights"];
+            createMultiSelectButtons(tier2Options);
+         } else if (text.toLowerCase().includes("would you like me to draft")) {
+             addMessage('concierge', text);
+             createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
+         } else {
+            const quoteRegex = /"(.*?)"/;
+            const matches = text.match(quoteRegex);
+            if (matches && matches[1].length > 10) {
+                const reviewText = matches[1];
+                addMessage('concierge', "Here's a draft based on your feedback:");
+                createEditableDraft(reviewText);
+            } else {
+                addMessage('concierge', text);
+            }
+        }
+    }
+    
     function createEditableDraft(reviewText) { /* ... same as before ... */ }
     function createQuickReplies(replies) { /* ... same as before ... */ }
     function createMultiSelectButtons(options) { /* ... same as before ... */ }
@@ -88,33 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1000);
         } else {
             handleFinalMessagePart(text);
-        }
-    }
-    function handleFinalMessagePart(text) {
-         if (text.toLowerCase().includes("how was your visit") || text.toLowerCase().includes("share your feedback")) {
-            addMessage('concierge', text);
-            createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
-         } else if (text.includes("main reason for your visit today?")) {
-            addMessage('concierge', text);
-            const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"];
-            createMultiSelectButtons(tier1Options);
-         } else if (text.includes("what else stood out?")) {
-            addMessage('concierge', text);
-            const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved", "👍 No Other Highlights"];
-            createMultiSelectButtons(tier2Options);
-         } else if (text.toLowerCase().includes("would you like me to draft")) {
-             addMessage('concierge', text);
-             createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
-         } else {
-            const quoteRegex = /"(.*?)"/;
-            const matches = text.match(quoteRegex);
-            if (matches && matches[1].length > 10) {
-                const reviewText = matches[1];
-                addMessage('concierge', "Here's a draft based on your feedback:");
-                createEditableDraft(reviewText);
-            } else {
-                addMessage('concierge', text);
-            }
         }
     }
     function createEditableDraft(reviewText) {
