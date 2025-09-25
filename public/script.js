@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    // --- THIS FUNCTION IS NOW CORRECTED ---
     function processAIResponse(text) {
         removeTypingIndicator();
         if (text.includes("|")) {
@@ -57,8 +58,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const statement = parts[0].trim();
             const question = parts[1].trim();
             
+            // This now correctly handles populating the initial bubble
             if (statement.toLowerCase().includes("hi! i'm alex")) {
-                initialBubble.innerText = statement;
+                initialBubble.innerText = statement + " " + question; // Combine for the welcome screen
                 handleFinalMessagePart(question);
             } else {
                 addMessage('concierge', statement);
@@ -110,8 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // --- The rest of your functions are the same ---
-    // (addMessage, showTypingIndicator, removeTypingIndicator, createEditableDraft, etc.)
+    // --- The rest of the functions are unchanged ---
+    // (addMessage, showTypingIndicator, removeTypingIndicator, etc.)
     
     function addMessage(sender, text, isHtml = false) {
         const wrapper = document.createElement('div');
@@ -254,9 +256,8 @@ document.addEventListener('DOMContentLoaded', () => {
     sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { getAIResponse(chatInput.value); chatInput.value = ''; } });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
 
-    // CORRECTED: This part kicks off the conversation
+    // Initial greeting
     setTimeout(() => {
         getAIResponse("Hello", true);
     }, 500);
-    showTypingIndicator(); // Show indicator while waiting for the first message
 });
