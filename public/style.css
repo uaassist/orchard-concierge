@@ -48,16 +48,7 @@ body {
     color: var(--text-dark);
 }
 
-/* --- THIS IS THE KEY CHANGE --- */
-.chat-body-styled {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column; /* Changed from column-reverse to column */
-    background-color: #F9FAFB;
-}
-
+.chat-body-styled { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column-reverse; background-color: #F9FAFB; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .message-wrapper { margin-bottom: 12px; display: flex; max-width: 100%; animation: fadeIn 0.3s ease-out; align-items: flex-end; }
 .concierge { justify-content: flex-start; }
@@ -70,14 +61,7 @@ body {
 #input-row { display: flex; align-items: center; }
 .input-field { flex: 1; width: 100%; padding: 14px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; }
 #send-button { width: 48px; height: 48px; margin-left: 12px; border-radius: 8px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5em; background-color: var(--primary-color); color: #fff; border: none; cursor: pointer; }
-
-/* We change the quick replies to appear at the start (top) of the container */
-#quick-replies-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start; /* Changed from flex-end */
-    margin-bottom: 12px;
-}
+#quick-replies-container { display: flex; flex-wrap: wrap; justify-content: flex-end; margin-bottom: 12px; }
 .quick-reply-btn { margin: 4px; padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); background: white; color: var(--text-dark); cursor: pointer; font-size: 14px; font-weight: 500; }
 .quick-reply-btn.selected { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 .continue-btn { background-color: var(--primary-color); color: white; font-weight: 600; flex-basis: 100%; margin-top: 8px; padding: 12px; font-size: 16px; border-radius: 8px; }
