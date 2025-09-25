@@ -1,103 +1,241 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+document.addEventListener('DOMContentLoaded', () => {
+    // --- NEW: Element selectors for the two views ---
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const chatView = document.getElementById('chat-view');
+    
+    const chatBody = document.getElementById('chat-body');
+    const chatInput = document.getElementById('chat-input');
+    const sendButton = document.getElementById('send-button');
+    const quickRepliesContainer = document.getElementById('quick-replies-container');
+    const inputRow = document.getElementById('input-row');
+    
+    // --- NEW: Event listeners for the initial choice buttons ---
+    const initialChoiceButtons = document.querySelectorAll('.choice-button');
+    initialChoiceButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const userChoice = button.innerText.trim();
+            startConversation(userChoice);
+        });
+    });
 
-:root {
-    --primary-color: #E60000;      /* The official Vodafone Red */
-    --text-dark: #1D2B3A;
-    --border-color: #DDE2E7;
-}
+    // --- NEW: Function to transition from welcome to chat view ---
+    function startConversation(firstMessage) {
+        welcomeScreen.style.display = 'none'; // Hide the welcome screen
+        chatView.classList.remove('hidden');   // Show the chat view
+        
+        // Add the user's first choice to the chat history and UI
+        addMessage('user', firstMessage);
+        conversationHistory.push({ role: 'user', content: firstMessage });
+        
+        // Start the AI conversation
+        getAIResponse();
+    }
 
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: #E5E7EB;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
+    let conversationHistory = [];
+    const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
+    const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
+    const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp'; // Vodafone Avatar
+    let selectedKeywords = [];
 
-.onboarding-container {
-    max-width: 420px;
-    width: 100%;
-    height: 85vh;
-    max-height: 750px;
-    background-color: #fff;
-    border-radius: 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
+    function addMessage(sender, text, isHtml = false) {
+        const wrapper = document.createElement('div');
+        wrapper.className = `message-wrapper ${sender}`;
+        if (sender === 'concierge') {
+            const avatarImg = document.createElement('img');
+            avatarImg.src = avatarUrl;
+            avatarImg.className = 'chat-avatar';
+            avatarImg.alt = 'TOBi the Assistant';
+            wrapper.appendChild(avatarImg);
+        }
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        if (isHtml) { bubble.innerHTML = text; } else { bubble.innerText = text; }
+        wrapper.appendChild(bubble);
+        chatBody.prepend(wrapper);
+    }
 
-.simple-header {
-    text-align: center;
-    padding: 20px;
-    border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
-}
-.header-icon {
-    height: 28px;
-    width: auto;
-    fill: var(--primary-color); /* Use the brand color for the icon */
-    margin-bottom: 8px;
-}
-.simple-header h1 {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0;
-    color: var(--text-dark);
-}
-
-#content-area {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-}
-
-#welcome-screen, #chat-view {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-#welcome-screen {
-    padding: 30px 20px;
-    text-align: center;
-    animation: fadeIn 0.5s ease-out;
-    box-sizing: border-box;
-}
-.welcome-header { margin-bottom: 20px; }
-.welcome-avatar { width: 90px; height: 90px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-.concierge-name-tag { margin-top: 10px; font-weight: 600; color: var(--text-dark); }
-.initial-bubble { background: #F0F2F5; color: var(--text-dark); padding: 15px 20px; border-radius: 20px; border-bottom-left-radius: 6px; max-width: 90%; margin: 0 auto; line-height: 1.6; font-size: 16px; text-align: center; }
-.initial-choices { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; }
-.choice-button { width: 100%; padding: 18px; border-radius: 12px; border: 1px solid var(--border-color); background-color: #fff; font-size: 16px; font-weight: 500; color: var(--text-dark); cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
-.choice-button:hover { border-color: var(--primary-color); box-shadow: 0 4px 15px rgba(230, 0, 0, 0.1); transform: translateY(-2px); }
-
-.hidden { display: none !important; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-/* Duplicating chat styles for completeness */
-.chat-body-styled { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column-reverse; background-color: #F9FAFB; }
-.message-wrapper { margin-bottom: 12px; display: flex; max-width: 100%; align-items: flex-end; }
-.concierge { justify-content: flex-start; }
-.user { justify-content: flex-end; }
-.chat-avatar { width: 36px; height: 36px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
-.bubble { padding: 12px 16px; border-radius: 20px; max-width: 80%; line-height: 1.6; font-size: 16px; }
-.concierge .bubble { background: #E5E7EB; color: var(--text-dark); border-bottom-left-radius: 6px; }
-.user .bubble { background: var(--primary-color); color: white; border-bottom-right-radius: 6px; }
-.chat-input-area-styled { padding: 16px; border-top: 1px solid var(--border-color); background: #fff; }
-#input-row { display: flex; align-items: center; }
-.input-field { flex: 1; width: 100%; padding: 14px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; }
-#send-button { width: 48px; height: 48px; margin-left: 12px; border-radius: 8px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5em; background-color: var(--primary-color); color: #fff; border: none; cursor: pointer; }
-#quick-replies-container { display: flex; flex-wrap: wrap; justify-content: flex-end; margin-bottom: 12px; }
-.quick-reply-btn { margin: 4px; padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); background: white; color: var(--text-dark); cursor: pointer; font-size: 14px; font-weight: 500; }
-.quick-reply-btn.selected { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
-.continue-btn { background-color: var(--primary-color); color: white; font-weight: 600; flex-basis: 100%; margin-top: 8px; padding: 12px; font-size: 16px; border-radius: 8px; }
-.review-draft-textarea { width: 100%; box-sizing: border-box; height: 120px; margin: 10px 0; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color); font-family: 'Inter', sans-serif; font-size: 16px; resize: vertical; }
-.typing-indicator .bubble { display: flex; align-items: center; padding: 12px 15px; }
-.dot { width: 8px; height: 8px; margin: 0 2px; background-color: #9CA3AF; border-radius: 50%; animation: bounce 1.3s infinite ease-in-out; }
-.dot:nth-child(2) { animation-delay: -1.1s; }
-.dot:nth-child(3) { animation-delay: -0.9s; }
-@keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
+    // Renamed for clarity, now called by startConversation and other actions
+    async function getAIResponse(content, isSilent = false) {
+        if (content) {
+            if (!isSilent) { addMessage('user', content); }
+            conversationHistory.push({ role: 'user', content });
+        }
+        clearQuickReplies();
+        showTypingIndicator();
+        try {
+            const response = await fetch('/api/concierge', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: conversationHistory }),
+            });
+            if (!response.ok) throw new Error('Network response was not ok.');
+            const data = await response.json();
+            const aiMessage = data.message;
+            conversationHistory.push(aiMessage);
+            processAIResponse(aiMessage.content);
+        } catch (error) {
+            console.error("Fetch Error:", error);
+            processAIResponse('Sorry, I seem to be having trouble connecting. Please try again later.');
+        }
+    }
+    
+    function showTypingIndicator() {
+        if (document.querySelector('.typing-indicator')) return;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'message-wrapper concierge typing-indicator';
+        wrapper.innerHTML = `<img src="${avatarUrl}" class="chat-avatar" alt="TOBi typing"><div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
+        chatBody.prepend(wrapper);
+    }
+    function removeTypingIndicator() {
+        const indicator = document.querySelector('.typing-indicator');
+        if (indicator) indicator.remove();
+    }
+    function processAIResponse(text) {
+        removeTypingIndicator();
+        if (text.includes("|")) {
+            const parts = text.split('|');
+            const statement = parts[0].trim();
+            const question = parts[1].trim();
+            addMessage('concierge', statement);
+            setTimeout(() => {
+                showTypingIndicator();
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    handleFinalMessagePart(question);
+                }, 1200);
+            }, 1000);
+        } else {
+            handleFinalMessagePart(text);
+        }
+    }
+    function handleFinalMessagePart(text) {
+         if (text.includes("main reason for your visit today?")) {
+            addMessage('concierge', text);
+            const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"];
+            createMultiSelectButtons(tier1Options);
+         } else if (text.includes("what else stood out?")) {
+            addMessage('concierge', text);
+            const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved", "👍 No Other Highlights"];
+            createMultiSelectButtons(tier2Options);
+         } else if (text.toLowerCase().includes("would you like me to draft")) {
+             addMessage('concierge', text);
+             createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
+         } else {
+            const quoteRegex = /"(.*?)"/;
+            const matches = text.match(quoteRegex);
+            if (matches && matches[1].length > 10) {
+                const reviewText = matches[1];
+                addMessage('concierge', "Here's a draft based on your feedback:");
+                createEditableDraft(reviewText);
+            } else {
+                addMessage('concierge', text);
+            }
+        }
+    }
+    function createEditableDraft(reviewText) {
+        clearQuickReplies();
+        const oldDraft = document.getElementById('review-draft-wrapper');
+        if(oldDraft) oldDraft.remove();
+        const wrapper = document.createElement('div');
+        wrapper.id = 'review-draft-wrapper';
+        const textArea = document.createElement('textarea');
+        textArea.id = 'review-draft-textarea';
+        textArea.className = 'review-draft-textarea';
+        textArea.value = reviewText;
+        wrapper.appendChild(textArea);
+        chatBody.prepend(wrapper);
+        addMessage('concierge', 'Feel free to edit it. When you\'re ready, just tap below.');
+        createPostButtons();
+    }
+    function createQuickReplies(replies) {
+        clearQuickReplies();
+        inputRow.style.display = 'none';
+        replies.forEach(replyText => {
+            const button = document.createElement('button');
+            button.className = 'quick-reply-btn';
+            button.innerText = replyText;
+            button.onclick = () => { getAIResponse(replyText); };
+            quickRepliesContainer.appendChild(button);
+        });
+    }
+    function createMultiSelectButtons(options) {
+        clearQuickReplies();
+        inputRow.style.display = 'none';
+        selectedKeywords = [];
+        options.forEach(optionText => {
+            const button = document.createElement('button');
+            button.className = 'quick-reply-btn';
+            button.innerText = optionText;
+            button.onclick = () => {
+                if (optionText === "➡️ More options") {
+                    addMessage('user', 'More options');
+                    button.style.display = 'none';
+                    showTypingIndicator();
+                    setTimeout(() => {
+                        removeTypingIndicator();
+                        const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved"];
+                        const continueButton = document.querySelector('.continue-btn');
+                        tier2Options.forEach(tier2Text => {
+                            const newButton = document.createElement('button');
+                            newButton.className = 'quick-reply-btn';
+                            newButton.innerText = tier2Text;
+                            newButton.onclick = () => {
+                                newButton.classList.toggle('selected');
+                                if (selectedKeywords.includes(tier2Text)) {
+                                    selectedKeywords = selectedKeywords.filter(k => k !== tier2Text);
+                                } else {
+                                    selectedKeywords.push(tier2Text);
+                                }
+                            };
+                            quickRepliesContainer.insertBefore(newButton, continueButton);
+                        });
+                    }, 800);
+                    return;
+                }
+                button.classList.toggle('selected');
+                if (selectedKeywords.includes(optionText)) {
+                    selectedKeywords = selectedKeywords.filter(k => k !== optionText);
+                } else {
+                    selectedKeywords.push(optionText);
+                }
+            };
+            quickRepliesContainer.appendChild(button);
+        });
+        const continueButton = document.createElement('button');
+        continueButton.className = 'quick-reply-btn continue-btn';
+        continueButton.innerText = 'Continue';
+        continueButton.onclick = () => {
+            const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No Other Highlights";
+            getAIResponse(combinedMessage);
+        };
+        quickRepliesContainer.appendChild(continueButton);
+    }
+    function createPostButtons() {
+        clearQuickReplies();
+        inputRow.style.display = 'none';
+        const postButton = document.createElement('button');
+        postButton.className = 'quick-reply-btn';
+        postButton.innerText = '✅ Post to Google';
+        postButton.onclick = () => {
+            const draftText = document.getElementById('review-draft-textarea').value;
+            navigator.clipboard.writeText(draftText).then(() => {
+                window.open(googleReviewUrl, '_blank');
+                // showThankYouScreen(); // Add this back if you want the final screen
+            });
+        };
+        const regenerateButton = document.createElement('button');
+        regenerateButton.className = 'quick-reply-btn';
+        regenerateButton.innerText = '🔄 Try another version';
+        regenerateButton.onclick = () => {
+             getAIResponse("That wasn't quite right, please try another version.", true);
+        };
+        quickRepliesContainer.appendChild(regenerateButton);
+        quickRepliesContainer.appendChild(postButton);
+    }
+    function clearQuickReplies() {
+        quickRepliesContainer.innerHTML = '';
+        inputRow.style.display = 'flex';
+    }
+    sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { getAIResponse(chatInput.value); chatInput.value = ''; } });
+    chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
+});
