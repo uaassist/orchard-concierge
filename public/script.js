@@ -208,5 +208,8 @@ document.addEventListener('DOMContentLoaded', () => {
         quickRepliesContainer.innerHTML = '';
     }
 
-    getAIResponse("Hello", true);
+    // --- CORRECTED INITIALIZATION LOGIC ---
+    // We now call the AI immediately without showing a typing indicator first.
+    getAIResponse("Hello");
+
 });
