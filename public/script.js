@@ -1,9 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const chatBody = document.getElementById('chat-body');
-    const chatInput = document.getElementById('chat-input');
-    const sendButton = document.getElementById('send-button');
     const quickRepliesContainer = document.getElementById('quick-replies-container');
     const inputRow = document.getElementById('input-row');
+    
     let conversationHistory = [];
     const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
@@ -28,17 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
         chatBody.prepend(wrapper);
     }
 
-    async function getAIResponse(userMessage, isFirstMessage = false) {
-        if (userMessage) {
-            conversationHistory.push({ role: 'user', content: userMessage });
-            if (!isFirstMessage) { // Don't show the user's "Hello"
-                addMessage('user', userMessage);
-            }
+    async function getAIResponse(userMessage) {
+        conversationHistory.push({ role: 'user', content: userMessage });
+        if (userMessage.toLowerCase() !== "hello") {
+            addMessage('user', userMessage);
         }
         clearQuickReplies();
-        if (!isFirstMessage) { // Don't show typing indicator for the very first message
-            showTypingIndicator();
-        }
+        showTypingIndicator();
         try {
             const response = await fetch('/api/concierge', {
                 method: 'POST',
@@ -97,12 +92,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function handleFinalQuestion(question) {
         addMessage('concierge', question, false, true);
-        if (question.toLowerCase().includes("how was your visit") || question.toLowerCase().includes("share your feedback")) {
+        if (question.toLowerCase().includes("how was your visit")) {
             createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."], true);
         } else if (question.includes("main reason for your visit today?")) {
-            createMultiSelectButtons(["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"]);
+            const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"];
+            createMultiSelectButtons(tier1Options);
         } else if (question.includes("what else stood out?")) {
-            createMultiSelectButtons(["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved", "👍 No Other Highlights"]);
+            const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved", "👍 No Other Highlights"];
+            createMultiSelectButtons(tier2Options, true);
         } else if (question.toLowerCase().includes("would you like me to draft")) {
              createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
         }
@@ -123,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function createQuickReplies(replies, useColumnLayout = false) {
         clearQuickReplies();
-        inputRow.style.display = 'none';
         if (useColumnLayout) {
             quickRepliesContainer.classList.add('column-layout');
         } else {
@@ -141,17 +137,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function createMultiSelectButtons(options) {
-        clearQuickReplies();
-        inputRow.style.display = 'none';
-        quickRepliesContainer.classList.remove('column-layout');
-        selectedKeywords = [];
+    function createMultiSelectButtons(options, shouldAppend = false) {
+        if (!shouldAppend) {
+            clearQuickReplies();
+            quickRepliesContainer.classList.remove('column-layout');
+            selectedKeywords = [];
+        }
         options.forEach(optionText => {
             const button = document.createElement('button');
             button.className = 'quick-reply-btn';
             button.innerText = optionText;
-            button.onclick = () => {
-                if (optionText === "➡️ More options") {
+            if (optionText === "➡️ More options") {
+                button.onclick = () => {
                     addMessage('user', 'More options');
                     button.style.display = 'none';
                     showTypingIndicator();
@@ -159,30 +156,38 @@ document.addEventListener('DOMContentLoaded', () => {
                         removeTypingIndicator();
                         handleFinalQuestion("what else stood out?");
                     }, 400);
-                    return;
-                }
-                button.classList.toggle('selected');
-                if (selectedKeywords.includes(optionText)) {
-                    selectedKeywords = selectedKeywords.filter(k => k !== optionText);
-                } else {
-                    selectedKeywords.push(optionText);
-                }
-            };
-            quickRepliesContainer.appendChild(button);
+                };
+            } else {
+                button.onclick = () => {
+                    button.classList.toggle('selected');
+                    if (selectedKeywords.includes(optionText)) {
+                        selectedKeywords = selectedKeywords.filter(k => k !== optionText);
+                    } else {
+                        selectedKeywords.push(optionText);
+                    }
+                };
+            }
+            if (shouldAppend) {
+                const continueButton = document.querySelector('.continue-btn');
+                quickRepliesContainer.insertBefore(button, continueButton);
+            } else {
+                quickRepliesContainer.appendChild(button);
+            }
         });
-        const continueButton = document.createElement('button');
-        continueButton.className = 'quick-reply-btn continue-btn';
-        continueButton.innerText = 'Continue';
-        continueButton.onclick = () => {
-            const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No Other Highlights";
-            getAIResponse(combinedMessage);
-        };
-        quickRepliesContainer.appendChild(continueButton);
+        if (!shouldAppend) {
+            const continueButton = document.createElement('button');
+            continueButton.className = 'quick-reply-btn continue-btn';
+            continueButton.innerText = 'Continue';
+            continueButton.onclick = () => {
+                const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No Other Highlights";
+                getAIResponse(combinedMessage);
+            };
+            quickRepliesContainer.appendChild(continueButton);
+        }
     }
 
     function createPostButtons() {
         clearQuickReplies();
-        inputRow.style.display = 'none';
         quickRepliesContainer.classList.remove('column-layout');
         const regenerateButton = document.createElement('button');
         regenerateButton.className = 'quick-reply-btn';
@@ -203,16 +208,15 @@ document.addEventListener('DOMContentLoaded', () => {
         quickRepliesContainer.appendChild(postButton);
     }
 
+    // UPDATED: This is now hidden from the UI
     function clearQuickReplies() {
         quickRepliesContainer.innerHTML = '';
-        inputRow.style.display = 'flex';
-        chatInput.disabled = false;
+        if (inputRow) {
+            inputRow.style.display = 'none';
+        }
     }
 
-    sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { getAIResponse(chatInput.value); chatInput.value = ''; } });
-    chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
-
-    // --- CORRECTED INITIALIZATION LOGIC ---
-    // Pass a 'true' flag to indicate this is the very first message.
+    // We no longer need the event listeners for the text input
+    
     getAIResponse("Hello", true);
 });
