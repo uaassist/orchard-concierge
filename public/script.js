@@ -1,38 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Element selectors for the two views ---
-    const welcomeScreen = document.getElementById('welcome-screen');
-    const chatView = document.getElementById('chat-view');
-    
     const chatBody = document.getElementById('chat-body');
     const chatInput = document.getElementById('chat-input');
     const sendButton = document.getElementById('send-button');
     const quickRepliesContainer = document.getElementById('quick-replies-container');
     const inputRow = document.getElementById('input-row');
-    
-    // --- Event listeners for the initial choice buttons ---
-    const initialChoiceButtons = document.querySelectorAll('.choice-button');
-    initialChoiceButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const userChoice = button.innerText.trim();
-            startConversation(userChoice);
-        });
-    });
-
-    // --- Function to transition from welcome to chat view ---
-    function startConversation(firstMessage) {
-        welcomeScreen.style.display = 'none'; // Hide the welcome screen
-        chatView.classList.remove('hidden');   // Show the chat view
-        
-        // Start the AI conversation with the user's first choice
-        getAIResponse(firstMessage);
-    }
-
     let conversationHistory = [];
     const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
     const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp'; // Vodafone Avatar
     let selectedKeywords = [];
 
+    function addMessage(sender, text, isHtml = false) { /* ... same as before ... */ }
+    async function sendMessage(content, isSilent = false) { /* ... same as before ... */ }
+    function showTypingIndicator() { /* ... same as before ... */ }
+    function removeTypingIndicator() { /* ... same as before ... */ }
+    function processAIResponse(text) { /* ... same as before ... */ }
+    function handleFinalMessagePart(text) { /* ... same as before ... */ }
+    function createEditableDraft(reviewText) { /* ... same as before ... */ }
+    function createQuickReplies(replies) { /* ... same as before ... */ }
+    function createMultiSelectButtons(options) { /* ... same as before ... */ }
+    function createPostButtons() { /* ... same as before ... */ }
+    function clearQuickReplies() { /* ... same as before ... */ }
+    
+    // --- The rest of the functions are unchanged. I'm including them for completeness ---
+    
     function addMessage(sender, text, isHtml = false) {
         const wrapper = document.createElement('div');
         wrapper.className = `message-wrapper ${sender}`;
@@ -49,12 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.appendChild(bubble);
         chatBody.prepend(wrapper);
     }
-
-    async function getAIResponse(content, isSilent = false) {
-        if (content) {
-            if (!isSilent) { addMessage('user', content); }
-            conversationHistory.push({ role: 'user', content });
-        }
+    async function sendMessage(content, isSilent = false) {
+        if (!isSilent) { addMessage('user', content); }
+        conversationHistory.push({ role: 'user', content });
         clearQuickReplies();
         showTypingIndicator();
         try {
@@ -73,7 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
             processAIResponse('Sorry, I seem to be having trouble connecting. Please try again later.');
         }
     }
-    
     function showTypingIndicator() {
         if (document.querySelector('.typing-indicator')) return;
         const wrapper = document.createElement('div');
@@ -103,8 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
             handleFinalMessagePart(text);
         }
     }
-    
-    // --- THIS IS THE FULLY CORRECTED FUNCTION ---
     function handleFinalMessagePart(text) {
          if (text.toLowerCase().includes("how was your visit") || text.toLowerCase().includes("share your feedback")) {
             addMessage('concierge', text);
@@ -132,7 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-    
     function createEditableDraft(reviewText) {
         clearQuickReplies();
         const oldDraft = document.getElementById('review-draft-wrapper');
@@ -155,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const button = document.createElement('button');
             button.className = 'quick-reply-btn';
             button.innerText = replyText;
-            button.onclick = () => { getAIResponse(replyText); };
+            button.onclick = () => { sendMessage(replyText); };
             quickRepliesContainer.appendChild(button);
         });
     }
@@ -207,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
         continueButton.innerText = 'Continue';
         continueButton.onclick = () => {
             const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No Other Highlights";
-            getAIResponse(combinedMessage);
+            sendMessage(combinedMessage);
         };
         quickRepliesContainer.appendChild(continueButton);
     }
@@ -228,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
         regenerateButton.className = 'quick-reply-btn';
         regenerateButton.innerText = '🔄 Try another version';
         regenerateButton.onclick = () => {
-             getAIResponse("That wasn't quite right, please try another version.", true);
+             sendMessage("That wasn't quite right, please try another version.", true);
         };
         quickRepliesContainer.appendChild(regenerateButton);
         quickRepliesContainer.appendChild(postButton);
@@ -237,8 +221,13 @@ document.addEventListener('DOMContentLoaded', () => {
         quickRepliesContainer.innerHTML = '';
         inputRow.style.display = 'flex';
     }
-    sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { getAIResponse(chatInput.value); chatInput.value = ''; } });
+    sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { sendMessage(chatInput.value); chatInput.value = ''; } });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
 
-    // This block is removed as the conversation now starts after the welcome screen.
+    // --- THIS IS THE CORRECTED INITIALIZATION LOGIC ---
+    // We send a "silent" message to the AI to kick off the conversation
+    setTimeout(() => {
+        sendMessage("Hello", true);
+    }, 500);
+    showTypingIndicator();
 });
