@@ -62,43 +62,55 @@ body {
 .input-field { flex: 1; width: 100%; padding: 14px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; }
 #send-button { width: 48px; height: 48px; margin-left: 12px; border-radius: 8px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5em; background-color: var(--primary-color); color: #fff; border: none; cursor: pointer; }
 
-/* --- UPDATED: Button Layout Styling --- */
+/* --- Default Button Layout (Row) --- */
 #quick-replies-container { 
     display: flex; 
-    flex-direction: column; /* Stack buttons vertically */
-    gap: 10px; /* Add space between buttons */
+    flex-wrap: wrap; 
+    justify-content: flex-end; 
+    gap: 8px; 
     margin-bottom: 12px; 
 }
 .quick-reply-btn { 
-    width: 100%; /* Make buttons full width */
-    box-sizing: border-box; /* Ensure padding is included in width */
-    margin: 0; /* Remove horizontal margins */
-    padding: 16px; 
-    border-radius: 12px; 
+    margin: 0;
+    padding: 8px 16px; 
+    border-radius: 20px; 
     border: 1px solid var(--border-color); 
     background: white; 
     color: var(--text-dark); 
     cursor: pointer; 
-    font-size: 16px; 
+    font-size: 14px; 
     font-weight: 500;
     transition: all 0.2s;
+}
+
+/* --- Specific Styles for the First Step (Column Layout) --- */
+#quick-replies-container.column-layout {
+    flex-direction: column;
+    gap: 12px;
+}
+.column-layout .quick-reply-btn {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 16px;
     text-align: left;
     display: flex;
     align-items: center;
     gap: 10px;
 }
-.quick-reply-btn:hover { 
-    border-color: var(--primary-color); 
+.column-layout .quick-reply-btn:hover {
+    border-color: var(--primary-color);
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
-.quick-reply-btn.selected { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
-.continue-btn { 
-    background-color: var(--primary-color); 
-    color: white; 
-    font-weight: 600; 
-    justify-content: center; /* Center the text for the continue button */
+
+.quick-reply-btn:hover { 
+    border-color: var(--primary-color); 
+    color: var(--primary-color); 
 }
+.quick-reply-btn.selected { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+.continue-btn { background-color: var(--primary-color); color: white; font-weight: 600; flex-basis: 100%; margin-top: 8px; padding: 12px; font-size: 16px; border-radius: 8px; }
 
 .review-draft-textarea { width: 100%; box-sizing: border-box; height: 120px; margin: 10px 0; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color); font-family: 'Inter', sans-serif; font-size: 16px; resize: vertical; }
 .typing-indicator .bubble { display: flex; align-items: center; padding: 12px 15px; }
