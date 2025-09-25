@@ -15,79 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function showTypingIndicator() { /* ... same as before ... */ }
     function removeTypingIndicator() { /* ... same as before ... */ }
     function processAIResponse(text) { /* ... same as before ... */ }
-    
-    // --- THIS IS THE KEY UPDATED FUNCTION ---
-    function handleFinalQuestion(question) {
-        addMessage('concierge', question, false, true);
-        if (question.toLowerCase().includes("how was your visit") || question.toLowerCase().includes("share your feedback")) {
-            createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."], true);
-        } else if (question.includes("main reason for your visit today?")) {
-            // CORRECTED: Telecom Tier 1 options
-            const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"];
-            createMultiSelectButtons(tier1Options);
-        } else if (question.includes("what else stood out?")) {
-            // CORRECTED: Telecom Tier 2 options
-            const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved"];
-            createMultiSelectButtons(tier2Options, true); // Append these to the list
-        } else if (question.toLowerCase().includes("would you like me to draft")) {
-             createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
-        }
-    }
-    
-    // --- THIS FUNCTION IS NOW UPDATED ---
-    function createMultiSelectButtons(options, shouldAppend = false) {
-        if (!shouldAppend) {
-            clearQuickReplies();
-            inputRow.style.display = 'none';
-            quickRepliesContainer.classList.remove('column-layout');
-            selectedKeywords = [];
-        }
-
-        options.forEach(optionText => {
-            const button = document.createElement('button');
-            button.className = 'quick-reply-btn';
-            button.innerText = optionText;
-            
-            if (optionText === "➡️ More options") {
-                button.onclick = () => {
-                    addMessage('user', 'More options');
-                    button.style.display = 'none';
-                    showTypingIndicator();
-                    setTimeout(() => {
-                        removeTypingIndicator();
-                        handleFinalQuestion("what else stood out?");
-                    }, 400);
-                };
-            } else {
-                button.onclick = () => {
-                    button.classList.toggle('selected');
-                    if (selectedKeywords.includes(optionText)) {
-                        selectedKeywords = selectedKeywords.filter(k => k !== optionText);
-                    } else {
-                        selectedKeywords.push(optionText);
-                    }
-                };
-            }
-
-            if (shouldAppend) {
-                const continueButton = document.querySelector('.continue-btn');
-                quickRepliesContainer.insertBefore(button, continueButton);
-            } else {
-                quickRepliesContainer.appendChild(button);
-            }
-        });
-        
-        if (!shouldAppend) {
-            const continueButton = document.createElement('button');
-            continueButton.className = 'quick-reply-btn continue-btn';
-            continueButton.innerText = 'Continue';
-            continueButton.onclick = () => {
-                const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No Other Highlights";
-                getAIResponse(combinedMessage);
-            };
-            quickRepliesContainer.appendChild(continueButton);
-        }
-    }
+    function handleFinalQuestion(question) { /* ... same as before ... */ }
+    function createEditableDraft(reviewText) { /* ... same as before ... */ }
+    function createQuickReplies(replies, useColumnLayout = false) { /* ... same as before ... */ }
+    function createMultiSelectButtons(options) { /* ... same as before ... */ }
+    function createPostButtons() { /* ... same as before ... */ }
+    function clearQuickReplies() { /* ... same as before ... */ }
     
     // --- The rest of the functions are unchanged. I'm including them for completeness ---
     
@@ -155,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     removeTypingIndicator();
                     handleFinalQuestion(question);
                 }, 300);
-            }, 200);
+            }, 500);
         } else {
             const quoteRegex = /"(.*?)"/s;
             const matches = text.match(quoteRegex);
@@ -165,6 +98,18 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 addMessage('concierge', text, false, false);
             }
+        }
+    }
+    function handleFinalQuestion(question) {
+        addMessage('concierge', question, false, true);
+        if (question.toLowerCase().includes("how was your visit") || question.toLowerCase().includes("share your feedback")) {
+            createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."], true);
+        } else if (question.includes("main reason for your visit today?")) {
+            createMultiSelectButtons(["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"]);
+        } else if (question.includes("what else stood out?")) {
+            createMultiSelectButtons(["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved", "👍 No Other Highlights"]);
+        } else if (question.toLowerCase().includes("would you like me to draft")) {
+             createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
         }
     }
     function createEditableDraft(reviewText) {
@@ -198,6 +143,44 @@ document.addEventListener('DOMContentLoaded', () => {
             quickRepliesContainer.appendChild(button);
         });
     }
+    function createMultiSelectButtons(options) {
+        clearQuickReplies();
+        inputRow.style.display = 'none';
+        quickRepliesContainer.classList.remove('column-layout');
+        selectedKeywords = [];
+        options.forEach(optionText => {
+            const button = document.createElement('button');
+            button.className = 'quick-reply-btn';
+            button.innerText = optionText;
+            button.onclick = () => {
+                if (optionText === "➡️ More options") {
+                    addMessage('user', 'More options');
+                    button.style.display = 'none';
+                    showTypingIndicator();
+                    setTimeout(() => {
+                        removeTypingIndicator();
+                        handleFinalQuestion("what else stood out?");
+                    }, 400);
+                    return;
+                }
+                button.classList.toggle('selected');
+                if (selectedKeywords.includes(optionText)) {
+                    selectedKeywords = selectedKeywords.filter(k => k !== optionText);
+                } else {
+                    selectedKeywords.push(optionText);
+                }
+            };
+            quickRepliesContainer.appendChild(button);
+        });
+        const continueButton = document.createElement('button');
+        continueButton.className = 'quick-reply-btn continue-btn';
+        continueButton.innerText = 'Continue';
+        continueButton.onclick = () => {
+            const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No Other Highlights";
+            getAIResponse(combinedMessage);
+        };
+        quickRepliesContainer.appendChild(continueButton);
+    }
     function createPostButtons() {
         clearQuickReplies();
         inputRow.style.display = 'none';
@@ -227,8 +210,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { getAIResponse(chatInput.value); chatInput.value = ''; } });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
-    setTimeout(() => {
-        getAIResponse("Hello");
-    }, 250);
-    showTypingIndicator();
+
+    // --- CORRECTED INITIALIZATION LOGIC ---
+    // We now call the AI immediately and don't show the typing indicator first.
+    getAIResponse("Hello");
 });
