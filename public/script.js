@@ -7,52 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let conversationHistory = [];
     const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
-    const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp'; // Vodafone Avatar
+    const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp';
     let selectedKeywords = [];
 
-    function addMessage(sender, text, isHtml = false) { /* ... same as before ... */ }
-    async function sendMessage(content, isSilent = false) { /* ... same as before ... */ }
-    function showTypingIndicator() { /* ... same as before ... */ }
-    function removeTypingIndicator() { /* ... same as before ... */ }
-    function processAIResponse(text) { /* ... same as before ... */ }
-    
-    // --- THIS IS THE FULLY CORRECTED FUNCTION ---
-    function handleFinalMessagePart(text) {
-         if (text.toLowerCase().includes("how was your visit") || text.toLowerCase().includes("share your feedback")) {
-            addMessage('concierge', text);
-            createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
-         } else if (text.includes("main reason for your visit today?")) {
-            addMessage('concierge', text);
-            const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"];
-            createMultiSelectButtons(tier1Options);
-         } else if (text.includes("what else stood out?")) {
-            addMessage('concierge', text);
-            const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved", "👍 No Other Highlights"];
-            createMultiSelectButtons(tier2Options);
-         } else if (text.toLowerCase().includes("would you like me to draft")) {
-             addMessage('concierge', text);
-             createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
-         } else {
-            const quoteRegex = /"(.*?)"/;
-            const matches = text.match(quoteRegex);
-            if (matches && matches[1].length > 10) {
-                const reviewText = matches[1];
-                addMessage('concierge', "Here's a draft based on your feedback:");
-                createEditableDraft(reviewText);
-            } else {
-                addMessage('concierge', text);
-            }
-        }
-    }
-    
-    function createEditableDraft(reviewText) { /* ... same as before ... */ }
-    function createQuickReplies(replies) { /* ... same as before ... */ }
-    function createMultiSelectButtons(options) { /* ... same as before ... */ }
-    function createPostButtons() { /* ... same as before ... */ }
-    function clearQuickReplies() { /* ... same as before ... */ }
-    
-    // --- The rest of the functions are unchanged. I'm including them for completeness ---
-    
     function addMessage(sender, text, isHtml = false) {
         const wrapper = document.createElement('div');
         wrapper.className = `message-wrapper ${sender}`;
@@ -69,9 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.appendChild(bubble);
         chatBody.prepend(wrapper);
     }
-    async function sendMessage(content, isSilent = false) {
-        if (!isSilent) { addMessage('user', content); }
-        conversationHistory.push({ role: 'user', content });
+
+    async function getAIResponse(userMessage) {
+        if (userMessage) {
+            conversationHistory.push({ role: 'user', content: userMessage });
+            if (userMessage.toLowerCase() !== "hello") { addMessage('user', userMessage); }
+        }
         clearQuickReplies();
         showTypingIndicator();
         try {
@@ -90,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             processAIResponse('Sorry, I seem to be having trouble connecting. Please try again later.');
         }
     }
+
     function showTypingIndicator() {
         if (document.querySelector('.typing-indicator')) return;
         const wrapper = document.createElement('div');
@@ -97,10 +58,12 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.innerHTML = `<img src="${avatarUrl}" class="chat-avatar" alt="TOBi typing"><div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
         chatBody.prepend(wrapper);
     }
+
     function removeTypingIndicator() {
         const indicator = document.querySelector('.typing-indicator');
         if (indicator) indicator.remove();
     }
+
     function processAIResponse(text) {
         removeTypingIndicator();
         if (text.includes("|")) {
@@ -112,19 +75,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 showTypingIndicator();
                 setTimeout(() => {
                     removeTypingIndicator();
-                    handleFinalMessagePart(question);
+                    handleFinalQuestion(question);
                 }, 1200);
             }, 1000);
         } else {
-            handleFinalMessagePart(text);
+            handleFinalQuestion(text);
         }
     }
+    
+    function handleFinalQuestion(question) {
+        addMessage('concierge', question);
+        if (question.toLowerCase().includes("how was your visit") || question.toLowerCase().includes("share your feedback")) {
+            const options = ["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."];
+            createQuickReplies(options, true); // Use column layout for the first step
+        } else if (question.includes("main reason for your visit today?")) {
+            const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"];
+            createMultiSelectButtons(tier1Options);
+        } else if (question.includes("what else stood out?")) {
+            const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved", "👍 No Other Highlights"];
+            createMultiSelectButtons(tier2Options);
+        } else if (question.toLowerCase().includes("would you like me to draft")) {
+             createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
+        } else if (question.includes("Here's a draft")) {
+            const reviewTextMatch = question.match(/"(.*?)"/s);
+            if (reviewTextMatch && reviewTextMatch[1]) {
+                createEditableDraft(reviewTextMatch[1]);
+            }
+        }
+    }
+    
     function createEditableDraft(reviewText) {
         clearQuickReplies();
-        const oldDraft = document.getElementById('review-draft-wrapper');
-        if(oldDraft) oldDraft.remove();
         const wrapper = document.createElement('div');
-        wrapper.id = 'review-draft-wrapper';
         const textArea = document.createElement('textarea');
         textArea.id = 'review-draft-textarea';
         textArea.className = 'review-draft-textarea';
@@ -134,20 +116,28 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessage('concierge', 'Feel free to edit it. When you\'re ready, just tap below.');
         createPostButtons();
     }
-    function createQuickReplies(replies) {
+
+    function createQuickReplies(replies, useColumnLayout = false) {
         clearQuickReplies();
         inputRow.style.display = 'none';
+        if (useColumnLayout) {
+            quickRepliesContainer.classList.add('column-layout');
+        } else {
+            quickRepliesContainer.classList.remove('column-layout');
+        }
         replies.forEach(replyText => {
             const button = document.createElement('button');
             button.className = 'quick-reply-btn';
             button.innerText = replyText;
-            button.onclick = () => { sendMessage(replyText); };
+            button.onclick = () => { getAIResponse(replyText); };
             quickRepliesContainer.appendChild(button);
         });
     }
+
     function createMultiSelectButtons(options) {
         clearQuickReplies();
         inputRow.style.display = 'none';
+        quickRepliesContainer.classList.remove('column-layout'); // Ensure default is row
         selectedKeywords = [];
         options.forEach(optionText => {
             const button = document.createElement('button');
@@ -160,22 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     showTypingIndicator();
                     setTimeout(() => {
                         removeTypingIndicator();
-                        const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved"];
-                        const continueButton = document.querySelector('.continue-btn');
-                        tier2Options.forEach(tier2Text => {
-                            const newButton = document.createElement('button');
-                            newButton.className = 'quick-reply-btn';
-                            newButton.innerText = tier2Text;
-                            newButton.onclick = () => {
-                                newButton.classList.toggle('selected');
-                                if (selectedKeywords.includes(tier2Text)) {
-                                    selectedKeywords = selectedKeywords.filter(k => k !== tier2Text);
-                                } else {
-                                    selectedKeywords.push(tier2Text);
-                                }
-                            };
-                            quickRepliesContainer.insertBefore(newButton, continueButton);
-                        });
+                        handleFinalQuestion("what else stood out?");
                     }, 800);
                     return;
                 }
@@ -193,13 +168,15 @@ document.addEventListener('DOMContentLoaded', () => {
         continueButton.innerText = 'Continue';
         continueButton.onclick = () => {
             const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No Other Highlights";
-            sendMessage(combinedMessage);
+            getAIResponse(combinedMessage);
         };
         quickRepliesContainer.appendChild(continueButton);
     }
+
     function createPostButtons() {
         clearQuickReplies();
         inputRow.style.display = 'none';
+        quickRepliesContainer.classList.remove('column-layout');
         const postButton = document.createElement('button');
         postButton.className = 'quick-reply-btn';
         postButton.innerText = '✅ Post to Google';
@@ -207,29 +184,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const draftText = document.getElementById('review-draft-textarea').value;
             navigator.clipboard.writeText(draftText).then(() => {
                 window.open(googleReviewUrl, '_blank');
-                // showThankYouScreen(); // Add this back if you want the final screen
             });
         };
         const regenerateButton = document.createElement('button');
         regenerateButton.className = 'quick-reply-btn';
         regenerateButton.innerText = '🔄 Try another version';
         regenerateButton.onclick = () => {
-             sendMessage("That wasn't quite right, please try another version.", true);
+             getAIResponse("That wasn't quite right, please try another version.", true);
         };
         quickRepliesContainer.appendChild(regenerateButton);
         quickRepliesContainer.appendChild(postButton);
     }
+
     function clearQuickReplies() {
         quickRepliesContainer.innerHTML = '';
         inputRow.style.display = 'flex';
+        chatInput.disabled = false;
     }
-    sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { sendMessage(chatInput.value); chatInput.value = ''; } });
+
+    sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { getAIResponse(chatInput.value); chatInput.value = ''; } });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
 
-    // --- THIS IS THE CORRECTED INITIALIZATION LOGIC ---
-    // We send a "silent" message to the AI to kick off the conversation
-    setTimeout(() => {
-        sendMessage("Hello", true);
-    }, 500);
-    showTypingIndicator();
+    getAIResponse("Hello");
 });
