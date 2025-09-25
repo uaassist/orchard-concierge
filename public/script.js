@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const quickRepliesContainer = document.getElementById('quick-replies-container');
     const inputRow = document.getElementById('input-row');
     
+    // --- Event listeners for the initial choice buttons ---
     const initialChoiceButtons = document.querySelectorAll('.choice-button');
     initialChoiceButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -17,21 +18,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Function to transition from welcome to chat view ---
     function startConversation(firstMessage) {
-        welcomeScreen.style.display = 'none';
-        chatView.classList.remove('hidden');
+        welcomeScreen.style.display = 'none'; // Hide the welcome screen
+        chatView.classList.remove('hidden');   // Show the chat view
         
-        addMessage('user', firstMessage);
-        conversationHistory.push({ role: 'user', content: firstMessage });
-        
-        // This is the first call to the AI
-        getAIResponse();
+        // Start the AI conversation with the user's first choice
+        getAIResponse(firstMessage);
     }
 
     let conversationHistory = [];
     const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
-    const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp';
+    const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp'; // Vodafone Avatar
     let selectedKeywords = [];
 
     function addMessage(sender, text, isHtml = false) {
@@ -75,9 +74,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    function showTypingIndicator() { /* ... (This function is unchanged) ... */ }
-    function removeTypingIndicator() { /* ... (This function is unchanged) ... */ }
-
+    function showTypingIndicator() {
+        if (document.querySelector('.typing-indicator')) return;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'message-wrapper concierge typing-indicator';
+        wrapper.innerHTML = `<img src="${avatarUrl}" class="chat-avatar" alt="TOBi typing"><div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
+        chatBody.prepend(wrapper);
+    }
+    function removeTypingIndicator() {
+        const indicator = document.querySelector('.typing-indicator');
+        if (indicator) indicator.remove();
+    }
     function processAIResponse(text) {
         removeTypingIndicator();
         if (text.includes("|")) {
@@ -96,8 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
             handleFinalMessagePart(text);
         }
     }
-    
-    // --- THIS FUNCTION IS NOW CORRECTED ---
     function handleFinalMessagePart(text) {
          if (text.includes("main reason for your visit today?")) {
             addMessage('concierge', text);
@@ -121,26 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 addMessage('concierge', text);
             }
         }
-    }
-    
-    function createEditableDraft(reviewText) { /* ... (This function is unchanged) ... */ }
-    function createQuickReplies(replies) { /* ... (This function is unchanged) ... */ }
-    function createMultiSelectButtons(options) { /* ... (This function is unchanged) ... */ }
-    function createPostButtons() { /* ... (This function is unchanged) ... */ }
-    function clearQuickReplies() { /* ... (This function is unchanged) ... */ }
-    
-    // --- The rest of the functions are unchanged. I'm including them for completeness ---
-    
-    function showTypingIndicator() {
-        if (document.querySelector('.typing-indicator')) return;
-        const wrapper = document.createElement('div');
-        wrapper.className = 'message-wrapper concierge typing-indicator';
-        wrapper.innerHTML = `<img src="${avatarUrl}" class="chat-avatar" alt="TOBi typing"><div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
-        chatBody.prepend(wrapper);
-    }
-    function removeTypingIndicator() {
-        const indicator = document.querySelector('.typing-indicator');
-        if (indicator) indicator.remove();
     }
     function createEditableDraft(reviewText) {
         clearQuickReplies();
