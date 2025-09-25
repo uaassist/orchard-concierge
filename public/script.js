@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendButton = document.getElementById('send-button');
     const quickRepliesContainer = document.getElementById('quick-replies-container');
     const inputRow = document.getElementById('input-row');
-    const chatInputArea = document.getElementById('chat-input-area');
     let conversationHistory = [];
     const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
@@ -32,10 +31,14 @@ document.addEventListener('DOMContentLoaded', () => {
     async function getAIResponse(userMessage, isFirstMessage = false) {
         if (userMessage) {
             conversationHistory.push({ role: 'user', content: userMessage });
-            if (!isFirstMessage) { addMessage('user', userMessage); }
+            if (!isFirstMessage) { // Don't show the user's "Hello"
+                addMessage('user', userMessage);
+            }
         }
         clearQuickReplies();
-        showTypingIndicator();
+        if (!isFirstMessage) { // Don't show typing indicator for the very first message
+            showTypingIndicator();
+        }
         try {
             const response = await fetch('/api/concierge', {
                 method: 'POST',
@@ -102,11 +105,9 @@ document.addEventListener('DOMContentLoaded', () => {
             createMultiSelectButtons(["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved", "👍 No Other Highlights"]);
         } else if (question.toLowerCase().includes("would you like me to draft")) {
              createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
-        } else {
-            clearQuickReplies();
         }
     }
-    
+
     function createEditableDraft(reviewText) {
         clearQuickReplies();
         const wrapper = document.createElement('div');
@@ -212,17 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
 
     // --- CORRECTED INITIALIZATION LOGIC ---
-    // Hide the input area to start
-    chatInputArea.style.display = 'none';
-    
-    // This function now also shows the input area after the first message
-    function initializeChat() {
-        showTypingIndicator();
-        setTimeout(() => {
-            chatInputArea.style.display = 'block';
-            getAIResponse("Hello", true);
-        }, 800); // A brief delay before the chat starts
-    }
-    
-    initializeChat();
+    // Pass a 'true' flag to indicate this is the very first message.
+    getAIResponse("Hello", true);
 });
