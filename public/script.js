@@ -106,7 +106,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- THIS IS THE FULLY CORRECTED FUNCTION ---
     function handleFinalMessagePart(text) {
-         if (text.includes("main reason for your visit today?")) {
+         if (text.toLowerCase().includes("how was your visit") || text.toLowerCase().includes("share your feedback")) {
+            addMessage('concierge', text);
+            createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."]);
+         } else if (text.includes("main reason for your visit today?")) {
             addMessage('concierge', text);
             const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"];
             createMultiSelectButtons(tier1Options);
@@ -236,4 +239,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { getAIResponse(chatInput.value); chatInput.value = ''; } });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
+
+    // This block is removed as the conversation now starts after the welcome screen.
 });
