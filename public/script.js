@@ -10,20 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp';
     let selectedKeywords = [];
 
-    function addMessage(sender, text, isHtml = false, isQuestion = false) { /* ... same as before ... */ }
-    async function getAIResponse(userMessage) { /* ... same as before ... */ }
-    function showTypingIndicator() { /* ... same as before ... */ }
-    function removeTypingIndicator() { /* ... same as before ... */ }
-    function processAIResponse(text) { /* ... same as before ... */ }
-    function handleFinalQuestion(question) { /* ... same as before ... */ }
-    function createEditableDraft(reviewText) { /* ... same as before ... */ }
-    function createQuickReplies(replies, useColumnLayout = false) { /* ... same as before ... */ }
-    function createMultiSelectButtons(options) { /* ... same as before ... */ }
-    function createPostButtons() { /* ... same as before ... */ }
-    function clearQuickReplies() { /* ... same as before ... */ }
-    
-    // --- The rest of the functions are unchanged. I'm including them for completeness ---
-    
     function addMessage(sender, text, isHtml = false, isQuestion = false) {
         const wrapper = document.createElement('div');
         wrapper.className = `message-wrapper ${sender}`;
@@ -41,13 +27,18 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.appendChild(bubble);
         chatBody.prepend(wrapper);
     }
-    async function getAIResponse(userMessage) {
+
+    async function getAIResponse(userMessage, isFirstMessage = false) {
         if (userMessage) {
             conversationHistory.push({ role: 'user', content: userMessage });
-            if (userMessage.toLowerCase() !== "hello") { addMessage('user', userMessage); }
+            if (!isFirstMessage) { // Don't show the user's "Hello"
+                addMessage('user', userMessage);
+            }
         }
         clearQuickReplies();
-        showTypingIndicator();
+        if (!isFirstMessage) { // Don't show typing indicator for the very first message
+            showTypingIndicator();
+        }
         try {
             const response = await fetch('/api/concierge', {
                 method: 'POST',
@@ -64,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
             processAIResponse('Sorry, I seem to be having trouble connecting. Please try again later.');
         }
     }
+
     function showTypingIndicator() {
         if (document.querySelector('.typing-indicator')) return;
         const wrapper = document.createElement('div');
@@ -71,10 +63,12 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.innerHTML = `<img src="${avatarUrl}" class="chat-avatar" alt="TOBi typing"><div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
         chatBody.prepend(wrapper);
     }
+
     function removeTypingIndicator() {
         const indicator = document.querySelector('.typing-indicator');
         if (indicator) indicator.remove();
     }
+
     function processAIResponse(text) {
         removeTypingIndicator();
         if (text.includes("|")) {
@@ -100,6 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
+    
     function handleFinalQuestion(question) {
         addMessage('concierge', question, false, true);
         if (question.toLowerCase().includes("how was your visit") || question.toLowerCase().includes("share your feedback")) {
@@ -112,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
              createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
         }
     }
+
     function createEditableDraft(reviewText) {
         clearQuickReplies();
         const wrapper = document.createElement('div');
@@ -124,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessage('concierge', 'Feel free to edit it. When you\'re ready, just tap below.', false, true);
         createPostButtons();
     }
+
     function createQuickReplies(replies, useColumnLayout = false) {
         clearQuickReplies();
         inputRow.style.display = 'none';
@@ -143,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
             quickRepliesContainer.appendChild(button);
         });
     }
+
     function createMultiSelectButtons(options) {
         clearQuickReplies();
         inputRow.style.display = 'none';
@@ -181,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         quickRepliesContainer.appendChild(continueButton);
     }
+
     function createPostButtons() {
         clearQuickReplies();
         inputRow.style.display = 'none';
@@ -203,15 +202,17 @@ document.addEventListener('DOMContentLoaded', () => {
         quickRepliesContainer.appendChild(regenerateButton);
         quickRepliesContainer.appendChild(postButton);
     }
+
     function clearQuickReplies() {
         quickRepliesContainer.innerHTML = '';
         inputRow.style.display = 'flex';
         chatInput.disabled = false;
     }
+
     sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { getAIResponse(chatInput.value); chatInput.value = ''; } });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
 
     // --- CORRECTED INITIALIZATION LOGIC ---
-    // We now call the AI immediately and don't show the typing indicator first.
-    getAIResponse("Hello");
+    // Pass a 'true' flag to indicate this is the very first message.
+    getAIResponse("Hello", true);
 });
