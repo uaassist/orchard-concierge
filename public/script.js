@@ -4,12 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendButton = document.getElementById('send-button');
     const quickRepliesContainer = document.getElementById('quick-replies-container');
     const inputRow = document.getElementById('input-row');
-    // NEW: Selector for the entire input area
     const chatInputArea = document.getElementById('chat-input-area');
-
-    // NEW: Hide the input area on initial load
-    chatInputArea.classList.add('hidden');
-
     let conversationHistory = [];
     const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
@@ -40,9 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!isFirstMessage) { addMessage('user', userMessage); }
         }
         clearQuickReplies();
-        if (!isFirstMessage) {
-            showTypingIndicator();
-        }
+        showTypingIndicator();
         try {
             const response = await fetch('/api/concierge', {
                 method: 'POST',
@@ -99,7 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // --- UPDATED: Now shows the input area when appropriate ---
     function handleFinalQuestion(question) {
         addMessage('concierge', question, false, true);
         if (question.toLowerCase().includes("how was your visit") || question.toLowerCase().includes("share your feedback")) {
@@ -111,26 +103,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (question.toLowerCase().includes("would you like me to draft")) {
              createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
         } else {
-            // If the AI asks a question we don't have buttons for, show the text input
             clearQuickReplies();
         }
     }
-    
-    function createEditableDraft(reviewText) { /* ... same as before ... */ }
-    function createQuickReplies(replies, useColumnLayout = false) { /* ... same as before ... */ }
-    function createMultiSelectButtons(options) { /* ... same as before ... */ }
-    function createPostButtons() { /* ... same as before ... */ }
-    
-    // --- UPDATED: Now shows the input area when cleared ---
-    function clearQuickReplies() {
-        quickRepliesContainer.innerHTML = '';
-        inputRow.style.display = 'flex';
-        chatInput.disabled = false;
-        // Show the whole input area
-        chatInputArea.classList.remove('hidden');
-    }
-
-    // --- The rest of the functions are unchanged. I'm including them for completeness ---
     
     function createEditableDraft(reviewText) {
         clearQuickReplies();
@@ -144,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessage('concierge', 'Feel free to edit it. When you\'re ready, just tap below.', false, true);
         createPostButtons();
     }
+
     function createQuickReplies(replies, useColumnLayout = false) {
         clearQuickReplies();
         inputRow.style.display = 'none';
@@ -163,6 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
             quickRepliesContainer.appendChild(button);
         });
     }
+
     function createMultiSelectButtons(options) {
         clearQuickReplies();
         inputRow.style.display = 'none';
@@ -201,6 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         quickRepliesContainer.appendChild(continueButton);
     }
+
     function createPostButtons() {
         clearQuickReplies();
         inputRow.style.display = 'none';
@@ -223,9 +201,28 @@ document.addEventListener('DOMContentLoaded', () => {
         quickRepliesContainer.appendChild(regenerateButton);
         quickRepliesContainer.appendChild(postButton);
     }
-    
+
+    function clearQuickReplies() {
+        quickRepliesContainer.innerHTML = '';
+        inputRow.style.display = 'flex';
+        chatInput.disabled = false;
+    }
+
     sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { getAIResponse(chatInput.value); chatInput.value = ''; } });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
 
-    getAIResponse("Hello", true);
+    // --- CORRECTED INITIALIZATION LOGIC ---
+    // Hide the input area to start
+    chatInputArea.style.display = 'none';
+    
+    // This function now also shows the input area after the first message
+    function initializeChat() {
+        showTypingIndicator();
+        setTimeout(() => {
+            chatInputArea.style.display = 'block';
+            getAIResponse("Hello", true);
+        }, 800); // A brief delay before the chat starts
+    }
+    
+    initializeChat();
 });
