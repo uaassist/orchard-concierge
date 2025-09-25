@@ -1,8 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
 :root {
-    --primary-color: #E60000;      /* Vodafone Red */
-    --primary-color-hover: #c40000;
+    --primary-color: #E60000;      /* The official Vodafone Red */
     --highlight-bg-color: #fcebeb;
     --text-dark: #1D2B3A;
     --border-color: #DDE2E7;
@@ -22,7 +21,7 @@ body {
     max-width: 420px;
     width: 100%;
     height: 85vh;
-    max-height: 800px; /* Increased max-height for mobile */
+    max-height: 800px;
     background-color: #fff;
     border-radius: 24px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
@@ -31,7 +30,6 @@ body {
     overflow: hidden;
 }
 
-/* UPDATED: Header with better hierarchy */
 .simple-header {
     text-align: center;
     padding: 20px;
@@ -39,13 +37,13 @@ body {
     flex-shrink: 0;
 }
 .header-icon {
-    height: 32px; /* Larger icon */
+    height: 32px;
     width: auto;
     fill: var(--primary-color);
     margin-bottom: 10px;
 }
 .simple-header h1 {
-    font-size: 20px; /* Larger title */
+    font-size: 20px;
     font-weight: 700;
     margin: 0;
     color: var(--text-dark);
@@ -58,11 +56,11 @@ body {
 .user { justify-content: flex-end; }
 .chat-avatar { width: 36px; height: 36px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
 .bubble {
-    padding: 12px 18px; /* Slightly more padding */
+    padding: 12px 18px;
     border-radius: 22px;
     max-width: 80%;
     line-height: 1.6;
-    font-size: 16px; /* Optimized font size */
+    font-size: 16px;
 }
 .concierge .bubble { background: #E5E7EB; color: var(--text-dark); border-bottom-left-radius: 6px; }
 .user .bubble { background: var(--primary-color); color: white; border-bottom-right-radius: 6px; }
@@ -73,44 +71,44 @@ body {
 .input-field { flex: 1; width: 100%; padding: 14px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; }
 #send-button { width: 48px; height: 48px; margin-left: 12px; border-radius: 8px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5em; background-color: var(--primary-color); color: #fff; border: none; cursor: pointer; }
 
-/* --- UPDATED: Mobile-First Button Styles --- */
-#quick-replies-container {
+/* UPDATED: Button Layout Styling with Consistent Height */
+#quick-replies-container { 
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 1fr; /* Make all grid rows the same height */
     gap: 10px;
     margin-bottom: 12px; 
 }
-.quick-reply-btn {
+.quick-reply-btn { 
     margin: 0;
-    padding: 14px 8px; /* Increased vertical padding for bigger tap targets */
-    min-height: 50px; /* Ensure a minimum height */
-    border-radius: 10px;
-    background: transparent; /* Transparent background by default */
-    border: 2px solid var(--border-color); /* Visible border by default */
+    padding: 12px 8px;
+    border-radius: 10px; 
+    border: 2px solid var(--border-color); 
+    background: transparent; 
     color: var(--text-dark); 
     cursor: pointer; 
-    font-size: 15px;
+    font-size: 15px; 
     font-weight: 500;
     transition: all 0.2s;
     text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Vertically center content */
+    justify-content: center; /* Horizontally center content */
+    height: 100%; /* Ensure the button fills the grid cell height */
+    box-sizing: border-box;
 }
 
-/* Hover/Active state now fills the button */
 .quick-reply-btn:hover,
-.quick-reply-btn:active { 
+.quick-reply-btn:active,
+.quick-reply-btn.selected { 
     background-color: var(--primary-color);
     border-color: var(--primary-color);
     color: white; 
 }
 
-/* Column Layout for First Step */
 #quick-replies-container.column-layout { grid-template-columns: 1fr; gap: 12px; }
 .column-layout .quick-reply-btn { padding: 16px; text-align: left; justify-content: flex-start; }
 
-.quick-reply-btn.selected { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 .continue-btn { grid-column: 1 / -1; background-color: var(--primary-color); color: white; font-weight: 600; padding: 16px; font-size: 16px; border-radius: 10px; border: none; }
 
 .quick-reply-btn.primary-action {
@@ -119,9 +117,11 @@ body {
     border-color: var(--primary-color);
     font-weight: 600;
 }
-.quick-reply-btn.primary-action:hover { background-color: var(--primary-color-hover); border-color: var(--primary-color-hover); }
+.quick-reply-btn.primary-action:hover { background-color: #c40000; border-color: #c40000; }
 
-.review-draft-textarea { /* ... unchanged ... */ }
-.typing-indicator { /* ... unchanged ... */ }
-.dot { /* ... unchanged ... */ }
-@keyframes bounce { /* ... unchanged ... */ }
+.review-draft-textarea { width: 100%; box-sizing: border-box; height: 120px; margin: 10px 0; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color); font-family: 'Inter', sans-serif; font-size: 16px; resize: vertical; }
+.typing-indicator .bubble { display: flex; align-items: center; padding: 12px 15px; }
+.dot { width: 8px; height: 8px; margin: 0 2px; background-color: #9CA3AF; border-radius: 50%; animation: bounce 1.3s infinite ease-in-out; }
+.dot:nth-child(2) { animation-delay: -1.1s; }
+.dot:nth-child(3) { animation-delay: -0.9s; }
+@keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
