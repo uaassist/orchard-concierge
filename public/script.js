@@ -30,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     async function getAIResponse(userMessage) {
         if (userMessage) {
             conversationHistory.push({ role: 'user', content: userMessage });
-            // Don't show the initial "Hello" from the user
             if (userMessage.toLowerCase() !== "hello") {
                 addMessage('user', userMessage);
             }
@@ -99,8 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (question.toLowerCase().includes("would you like me to draft")) {
              createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
         } else if (question.includes("Here's a draft")) {
-            const reviewText = question.match(/"(.*?)"/s)[1];
-            createEditableDraft(reviewText);
+            const reviewTextMatch = question.match(/"(.*?)"/s);
+            if (reviewTextMatch && reviewTextMatch[1]) {
+                createEditableDraft(reviewTextMatch[1]);
+            }
         }
     }
     
@@ -152,7 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (selectedKeywords.includes(optionText)) {
                     selectedKeywords = selectedKeywords.filter(k => k !== optionText);
                 } else {
-                    selectedKeywords..push(optionText);
+                    // THIS IS THE CORRECTED LINE
+                    selectedKeywords.push(optionText);
                 }
             };
             quickRepliesContainer.appendChild(button);
@@ -199,6 +201,5 @@ document.addEventListener('DOMContentLoaded', () => {
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
 
     // --- CORRECTED INITIALIZATION ---
-    // We start the conversation by sending an initial "Hello" to the AI.
     getAIResponse("Hello");
 });
