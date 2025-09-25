@@ -7,21 +7,24 @@ document.addEventListener('DOMContentLoaded', () => {
     let conversationHistory = [];
     const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
-    const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp';
+    const avatarUrl = 'https://ucarecdn.com/2008f119-a819-4d18-8fb4-1236ca14b8b8/ChatGPTImageMay22202502_03_10PMezgifcomresize.png';
     let selectedKeywords = [];
 
-    function addMessage(sender, text, isHtml = false) {
+    function addMessage(sender, text, isHtml = false, isQuestion = false) {
         const wrapper = document.createElement('div');
         wrapper.className = `message-wrapper ${sender}`;
         if (sender === 'concierge') {
             const avatarImg = document.createElement('img');
             avatarImg.src = avatarUrl;
             avatarImg.className = 'chat-avatar';
-            avatarImg.alt = 'TOBi the Assistant';
+            avatarImg.alt = 'Alex the Concierge';
             wrapper.appendChild(avatarImg);
         }
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
+        if (isQuestion) {
+            bubble.classList.add('question-bubble');
+        }
         if (isHtml) { bubble.innerHTML = text; } else { bubble.innerText = text; }
         wrapper.appendChild(bubble);
         chatBody.prepend(wrapper);
@@ -55,22 +58,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.querySelector('.typing-indicator')) return;
         const wrapper = document.createElement('div');
         wrapper.className = 'message-wrapper concierge typing-indicator';
-        wrapper.innerHTML = `<img src="${avatarUrl}" class="chat-avatar" alt="TOBi typing"><div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
+        wrapper.innerHTML = `<img src="${avatarUrl}" class="chat-avatar" alt="Alex typing"><div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
         chatBody.prepend(wrapper);
     }
-
     function removeTypingIndicator() {
         const indicator = document.querySelector('.typing-indicator');
         if (indicator) indicator.remove();
     }
-
     function processAIResponse(text) {
         removeTypingIndicator();
         if (text.includes("|")) {
             const parts = text.split('|');
             const statement = parts[0].trim();
             const question = parts[1].trim();
-            addMessage('concierge', statement);
+            addMessage('concierge', statement, false, false);
             setTimeout(() => {
                 showTypingIndicator();
                 setTimeout(() => {
@@ -79,31 +80,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 300);
             }, 200);
         } else {
-            handleFinalQuestion(text);
-        }
-    }
-    
-    function handleFinalQuestion(question) {
-        addMessage('concierge', question);
-        if (question.toLowerCase().includes("how was your visit") || question.toLowerCase().includes("share your feedback")) {
-            const options = ["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."];
-            createQuickReplies(options, true);
-        } else if (question.includes("main reason for your visit today?")) {
-            const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"];
-            createMultiSelectButtons(tier1Options);
-        } else if (question.includes("what else stood out?")) {
-            const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved", "👍 No Other Highlights"];
-            createMultiSelectButtons(tier2Options);
-        } else if (question.toLowerCase().includes("would you like me to draft")) {
-             createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
-        } else if (question.includes("Here's a draft")) {
-            const reviewTextMatch = question.match(/"(.*?)"/s);
-            if (reviewTextMatch && reviewTextMatch[1]) {
-                createEditableDraft(reviewTextMatch[1]);
+            const quoteRegex = /"(.*?)"/s;
+            const matches = text.match(quoteRegex);
+             if (matches && matches[1].length > 10) {
+                addMessage('concierge', "Here's a draft based on your feedback:");
+                createEditableDraft(matches[1]);
+            } else {
+                addMessage('concierge', text, false, false);
             }
         }
     }
-    
+    function handleFinalQuestion(question) {
+        addMessage('concierge', question, false, true);
+        if (question.toLowerCase().includes("how was your visit") || question.toLowerCase().includes("share your feedback")) {
+            createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."], true);
+        } else if (question.includes("main reason for your visit today?")) {
+            createMultiSelectButtons(["✨ Friendly Staff", "🦷 Gentle Hygienist", "👍 Dr. Evans' Care", "🏢 Clean Office", "🕒 On-Time Appointment", "💬 Clear Explanations", "➡️ More options"]);
+        } else if (question.includes("what else stood out?")) {
+            createMultiSelectButtons(["🤖 Advanced Technology", "🛋️ Comfortable Environment", "💳 Billing Was Easy", "🧸 Great with Kids", "👍 No Other Highlights"]);
+        } else if (question.toLowerCase().includes("would you like me to draft")) {
+             createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
+        }
+    }
     function createEditableDraft(reviewText) {
         clearQuickReplies();
         const wrapper = document.createElement('div');
@@ -113,10 +111,9 @@ document.addEventListener('DOMContentLoaded', () => {
         textArea.value = reviewText;
         wrapper.appendChild(textArea);
         chatBody.prepend(wrapper);
-        addMessage('concierge', 'Feel free to edit it. When you\'re ready, just tap below.');
+        addMessage('concierge', 'Feel free to edit it. When you\'re ready, just tap below.', false, true);
         createPostButtons();
     }
-
     function createQuickReplies(replies, useColumnLayout = false) {
         clearQuickReplies();
         inputRow.style.display = 'none';
@@ -136,7 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
             quickRepliesContainer.appendChild(button);
         });
     }
-
     function createMultiSelectButtons(options) {
         clearQuickReplies();
         inputRow.style.display = 'none';
@@ -175,7 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         quickRepliesContainer.appendChild(continueButton);
     }
-
     function createPostButtons() {
         clearQuickReplies();
         inputRow.style.display = 'none';
@@ -198,15 +193,15 @@ document.addEventListener('DOMContentLoaded', () => {
         quickRepliesContainer.appendChild(regenerateButton);
         quickRepliesContainer.appendChild(postButton);
     }
-
     function clearQuickReplies() {
         quickRepliesContainer.innerHTML = '';
         inputRow.style.display = 'flex';
         chatInput.disabled = false;
     }
-
     sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { getAIResponse(chatInput.value); chatInput.value = ''; } });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
-
-    getAIResponse("Hello");
+    setTimeout(() => {
+        getAIResponse("Hello");
+    }, 250);
+    showTypingIndicator();
 });
