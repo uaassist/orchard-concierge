@@ -28,8 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     removeTypingIndicator();
                     handleFinalQuestion(question);
-                }, 600); // Shortened delay
-            }, 500);     // Shortened delay
+                }, 300); // Shortened delay
+            }, 200);     // Shortened delay
         } else {
             handleFinalQuestion(text);
         }
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(() => { // Shortened delay
                         removeTypingIndicator();
                         handleFinalQuestion("what else stood out?");
-                    }, 400);
+                    }, 200);
                     return;
                 }
                 button.classList.toggle('selected');
