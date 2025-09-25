@@ -57,10 +57,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const statement = parts[0].trim();
             const question = parts[1].trim();
             
-            // Special handling for the very first message
             if (statement.toLowerCase().includes("hi! i'm alex")) {
-                initialBubble.innerText = statement; // Populate the welcome bubble
-                handleFinalMessagePart(question);  // Handle the question part to create buttons
+                initialBubble.innerText = statement;
+                handleFinalMessagePart(question);
             } else {
                 addMessage('concierge', statement);
                 setTimeout(() => {
@@ -79,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleFinalMessagePart(text) {
          if (text.toLowerCase().includes("how was your visit")) {
             const choices = ["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."];
-            initialChoicesContainer.innerHTML = ''; // Clear previous
+            initialChoicesContainer.innerHTML = '';
             choices.forEach(choice => {
                 const button = document.createElement('button');
                 button.className = 'choice-button';
@@ -114,7 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- The rest of your functions are the same ---
     // (addMessage, showTypingIndicator, removeTypingIndicator, createEditableDraft, etc.)
     
-    // Pasting all functions for absolute completeness
     function addMessage(sender, text, isHtml = false) {
         const wrapper = document.createElement('div');
         wrapper.className = `message-wrapper ${sender}`;
@@ -234,3 +232,31 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         };
         const regenerateButton = document.createElement('button');
+        regenerateButton.className = 'quick-reply-btn';
+        regenerateButton.innerText = '🔄 Try another version';
+        regenerateButton.onclick = () => {
+             getAIResponse("That wasn't quite right, please try another version.", true);
+        };
+        quickRepliesContainer.appendChild(regenerateButton);
+        quickRepliesContainer.appendChild(postButton);
+    }
+    function showThankYouScreen() {
+        chatView.style.opacity = '0';
+        setTimeout(() => {
+            chatView.style.display = 'none';
+            thankYouScreen.classList.remove('hidden');
+        }, 400);
+    }
+    function clearQuickReplies() {
+        quickRepliesContainer.innerHTML = '';
+        inputRow.style.display = 'flex';
+    }
+    sendButton.addEventListener('click', () => { if (chatInput.value.trim()) { getAIResponse(chatInput.value); chatInput.value = ''; } });
+    chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
+
+    // CORRECTED: This part kicks off the conversation
+    setTimeout(() => {
+        getAIResponse("Hello", true);
+    }, 500);
+    showTypingIndicator(); // Show indicator while waiting for the first message
+});
