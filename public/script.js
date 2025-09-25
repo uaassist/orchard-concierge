@@ -213,4 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
     getAIResponse("Hello");
 });
+ // --- THIS IS THE CORRECTED INITIALIZATION LOGIC ---
+    setTimeout(() => {
+        getAIResponse("Hello");
+    }, 250); // Shortened initial delay
+    showTypingIndicator();
+});
 
