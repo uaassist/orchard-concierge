@@ -103,6 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
             handleFinalMessagePart(text);
         }
     }
+    
+    // --- THIS IS THE FULLY CORRECTED FUNCTION ---
     function handleFinalMessagePart(text) {
          if (text.includes("main reason for your visit today?")) {
             addMessage('concierge', text);
@@ -127,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
+    
     function createEditableDraft(reviewText) {
         clearQuickReplies();
         const oldDraft = document.getElementById('review-draft-wrapper');
