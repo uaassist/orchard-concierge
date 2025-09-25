@@ -28,8 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     removeTypingIndicator();
                     handleFinalQuestion(question);
-                }, 300); // Shortened delay
-            }, 200);     // Shortened delay
+                }, 400); // Shortened delay
+            }, 300);     // Shortened delay
         } else {
             handleFinalQuestion(text);
         }
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(() => { // Shortened delay
                         removeTypingIndicator();
                         handleFinalQuestion("what else stood out?");
-                    }, 200);
+                    }, 400);
                     return;
                 }
                 button.classList.toggle('selected');
@@ -213,3 +213,4 @@ document.addEventListener('DOMContentLoaded', () => {
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) { sendButton.click(); } });
     getAIResponse("Hello");
 });
+
