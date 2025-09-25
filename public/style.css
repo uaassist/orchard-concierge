@@ -2,6 +2,7 @@
 
 :root {
     --primary-color: #E60000;      /* The official Vodafone Red */
+    --highlight-bg-color: #fcebeb; /* A very light red for questions */
     --text-dark: #1D2B3A;
     --border-color: #DDE2E7;
 }
@@ -62,16 +63,16 @@ body {
 .input-field { flex: 1; width: 100%; padding: 14px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; }
 #send-button { width: 48px; height: 48px; margin-left: 12px; border-radius: 8px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5em; background-color: var(--primary-color); color: #fff; border: none; cursor: pointer; }
 
-/* --- UPDATED: Button Layout Styling (Now a 2-Column Grid) --- */
+/* Button Layout Styling (2-Column Grid) */
 #quick-replies-container { 
-    display: grid; /* Use CSS Grid */
-    grid-template-columns: 1fr 1fr; /* Create two equal columns */
-    gap: 10px; /* Space between buttons */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
     margin-bottom: 12px; 
 }
 .quick-reply-btn { 
     margin: 0;
-    padding: 12px 8px; /* Adjusted padding for grid layout */
+    padding: 12px 8px;
     border-radius: 8px; 
     border: 1px solid var(--border-color); 
     background: white; 
@@ -80,12 +81,12 @@ body {
     font-size: 14px; 
     font-weight: 500;
     transition: all 0.2s;
-    text-align: center; /* Center the text inside the buttons */
+    text-align: center;
 }
 
 /* Column Layout for First Step */
 #quick-replies-container.column-layout {
-    grid-template-columns: 1fr; /* Switch to a single column */
+    grid-template-columns: 1fr;
     gap: 12px;
 }
 .column-layout .quick-reply-btn {
@@ -109,9 +110,8 @@ body {
 }
 .quick-reply-btn.selected { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-/* Make the Continue button span both columns */
 .continue-btn { 
-    grid-column: 1 / -1; /* Span from the first to the last column line */
+    grid-column: 1 / -1;
     background-color: var(--primary-color); 
     color: white; 
     font-weight: 600; 
@@ -121,7 +121,6 @@ body {
     border-radius: 8px; 
 }
 
-/* Highlighted Primary Action Buttons */
 .quick-reply-btn.primary-action {
     background-color: var(--primary-color);
     color: white;
@@ -132,6 +131,12 @@ body {
     background-color: #c40000;
     border-color: #c40000;
     color: white;
+}
+
+/* --- RE-ADDED: Styling for Question Bubbles --- */
+.concierge .bubble.question-bubble {
+    font-weight: 500;
+    background-color: var(--highlight-bg-color);
 }
 
 .review-draft-textarea { width: 100%; box-sizing: border-box; height: 120px; margin: 10px 0; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color); font-family: 'Inter', sans-serif; font-size: 16px; resize: vertical; }
