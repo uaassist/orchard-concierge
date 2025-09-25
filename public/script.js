@@ -10,20 +10,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp';
     let selectedKeywords = [];
 
-    function addMessage(sender, text, isHtml = false, isQuestion = false) { /* ... (This function is unchanged) ... */ }
-    async function getAIResponse(userMessage) { /* ... (This function is unchanged) ... */ }
-    function showTypingIndicator() { /* ... (This function is unchanged) ... */ }
-    function removeTypingIndicator() { /* ... (This function is unchanged) ... */ }
-    function processAIResponse(text) { /* ... (This function is unchanged) ... */ }
-    function handleFinalQuestion(question) { /* ... (This function is unchanged) ... */ }
-    function createEditableDraft(reviewText) { /* ... (This function is unchanged) ... */ }
+    function addMessage(sender, text, isHtml = false, isQuestion = false) { /* ... same as before ... */ }
+    async function getAIResponse(userMessage) { /* ... same as before ... */ }
+    function showTypingIndicator() { /* ... same as before ... */ }
+    function removeTypingIndicator() { /* ... same as before ... */ }
+    function processAIResponse(text) { /* ... same as before ... */ }
     
     // --- THIS IS THE KEY UPDATED FUNCTION ---
-    function createMultiSelectButtons(options) {
-        clearQuickReplies();
-        inputRow.style.display = 'none';
-        quickRepliesContainer.classList.remove('column-layout');
-        selectedKeywords = [];
+    function handleFinalQuestion(question) {
+        addMessage('concierge', question, false, true);
+        if (question.toLowerCase().includes("how was your visit") || question.toLowerCase().includes("share your feedback")) {
+            createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."], true);
+        } else if (question.includes("main reason for your visit today?")) {
+            // CORRECTED: Telecom Tier 1 options
+            const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"];
+            createMultiSelectButtons(tier1Options);
+        } else if (question.includes("what else stood out?")) {
+            // CORRECTED: Telecom Tier 2 options
+            const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved"];
+            createMultiSelectButtons(tier2Options, true); // Append these to the list
+        } else if (question.toLowerCase().includes("would you like me to draft")) {
+             createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
+        }
+    }
+    
+    // --- THIS FUNCTION IS NOW UPDATED ---
+    function createMultiSelectButtons(options, shouldAppend = false) {
+        if (!shouldAppend) {
+            clearQuickReplies();
+            inputRow.style.display = 'none';
+            quickRepliesContainer.classList.remove('column-layout');
+            selectedKeywords = [];
+        }
 
         options.forEach(optionText => {
             const button = document.createElement('button');
@@ -33,26 +51,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (optionText === "➡️ More options") {
                 button.onclick = () => {
                     addMessage('user', 'More options');
-                    button.style.display = 'none'; // Hide the "More options" button
-                    
-                    // NEW LOGIC: Append new buttons without clearing
-                    const tier2Options = ["🤖 Advanced Technology", "🛋️ Comfortable Environment", "💳 Billing Was Easy", "🧸 Great with Kids"];
-                    const continueButton = document.querySelector('.continue-btn');
-
-                    tier2Options.forEach(tier2Text => {
-                        const newButton = document.createElement('button');
-                        newButton.className = 'quick-reply-btn';
-                        newButton.innerText = tier2Text;
-                        newButton.onclick = () => {
-                            newButton.classList.toggle('selected');
-                            if (selectedKeywords.includes(tier2Text)) {
-                                selectedKeywords = selectedKeywords.filter(k => k !== tier2Text);
-                            } else {
-                                selectedKeywords.push(tier2Text);
-                            }
-                        };
-                        quickRepliesContainer.insertBefore(newButton, continueButton);
-                    });
+                    button.style.display = 'none';
+                    showTypingIndicator();
+                    setTimeout(() => {
+                        removeTypingIndicator();
+                        handleFinalQuestion("what else stood out?");
+                    }, 400);
                 };
             } else {
                 button.onclick = () => {
@@ -64,22 +68,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 };
             }
-            quickRepliesContainer.appendChild(button);
+
+            if (shouldAppend) {
+                const continueButton = document.querySelector('.continue-btn');
+                quickRepliesContainer.insertBefore(button, continueButton);
+            } else {
+                quickRepliesContainer.appendChild(button);
+            }
         });
         
-        const continueButton = document.createElement('button');
-        continueButton.className = 'quick-reply-btn continue-btn';
-        continueButton.innerText = 'Continue';
-        continueButton.onclick = () => {
-            const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No Other Highlights";
-            getAIResponse(combinedMessage);
-        };
-        quickRepliesContainer.appendChild(continueButton);
+        if (!shouldAppend) {
+            const continueButton = document.createElement('button');
+            continueButton.className = 'quick-reply-btn continue-btn';
+            continueButton.innerText = 'Continue';
+            continueButton.onclick = () => {
+                const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No Other Highlights";
+                getAIResponse(combinedMessage);
+            };
+            quickRepliesContainer.appendChild(continueButton);
+        }
     }
-    
-    function createQuickReplies(replies, useColumnLayout = false) { /* ... (This function is unchanged) ... */ }
-    function createPostButtons() { /* ... (This function is unchanged) ... */ }
-    function clearQuickReplies() { /* ... (This function is unchanged) ... */ }
     
     // --- The rest of the functions are unchanged. I'm including them for completeness ---
     
@@ -157,18 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 addMessage('concierge', text, false, false);
             }
-        }
-    }
-    function handleFinalQuestion(question) {
-        addMessage('concierge', question, false, true);
-        if (question.toLowerCase().includes("how was your visit") || question.toLowerCase().includes("share your feedback")) {
-            createQuickReplies(["🙂 It was great!", "😐 It was okay.", "🙁 It wasn't good."], true);
-        } else if (question.includes("main reason for your visit today?")) {
-            createMultiSelectButtons(["✨ Friendly Staff", "🦷 Gentle Hygienist", "👍 Dr. Evans' Care", "🏢 Clean Office", "🕒 On-Time Appointment", "💬 Clear Explanations", "➡️ More options"]);
-        } else if (question.includes("what else stood out?")) {
-            createMultiSelectButtons(["🤖 Advanced Technology", "🛋️ Comfortable Environment", "💳 Billing Was Easy", "🧸 Great with Kids", "👍 No Other Highlights"]);
-        } else if (question.toLowerCase().includes("would you like me to draft")) {
-             createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
         }
     }
     function createEditableDraft(reviewText) {
