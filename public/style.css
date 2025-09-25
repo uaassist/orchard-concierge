@@ -1,8 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display.swap');
 
 :root {
     --primary-color: #E60000;      /* The official Vodafone Red */
-    --highlight-bg-color: #fcebeb; /* A very light red for questions */
+    --primary-color-hover: #c40000;
+    --highlight-bg-color: #fcebeb;
     --text-dark: #1D2B3A;
     --border-color: #DDE2E7;
 }
@@ -63,77 +64,65 @@ body {
 .input-field { flex: 1; width: 100%; padding: 14px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; }
 #send-button { width: 48px; height: 48px; margin-left: 12px; border-radius: 8px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5em; background-color: var(--primary-color); color: #fff; border: none; cursor: pointer; }
 
-/* Button Layout Styling (2-Column Grid) */
+/* --- UPDATED: Mobile-First Button Styling --- */
 #quick-replies-container { 
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    grid-template-columns: 1fr; /* Default to a single column for all steps */
+    gap: 12px; 
     margin-bottom: 12px; 
 }
 .quick-reply-btn { 
     margin: 0;
-    padding: 12px 8px;
-    border-radius: 8px; 
+    padding: 16px; /* Larger padding for easier tapping */
+    border-radius: 12px; 
     border: 1px solid var(--border-color); 
     background: white; 
     color: var(--text-dark); 
     cursor: pointer; 
-    font-size: 14px; 
+    font-size: 16px; /* Larger font size */
     font-weight: 500;
     transition: all 0.2s;
-    text-align: center;
-}
-
-/* Column Layout for First Step */
-#quick-replies-container.column-layout {
-    grid-template-columns: 1fr;
-    gap: 12px;
-}
-.column-layout .quick-reply-btn {
-    padding: 16px;
-    border-radius: 12px;
-    font-size: 16px;
     text-align: left;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px; /* More space between icon and text */
 }
-.column-layout .quick-reply-btn:hover {
-    border-color: var(--primary-color);
+.quick-reply-btn:hover { 
+    border-color: var(--primary-color); 
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
-
-.quick-reply-btn:hover { 
+.quick-reply-btn.selected { 
+    background-color: var(--primary-color); 
+    color: white; 
     border-color: var(--primary-color); 
-    color: var(--primary-color); 
 }
-.quick-reply-btn.selected { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
+/* Make the Continue button stand out */
 .continue-btn { 
     grid-column: 1 / -1;
     background-color: var(--primary-color); 
     color: white; 
     font-weight: 600; 
+    justify-content: center; /* Center the text */
     margin-top: 8px; 
-    padding: 14px; 
-    font-size: 16px; 
-    border-radius: 8px; 
 }
 
+/* Highlighted Primary Action Buttons */
 .quick-reply-btn.primary-action {
     background-color: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
     font-weight: 600;
+    justify-content: center; /* Center primary action text */
 }
 .quick-reply-btn.primary-action:hover {
-    background-color: #c40000;
-    border-color: #c40000;
+    background-color: var(--primary-color-hover);
+    border-color: var(--primary-color-hover);
     color: white;
 }
 
-/* --- RE-ADDED: Styling for Question Bubbles --- */
+/* Styling for Question Bubbles */
 .concierge .bubble.question-bubble {
     font-weight: 500;
     background-color: var(--highlight-bg-color);
