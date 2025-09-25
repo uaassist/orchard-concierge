@@ -8,21 +8,17 @@
 </head>
 <body>
     <div class="onboarding-container">
-        <!-- Simplified Header -->
         <div class="simple-header">
-            <!-- Vodafone Logo SVG -->
             <svg class="header-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                <path fill="#E60000" d="M224 512c123.8 0 224-100.2 224-224S347.8 64 224 64 0 164.2 0 288s100.2 224 224 224zM147.6 201.2c8.1-13.2 28.5-13.2 36.6 0l42.6 69.3c8.1 13.2-2.3 30.1-18.3 30.1h-85.1c-16 0-26.4-16.9-18.3-30.1l42.5-69.3z"/>
+                <path d="M224 512c123.8 0 224-100.2 224-224S347.8 64 224 64 0 164.2 0 288s100.2 224 224 224zM147.6 201.2c8.1-13.2 28.5-13.2 36.6 0l42.6 69.3c8.1 13.2-2.3 30.1-18.3 30.1h-85.1c-16 0-26.4-16.9-18.3-30.1l42.5-69.3z"/>
             </svg>
             <h1>Vodafone Feedback Assistant</h1>
         </div>
-
-        <!-- The Conversational Chat Area -->
         <div id="chat-body" class="chat-body-styled"></div>
         <div id="chat-input-area" class="chat-input-area-styled">
             <div id="quick-replies-container"></div>
             <div id="input-row">
-                <input type="text" id="chat-input" placeholder="Type a message..." class="input-field" disabled>
+                <input type="text" id="chat-input" placeholder="Type a message..." class="input-field">
                 <button id="send-button" class="button primary" aria-label="Send Message">➤</button>
             </div>
         </div>
