@@ -17,35 +17,13 @@
             <h1>Vodafone Feedback Assistant</h1>
         </div>
 
-        <!-- Content Area -->
-        <div id="content-area">
-            <div id="welcome-screen">
-                <div class="welcome-header">
-                    <!-- Your Correct Vodafone Avatar -->
-                    <img src="https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp" alt="TOBi the Assistant" class="welcome-avatar">
-                    <!-- Your Correct Vodafone AI Name -->
-                    <p class="concierge-name-tag">TOBi</p>
-                </div>
-                <!-- THIS IS THE CORRECTED BUBBLE TEXT -->
-                <div class="initial-bubble">
-                    Hi! I'm TOBi, your digital assistant for Vodafone Ukraine. Could you take a moment to share your feedback on your recent store visit?
-                </div>
-                <div id="initial-choices" class="initial-choices">
-                    <button class="choice-button">🙂 It was great!</button>
-                    <button class="choice-button">😐 It was okay.</button>
-                    <button class="choice-button">🙁 It wasn't good.</button>
-                </div>
-            </div>
-
-            <div id="chat-view" class="hidden">
-                <div id="chat-body" class="chat-body-styled"></div>
-                <div id="chat-input-area" class="chat-input-area-styled">
-                    <div id="quick-replies-container"></div>
-                    <div id="input-row">
-                        <input type="text" id="chat-input" placeholder="Type a message..." class="input-field">
-                        <button id="send-button" class="button primary" aria-label="Send Message">➤</button>
-                    </div>
-                </div>
+        <!-- The Conversational Chat Area -->
+        <div id="chat-body" class="chat-body-styled"></div>
+        <div id="chat-input-area" class="chat-input-area-styled">
+            <div id="quick-replies-container"></div>
+            <div id="input-row">
+                <input type="text" id="chat-input" placeholder="Type a message..." class="input-field" disabled>
+                <button id="send-button" class="button primary" aria-label="Send Message">➤</button>
             </div>
         </div>
     </div>
