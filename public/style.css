@@ -1,9 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
 :root {
-    --primary-color: #E60000;      /* The official Vodafone Red */
-    --primary-color-hover: #c40000;
-    --highlight-bg-color: #fcebeb;
+    --primary-color: #E60000;      /* Vodafone Red */
     --text-dark: #1D2B3A;
     --border-color: #DDE2E7;
 }
@@ -18,142 +16,43 @@ body {
     min-height: 100vh;
 }
 
-.onboarding-container {
-    max-width: 420px;
-    width: 100%;
-    height: 85vh;
-    max-height: 800px;
-    background-color: #fff;
-    border-radius: 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.simple-header {
-    text-align: center;
-    padding: 20px;
-    border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
-}
-.header-icon {
-    height: 32px;
-    width: auto;
-    fill: var(--primary-color);
-    margin-bottom: 10px;
-}
-.simple-header h1 {
-    font-size: 20px;
-    font-weight: 700;
-    margin: 0;
-    color: var(--text-dark);
-}
-
+.onboarding-container { max-width: 420px; width: 100%; height: 85vh; max-height: 800px; background-color: #fff; border-radius: 24px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08); display: flex; flex-direction: column; overflow: hidden; }
+.simple-header { text-align: center; padding: 20px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+.header-icon { height: 32px; width: auto; fill: var(--primary-color); margin-bottom: 10px; }
+.simple-header h1 { font-size: 20px; font-weight: 700; margin: 0; color: var(--text-dark); }
+#content-area { flex: 1; position: relative; overflow: hidden; }
+#welcome-screen, #chat-view { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; }
+#welcome-screen { padding: 30px 20px; text-align: center; animation: fadeIn 0.5s ease-out; box-sizing: border-box; }
+.welcome-header { margin-bottom: 20px; }
+.welcome-avatar { width: 90px; height: 90px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+.concierge-name-tag { margin-top: 10px; font-weight: 600; color: var(--text-dark); }
+.initial-bubble { background: #F0F2F5; color: var(--text-dark); padding: 15px 20px; border-radius: 20px; border-bottom-left-radius: 6px; max-width: 90%; margin: 0 auto; line-height: 1.6; font-size: 16px; text-align: center; }
+.initial-choices { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; }
+.choice-button { width: 100%; padding: 18px; border-radius: 12px; border: 1px solid var(--border-color); background-color: #fff; font-size: 16px; font-weight: 500; color: var(--text-dark); cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
+.choice-button:hover { border-color: var(--primary-color); box-shadow: 0 4px 15px rgba(230, 0, 0, 0.1); transform: translateY(-2px); }
 .chat-body-styled { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column-reverse; background-color: #F9FAFB; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.message-wrapper { margin-bottom: 12px; display: flex; max-width: 100%; animation: fadeIn 0.3s ease-out; align-items: flex-end; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.message-wrapper { margin-bottom: 12px; display: flex; max-width: 100%; align-items: flex-end; }
 .concierge { justify-content: flex-start; }
 .user { justify-content: flex-end; }
 .chat-avatar { width: 36px; height: 36px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
-.bubble {
-    padding: 12px 18px;
-    border-radius: 22px;
-    max-width: 80%;
-    line-height: 1.6;
-    font-size: 16px;
-}
+.bubble { padding: 12px 18px; border-radius: 22px; max-width: 80%; line-height: 1.6; font-size: 16px; }
 .concierge .bubble { background: #E5E7EB; color: var(--text-dark); border-bottom-left-radius: 6px; }
 .user .bubble { background: var(--primary-color); color: white; border-bottom-right-radius: 6px; }
-.concierge .bubble.question-bubble { font-weight: 500; background-color: var(--highlight-bg-color); }
-
+.concierge .bubble.question-bubble { font-weight: 500; background-color: #fcebeb; }
 .chat-input-area-styled { padding: 16px; border-top: 1px solid var(--border-color); background: #fff; }
-#input-row { display: flex; align-items: center; }
-.input-field { flex: 1; width: 100%; padding: 14px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; }
-#send-button { width: 48px; height: 48px; margin-left: 12px; border-radius: 8px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5em; background-color: var(--primary-color); color: #fff; border: none; cursor: pointer; }
-
-#quick-replies-container { 
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-auto-rows: 1fr;
-    gap: 10px;
-    margin-bottom: 12px; 
-}
-.quick-reply-btn { 
-    margin: 0;
-    padding: 12px 8px;
-    border-radius: 10px; 
-    border: 2px solid var(--border-color); 
-    background: transparent; 
-    color: var(--text-dark); 
-    cursor: pointer; 
-    font-size: 15px; 
-    font-weight: 500;
-    transition: all 0.2s;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    box-sizing: border-box;
-}
-
-.quick-reply-btn:hover,
-.quick-reply-btn:active,
-.quick-reply-btn.selected { 
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-    color: white; 
-}
-
+#quick-replies-container { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 10px; margin-bottom: 12px; }
+.quick-reply-btn { margin: 0; padding: 14px 8px; min-height: 50px; border-radius: 10px; background: transparent; border: 2px solid var(--border-color); color: var(--text-dark); cursor: pointer; font-size: 15px; font-weight: 500; transition: all 0.2s; text-align: center; display: flex; align-items: center; justify-content: center; height: 100%; box-sizing: border-box; }
+.quick-reply-btn:hover, .quick-reply-btn:active, .quick-reply-btn.selected { background-color: var(--primary-color); border-color: var(--primary-color); color: white; }
 #quick-replies-container.column-layout { grid-template-columns: 1fr; gap: 12px; }
 .column-layout .quick-reply-btn { padding: 16px; text-align: left; justify-content: flex-start; }
-
 .continue-btn { grid-column: 1 / -1; background-color: var(--primary-color); color: white; font-weight: 600; padding: 16px; font-size: 16px; border-radius: 10px; border: none; }
-
-.quick-reply-btn.primary-action {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-    font-weight: 600;
-    animation: pulse 2s infinite;
-}
-.quick-reply-btn.primary-action:hover {
-    background-color: var(--primary-color-hover);
-    border-color: var(--primary-color-hover);
-    animation: none;
-}
-
+.quick-reply-btn.primary-action { background-color: var(--primary-color); color: white; border-color: var(--primary-color); font-weight: 600; animation: pulse 2s infinite; }
+.quick-reply-btn.primary-action:hover { background-color: #c40000; border-color: #c40000; animation: none; }
 .review-draft-textarea { width: 100%; box-sizing: border-box; height: 120px; margin: 10px 0; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color); font-family: 'Inter', sans-serif; font-size: 16px; resize: vertical; }
-
-/* --- UPDATED: Single-Play Animation for Typing Indicator --- */
-.typing-indicator .bubble {
-    display: flex;
-    align-items: center;
-    padding: 12px 15px;
-}
-.dot {
-    width: 8px;
-    height: 8px;
-    margin: 0 2px;
-    background-color: #9CA3AF;
-    border-radius: 50%;
-    /* UPDATED: Removed 'infinite' */
-    animation: bounce 1.3s ease-in-out; 
-}
-.dot:nth-child(2) { animation-delay: 0.1s; } /* Adjusted delay */
-.dot:nth-child(3) { animation-delay: 0.2s; } /* Adjusted delay */
-@keyframes bounce {
-    0%, 100% { transform: scale(0); }
-    40% { transform: scale(1.0); }
-}
-
-@keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(230, 0, 0, 0.7); }
-    70% { box-shadow: 0 0 0 10px rgba(230, 0, 0, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(230, 0, 0, 0); }
-}
-/* --- NEW: Hide Input Area By Default --- */
-#chat-input-area.hidden {
-    display: none;
-}
+.typing-indicator .bubble { display: flex; align-items: center; padding: 12px 15px; }
+.dot { width: 8px; height: 8px; margin: 0 2px; background-color: #9CA3AF; border-radius: 50%; animation: bounce 1.3s ease-in-out; }
+.dot:nth-child(2) { animation-delay: 0.1s; } .dot:nth-child(3) { animation-delay: 0.2s; }
+@keyframes bounce { 0%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(230, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(230, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(230, 0, 0, 0); } }
+.hidden { display: none !important; }
