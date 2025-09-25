@@ -212,6 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- THIS IS THE CORRECTED INITIALIZATION LOGIC ---
     setTimeout(() => {
         getAIResponse("Hello");
-    }, 250); // Shortened initial delay
+    }, 50); // Shortened initial delay
     showTypingIndicator();
 });
+
