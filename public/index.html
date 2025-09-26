@@ -34,20 +34,24 @@
                 </div>
             </div>
 
-            <!-- NEW: The Choice Screen (Initially hidden) -->
+            <!-- UPDATED: The Choice Screen (Styled like the Welcome Screen) -->
             <div id="choice-screen" class="hidden">
-                <p class="pre-title">Thanks for your feedback!</p>
-                <h1 class="main-title">Please take a moment to leave us a review.</h1>
-                <p class="subtitle">Your responses will help us serve you better in the future.</p>
+                 <div class="welcome-header">
+                    <img src="https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp" alt="TOBi the Assistant" class="welcome-avatar">
+                    <p class="concierge-name-tag">TOBi</p>
+                </div>
+                <div class="initial-bubble">
+                    That's great to hear! To help other customers, would you mind posting a review on Google? I can even help you write it.
+                </div>
                 <p class="ukrainian-prompt">Оберіть, як ви хочете залишити свій відгук:</p>
-                <div class="cta-container">
-                    <button id="ai-draft-btn" class="choice-button-large primary">
-                        🤖 Get your review drafted by TOBi
+                <div class="initial-choices">
+                    <button id="ai-draft-btn" class="choice-button">
+                        🤖 Get TOBi to draft it for me
                         <span>Fast, easy, and ready to publish</span>
                     </button>
-                    <button id="manual-review-btn" class="choice-button-large secondary">
-                        📝 Write my own review on Google
-                        <span>Share your experience in your own words</span>
+                    <button id="manual-review-btn" class="choice-button">
+                        📝 I'll write my own review
+                        <span>Opens Google directly</span>
                     </button>
                 </div>
             </div>
