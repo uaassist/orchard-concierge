@@ -28,30 +28,31 @@
                     Hi! I'm TOBi, your digital assistant. Could you take a moment to share your feedback on your recent store visit?
                 </div>
                 <div id="initial-choices" class="initial-choices">
-                    <button class="choice-button">🙂 It was great!</button>
-                    <button class="choice-button">😐 It was okay.</button>
-                    <button class="choice-button">🙁 It wasn't good.</button>
+                    <button class="choice-button single-line">🙂 It was great!</button>
+                    <button class="choice-button single-line">😐 It was okay.</button>
+                    <button class="choice-button single-line">🙁 It wasn't good.</button>
                 </div>
             </div>
 
-            <!-- NEW: The Choice Screen (Initially hidden) -->
+            <!-- The Choice Screen (Styled like the screenshot) -->
             <div id="choice-screen" class="hidden">
-                <div class="welcome-header">
+                 <div class="welcome-header">
                     <img src="https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp" alt="TOBi the Assistant" class="welcome-avatar">
                     <p class="concierge-name-tag">TOBi</p>
                 </div>
-                <p class="pre-title">Thanks for your feedback!</p>
-                <h1 class="main-title">Please take a moment to leave us a review.</h1>
-                <p class="subtitle">Your responses will help us serve you better in the future.</p>
+                <div class="initial-bubble">
+                    That's great to hear! To help other customers, would you mind posting a review on Google? I can even help you write it.
+                </div>
                 <p class="ukrainian-prompt">Оберіть, як ви хочете залишити свій відгук:</p>
-                <div class="cta-container">
-                    <button id="ai-draft-btn" class="choice-button-large primary">
-                        🤖 Get your review drafted by TOBi
-                        <span>TOBi writes it. You publish it</span>
+                <div class="initial-choices">
+                    <!-- CORRECTED BUTTON STRUCTURE -->
+                    <button id="ai-draft-btn" class="choice-button">
+                        <div class="button-main-text">🤖 Get TOBi to draft it for me</div>
+                        <div class="button-sub-text">Fast, easy, and ready to publish</div>
                     </button>
-                    <button id="manual-review-btn" class="choice-button-large secondary">
-                        📝 Write my own review on Google
-                        <span>Share your experience in your own words</span>
+                    <button id="manual-review-btn" class="choice-button">
+                        <div class="button-main-text">📝 I'll write my own review</div>
+                        <div class="button-sub-text">Opens Google directly</div>
                     </button>
                 </div>
             </div>
@@ -68,17 +69,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
