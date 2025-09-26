@@ -1,30 +1,49 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Element selectors for the two views ---
-    const welcomeScreen = document.getElementById('welcome-screen');
-    const chatView = document.getElementById('chat-view');
     const chatBody = document.getElementById('chat-body');
     const quickRepliesContainer = document.getElementById('quick-replies-container');
-    
-    const initialChoiceButtons = document.querySelectorAll('.choice-button');
-    initialChoiceButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const userChoice = button.innerText.trim();
-            startConversation(userChoice);
-        });
-    });
-
-    function startConversation(firstMessage) {
-        welcomeScreen.style.display = 'none';
-        chatView.classList.remove('hidden');
-        getAIResponse(firstMessage);
-    }
-
     let conversationHistory = [];
-    const placeId = 'ChIJBRz8CwvP1EARf5R4VI2HGs4'; // <-- PASTE YOUR PLACE ID HERE
+    const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
     const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp';
     let selectedKeywords = [];
 
+    function addMessage(sender, text, isHtml = false, isQuestion = false) { /* ... same as before ... */ }
+    async function getAIResponse(userMessage) { /* ... same as before ... */ }
+    function showTypingIndicator() { /* ... same as before ... */ }
+    function removeTypingIndicator() { /* ... same as before ... */ }
+    function processAIResponse(text) { /* ... same as before ... */ }
+    function handleFinalQuestion(question) { /* ... same as before ... */ }
+    
+    // --- THIS IS THE KEY UPDATED FUNCTION ---
+    function createEditableDraft(reviewText) {
+        clearQuickReplies();
+        
+        // 1. Create and display the editable text area FIRST
+        const wrapper = document.createElement('div');
+        // We give it a message-wrapper class but don't add the 'concierge' class
+        // so it appears more like a system element than a message.
+        wrapper.className = 'message-wrapper'; 
+        
+        const textArea = document.createElement('textarea');
+        textArea.id = 'review-draft-textarea';
+        textArea.className = 'review-draft-textarea';
+        textArea.value = reviewText;
+        
+        wrapper.appendChild(textArea);
+        chatBody.prepend(wrapper);
+
+        // 2. NOW, display the instruction and the buttons
+        addMessage('concierge', 'Feel free to edit it. When you\'re ready, just tap below.', false, true);
+        createPostButtons();
+    }
+    
+    function createQuickReplies(replies, useColumnLayout = false) { /* ... same as before ... */ }
+    function createMultiSelectButtons(options, step) { /* ... same as before ... */ }
+    function createPostButtons() { /* ... same as before ... */ }
+    function clearQuickReplies() { /* ... same as before ... */ }
+    
+    // --- The rest of the functions for completeness ---
+    
     function addMessage(sender, text, isHtml = false, isQuestion = false) {
         const wrapper = document.createElement('div');
         wrapper.className = `message-wrapper ${sender}`;
@@ -42,7 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.appendChild(bubble);
         chatBody.prepend(wrapper);
     }
-
     async function getAIResponse(userMessage) {
         addMessage('user', userMessage);
         conversationHistory.push({ role: 'user', content: userMessage });
@@ -64,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
             processAIResponse('Sorry, I seem to be having trouble connecting. Please try again later.');
         }
     }
-    
     function showTypingIndicator() {
         if (document.querySelector('.typing-indicator')) return;
         const wrapper = document.createElement('div');
@@ -112,18 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (question.toLowerCase().includes("would you like me to draft")) {
              createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
         }
-    }
-    function createEditableDraft(reviewText) {
-        clearQuickReplies();
-        const wrapper = document.createElement('div');
-        const textArea = document.createElement('textarea');
-        textArea.id = 'review-draft-textarea';
-        textArea.className = 'review-draft-textarea';
-        textArea.value = reviewText;
-        wrapper.appendChild(textArea);
-        chatBody.prepend(wrapper);
-        addMessage('concierge', 'Feel free to edit it. When you\'re ready, just tap below.', false, true);
-        createPostButtons();
     }
     function createQuickReplies(replies, useColumnLayout = false) {
         clearQuickReplies();
@@ -200,4 +205,3 @@ document.addEventListener('DOMContentLoaded', () => {
         quickRepliesContainer.innerHTML = '';
     }
 });
-
