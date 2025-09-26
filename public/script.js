@@ -77,35 +77,62 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.innerHTML = `<img src="${avatarUrl}" class="chat-avatar" alt="TOBi typing"><div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
         chatBody.prepend(wrapper);
     }
+
     function removeTypingIndicator() {
         const indicator = document.querySelector('.typing-indicator');
         if (indicator) indicator.remove();
     }
+
     function processAIResponse(text) {
         removeTypingIndicator();
-        if (text.includes("|")) {
-            const parts = text.split('|');
-            const statement = parts[0].trim();
-            const question = parts[1].trim();
-            addMessage('concierge', statement, false, false);
+    
+        // This regex can detect a statement, followed by a pipe, followed by one or more button options separated by pipes.
+        const statementAndRepliesRegex = /^(.*?)\|([^|]+(?:\|[^|]+)*)$/;
+        const match = text.match(statementAndRepliesRegex);
+    
+        if (match) {
+            // Case 1: The AI response contains a statement AND quick replies (e.g., "Great!|Yes|No")
+            const statement = match[1].trim();
+            const replies = match[2].split('|').map(item => item.trim());
+            
+            if (statement) { // Only add a message bubble if the statement is not empty
+                 addMessage('concierge', statement, false, false);
+            }
+            
+            // This is the core of the new logic: we now check if the first "reply" is actually a survey question.
+            const isSurveyQuestion = replies[0].includes("main reason for your visit") || replies[0].includes("service experience like");
+    
             setTimeout(() => {
                 showTypingIndicator();
                 setTimeout(() => {
                     removeTypingIndicator();
-                    handleFinalQuestion(question);
+                    if (isSurveyQuestion) {
+                        // If it's a survey question, the question text is the first "reply"
+                        const questionText = replies.shift(); // .shift() removes the first item and returns it
+                        handleFinalQuestion(questionText); 
+                    } else {
+                        // If it's a simple choice (like the initial offer), create the buttons directly
+                        createQuickReplies(replies);
+                    }
                 }, 300);
             }, 500);
+    
         } else {
+            // Case 2: The AI response is a final statement or a review draft
             const quoteRegex = /"(.*?)"/s;
             const matches = text.match(quoteRegex);
-             if (matches && matches[1].length > 10) {
-                addMessage('concierge', "Here's a draft based on your feedback:");
+            if (matches && matches[1].length > 10) {
+                // It's the review draft
+                const statementBeforeDraft = text.split('"')[0].trim();
+                addMessage('concierge', statementBeforeDraft);
                 createEditableDraft(matches[1]);
             } else {
+                // It's a simple final message (e.g., "No problem, have a great day!")
                 addMessage('concierge', text, false, false);
             }
         }
     }
+
     function handleFinalQuestion(question) {
         addMessage('concierge', question, false, true);
         if (question.includes("main reason for your visit today?")) {
@@ -114,10 +141,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (question.includes("what was your service experience like?")) {
             const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved"];
             createMultiSelectButtons(tier2Options, 'experience');
-        } else if (question.toLowerCase().includes("would you like me to draft")) {
-             createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
         }
     }
+
     function createEditableDraft(reviewText) {
         clearQuickReplies();
         const wrapper = document.createElement('div');
@@ -130,17 +156,15 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessage('concierge', 'Feel free to edit it. When you\'re ready, just tap below.', false, true);
         createPostButtons();
     }
-    function createQuickReplies(replies, useColumnLayout = false) {
+
+    function createQuickReplies(replies) {
         clearQuickReplies();
-        if (useColumnLayout) {
-            quickRepliesContainer.classList.add('column-layout');
-        } else {
-            quickRepliesContainer.classList.remove('column-layout');
-        }
+        quickRepliesContainer.classList.remove('column-layout');
+
         replies.forEach(replyText => {
             const button = document.createElement('button');
             button.className = 'quick-reply-btn';
-            if (replyText.includes("Yes, draft it for me")) {
+            if (replyText.toLowerCase().includes("yes")) {
                 button.classList.add('primary-action');
             }
             button.innerText = replyText;
@@ -148,10 +172,11 @@ document.addEventListener('DOMContentLoaded', () => {
             quickRepliesContainer.appendChild(button);
         });
     }
+
     function createMultiSelectButtons(options, step) {
         clearQuickReplies();
         quickRepliesContainer.classList.remove('column-layout');
-        selectedKeywords = [];
+        selectedKeywords = []; // Reset for each step
         options.forEach(optionText => {
             const button = document.createElement('button');
             button.className = 'quick-reply-btn';
@@ -180,27 +205,36 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         quickRepliesContainer.appendChild(continueButton);
     }
+
     function createPostButtons() {
         clearQuickReplies();
         quickRepliesContainer.classList.remove('column-layout');
+        
         const regenerateButton = document.createElement('button');
         regenerateButton.className = 'quick-reply-btn';
         regenerateButton.innerText = '🔄 Try another version';
         regenerateButton.onclick = () => {
              getAIResponse("That wasn't quite right, please try another version.", true);
         };
+
         const postButton = document.createElement('button');
         postButton.className = 'quick-reply-btn primary-action';
         postButton.innerText = '✅ Post to Google';
         postButton.onclick = () => {
             const draftText = document.getElementById('review-draft-textarea').value;
             navigator.clipboard.writeText(draftText).then(() => {
-                window.open(googleReviewUrl, '_blank');
+                addMessage('concierge', "Great! Your review has been copied. I'll open Google for you now. Just tap the 5th star and paste your review. Thank you!");
+                setTimeout(() => {
+                    window.open(googleReviewUrl, '_blank');
+                }, 1500); // Small delay to let user read the message
             });
+            clearQuickReplies(); // Hide buttons after clicking post
         };
+        
         quickRepliesContainer.appendChild(regenerateButton);
         quickRepliesContainer.appendChild(postButton);
     }
+
     function clearQuickReplies() {
         quickRepliesContainer.innerHTML = '';
     }
