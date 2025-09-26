@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Element selectors for the two views ---
+    // --- Element selectors for all three views ---
     const welcomeScreen = document.getElementById('welcome-screen');
+    const choiceScreen = document.getElementById('choice-screen'); // New screen
     const chatView = document.getElementById('chat-view');
     
     const chatBody = document.getElementById('chat-body');
@@ -11,13 +12,39 @@ document.addEventListener('DOMContentLoaded', () => {
     initialChoiceButtons.forEach(button => {
         button.addEventListener('click', () => {
             const userChoice = button.innerText.trim();
-            startConversation(userChoice);
+            
+            if (userChoice === '🙂 It was great!') {
+                // If positive, show the new choice screen instead of starting the chat
+                welcomeScreen.style.display = 'none';
+                choiceScreen.classList.remove('hidden');
+            } else {
+                // For "okay" or "bad" feedback, go directly to the service recovery chat
+                startConversation(userChoice);
+            }
         });
     });
 
-    // --- Function to transition from welcome to chat view ---
+    // --- NEW: Event listeners for the two CTA buttons on the choice screen ---
+    const aiDraftBtn = document.getElementById('ai-draft-btn');
+    const manualReviewBtn = document.getElementById('manual-review-btn');
+
+    aiDraftBtn.addEventListener('click', () => {
+        // Hide the choice screen and start the AI conversation
+        choiceScreen.style.display = 'none';
+        startConversation("It was great!"); // We still need to pass the original positive intent to the AI
+    });
+
+    manualReviewBtn.addEventListener('click', () => {
+        // Open the Google Review page directly
+        window.open(googleReviewUrl, '_blank');
+        // Provide confirmation to the user
+        choiceScreen.innerHTML = `<h1 class="main-title">Thank you!</h1><p class="subtitle">We've opened the Google review page for you in a new tab.</p>`;
+    });
+
+    // --- Function to transition to the chat view ---
     function startConversation(firstMessage) {
-        welcomeScreen.style.display = 'none'; // Hide the welcome screen
+        welcomeScreen.style.display = 'none'; // Ensure welcome screen is hidden
+        choiceScreen.style.display = 'none';  // Ensure choice screen is hidden
         chatView.classList.remove('hidden');   // Show the chat view
         
         // Start the AI conversation with the user's first choice
@@ -27,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let conversationHistory = [];
     const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
-    const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp'; // Vodafone Avatar
+    const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp';
     let selectedKeywords = [];
 
     function addMessage(sender, text, isHtml = false, isQuestion = false) {
@@ -86,20 +113,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function processAIResponse(text) {
         removeTypingIndicator();
     
-        // This regex can detect a statement, followed by a pipe, followed by one or more button options separated by pipes.
         const statementAndRepliesRegex = /^(.*?)\|([^|]+(?:\|[^|]+)*)$/;
         const match = text.match(statementAndRepliesRegex);
     
         if (match) {
-            // Case 1: The AI response contains a statement AND quick replies (e.g., "Great!|Yes|No")
             const statement = match[1].trim();
             const replies = match[2].split('|').map(item => item.trim());
             
-            if (statement) { // Only add a message bubble if the statement is not empty
+            if (statement) {
                  addMessage('concierge', statement, false, false);
             }
             
-            // This is the core of the new logic: we now check if the first "reply" is actually a survey question.
             const isSurveyQuestion = replies[0].includes("main reason for your visit") || replies[0].includes("service experience like");
     
             setTimeout(() => {
@@ -107,27 +131,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     removeTypingIndicator();
                     if (isSurveyQuestion) {
-                        // If it's a survey question, the question text is the first "reply"
-                        const questionText = replies.shift(); // .shift() removes the first item and returns it
+                        const questionText = replies.shift();
                         handleFinalQuestion(questionText); 
                     } else {
-                        // If it's a simple choice (like the initial offer), create the buttons directly
                         createQuickReplies(replies);
                     }
                 }, 300);
             }, 500);
     
         } else {
-            // Case 2: The AI response is a final statement or a review draft
             const quoteRegex = /"(.*?)"/s;
             const matches = text.match(quoteRegex);
             if (matches && matches[1].length > 10) {
-                // It's the review draft
                 const statementBeforeDraft = text.split('"')[0].trim();
                 addMessage('concierge', statementBeforeDraft);
                 createEditableDraft(matches[1]);
             } else {
-                // It's a simple final message (e.g., "No problem, have a great day!")
                 addMessage('concierge', text, false, false);
             }
         }
@@ -160,7 +179,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function createQuickReplies(replies) {
         clearQuickReplies();
         quickRepliesContainer.classList.remove('column-layout');
-
         replies.forEach(replyText => {
             const button = document.createElement('button');
             button.className = 'quick-reply-btn';
@@ -176,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function createMultiSelectButtons(options, step) {
         clearQuickReplies();
         quickRepliesContainer.classList.remove('column-layout');
-        selectedKeywords = []; // Reset for each step
+        selectedKeywords = [];
         options.forEach(optionText => {
             const button = document.createElement('button');
             button.className = 'quick-reply-btn';
@@ -209,14 +227,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function createPostButtons() {
         clearQuickReplies();
         quickRepliesContainer.classList.remove('column-layout');
-        
         const regenerateButton = document.createElement('button');
         regenerateButton.className = 'quick-reply-btn';
         regenerateButton.innerText = '🔄 Try another version';
         regenerateButton.onclick = () => {
              getAIResponse("That wasn't quite right, please try another version.", true);
         };
-
         const postButton = document.createElement('button');
         postButton.className = 'quick-reply-btn primary-action';
         postButton.innerText = '✅ Post to Google';
@@ -226,11 +242,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 addMessage('concierge', "Great! Your review has been copied. I'll open Google for you now. Just tap the 5th star and paste your review. Thank you!");
                 setTimeout(() => {
                     window.open(googleReviewUrl, '_blank');
-                }, 1500); // Small delay to let user read the message
+                }, 1500);
             });
-            clearQuickReplies(); // Hide buttons after clicking post
+            clearQuickReplies();
         };
-        
         quickRepliesContainer.appendChild(regenerateButton);
         quickRepliesContainer.appendChild(postButton);
     }
