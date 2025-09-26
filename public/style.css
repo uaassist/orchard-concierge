@@ -35,22 +35,28 @@ body {
 /* --- CORRECTED BUTTON STYLES to match screenshot --- */
 .choice-button {
     width: 100%;
-    padding: 18px;
+    min-height: 70px; /* Ensure buttons have enough height */
+    padding: 16px 18px;
     border-radius: 12px;
     border: 1px solid var(--border-color);
     background-color: #fff;
     cursor: pointer;
     transition: all 0.2s;
-    /* Flexbox for two-column layout */
     display: flex;
-    flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    box-sizing: border-box; /* Important for padding */
+    justify-content: space-between; /* Pushes the two text divs apart */
+    box-sizing: border-box;
 }
+
+.choice-button:hover { 
+    border-color: var(--primary-color); 
+    box-shadow: 0 4px 15px rgba(230, 0, 0, 0.1); 
+    transform: translateY(-2px); 
+}
+
+/* Modifier class for the first screen's simple buttons */
 .choice-button.single-line {
-    flex-direction: row;
-    align-items: center;
+    justify-content: flex-start; /* Override space-between */
     gap: 10px;
     font-size: 16px;
     font-weight: 500;
@@ -58,29 +64,28 @@ body {
 }
 
 .button-main-text {
-    flex-basis: 55%; /* Give more space to the main text */
     font-size: 16px;
     font-weight: 500;
     color: var(--text-dark);
     line-height: 1.4;
     text-align: left;
 }
+
 .button-sub-text {
-    flex-basis: 45%; /* The rest of the space */
     font-size: 14px;
     font-weight: 400;
     color: #4B5563;
     line-height: 1.4;
     text-align: right;
+    padding-left: 10px; /* Add space between the two columns */
 }
-.choice-button:hover { border-color: var(--primary-color); box-shadow: 0 4px 15px rgba(230, 0, 0, 0.1); transform: translateY(-2px); }
 /* --- END CORRECTED STYLES --- */
 
 .ukrainian-prompt {
     font-weight: 600;
     color: var(--text-dark);
     margin-top: 30px;
-    margin-bottom: -15px; /* Pull the buttons closer */
+    margin-bottom: -15px;
 }
 
 /* --- CHAT VIEW STYLES (Unchanged) --- */
