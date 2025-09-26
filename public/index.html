@@ -12,11 +12,18 @@
              <h1>Vodafone Ukraine</h1>
         </div>
 
+        <!-- NEW: Progress Indicator -->
+        <div id="progress-indicator" class="hidden">
+            <div class="progress-segment"></div>
+            <div class="progress-segment"></div>
+            <div class="progress-segment"></div>
+        </div>
+
         <div id="content-area">
+            <!-- All other content remains the same -->
             <div id="welcome-screen">
                 <div class="welcome-header">
                     <img src="https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp" alt="TOBi the Assistant" class="welcome-avatar">
-                    <!-- Text Updated to match screenshot -->
                     <p class="concierge-name-tag">Hi! I'm TOBi, your AI-powered feedback assistant.</p>
                 </div>
                 <div class="initial-bubble">
@@ -37,11 +44,11 @@
                 <div class="initial-bubble">
                     Perfect. Let's post your feedback on Google. I can write a quick draft to get you started.
                 </div>
-                <p class="ukrainian-prompt">Choose how you want to leave your review:</p>
+                <p class="ukrainian-prompt">Оберіть, як ви хочете залишити свій відгук:</p>
                 <div class="initial-choices">
                     <button id="ai-draft-btn" class="choice-button">
                         <div class="button-main-text">🤖 Get TOBi to draft it for me</div>
-                        <div class="button-sub-text">Fast, easy, and ready to publish</div>
+                        <div class="button-sub-text">TOBi writes it. You publish it.</div>
                     </button>
                     <button id="manual-review-btn" class="choice-button">
                         <div class="button-main-text">📝 I'll write my own review</div>
@@ -61,6 +68,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
-
-
