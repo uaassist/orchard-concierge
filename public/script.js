@@ -1,58 +1,223 @@
-const fetch = require('node-fetch');
-
-const reviewExamples = `
-- "Came in to upgrade my plan and the staff were super helpful. Oksana explained all the new options clearly and I got a great deal. The whole process was much faster than I expected."
-- "Really clean and modern store. The team was friendly and helped me set up my new phone right there. A great, professional experience."
-- "I had an issue with my billing and the manager, Andriy, was very patient and sorted it all out for me. Appreciate the great customer service."
-`;
-
-const systemPrompt = `You are "TOBi," a friendly and helpful digital assistant for a "Vodafone Ukraine" retail store.
-
-**Your Task:**
-Your primary job is to create a high-quality, human-sounding review draft based ONLY on the keywords a user provides.
-
-**Your Thought Process & Narrative Flow:**
-1.  **Analyze the Input:** Look at all the keywords the user provided (e.g., "Helpful Staff", "Fast Service").
-2.  **Find the Story:** Identify the most personal or important keywords to be the core of the story.
-3.  **Construct a Narrative:** Weave the keywords into a short, natural story. Group similar ideas together.
-
-**CRITICAL Rules for the Review Draft:**
--   **DO NOT INVENT DETAILS:** You can ONLY use the keywords the user has provided.
--   **HUMAN TONE:** Use a casual, grounded tone based on the style guide.
--   **WORDS TO AVOID:** Do NOT use marketing words: "fantastic", "seamless", "unparalleled", "amazing".
--   **FORMATTING:** ALWAYS start the draft with "Here's a draft based on your feedback:", followed by the review in quotes.
-
-**Your Conversational Flow (DO NOT change this):**
-1.  **Opening:** The user will start by saying "Hello". Respond with: "Hi! I'm TOBi, your digital assistant for Vodafone Ukraine.|Could you take a moment to share your feedback on your recent store visit?".
-2.  **Positive Path:** If the user's message is "It was great!", respond: "That's great to hear! 🙂|What was the main reason for your visit today? (Tap all that apply)".
-3.  **Acknowledge & Offer to Draft:** After the user selects their keywords, you MUST acknowledge them and then immediately offer to draft the review. Use the separator. Example: "Okay, got it. Helpful Staff and Fast Service. Thanks!|Would you like me to draft a 5-star review for you based on your feedback?".
-4.  **Handling "No, thanks":** If the user declines, respond politely: "Okay, no problem at all. Thanks again for your feedback today. Have a great day!"
-5.  **Negative Path:** If the visit was not good, respond with empathy and offer to connect them to the store manager, using the "|" separator.
-
-**Real Customer Review Examples (Your Style Guide):**
-${reviewExamples}`;
-
-exports.handler = async function (event) {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
-  }
-  const { messages } = JSON.parse(event.body);
-  try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, },
-      body: JSON.stringify({
-        model: 'gpt-4-turbo',
-        messages: [ { role: 'system', content: systemPrompt }, ...messages ],
-        temperature: 0.7,
-      }),
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Element selectors for the two views ---
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const chatView = document.getElementById('chat-view');
+    
+    const chatBody = document.getElementById('chat-body');
+    const quickRepliesContainer = document.getElementById('quick-replies-container');
+    
+    // --- Event listeners for the initial choice buttons ---
+    const initialChoiceButtons = document.querySelectorAll('.choice-button');
+    initialChoiceButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const userChoice = button.innerText.trim();
+            startConversation(userChoice);
+        });
     });
-    if (!response.ok) { const errorData = await response.json(); console.error("OpenAI API Error:", errorData); throw new Error("OpenAI API request failed."); }
-    const data = await response.json();
-    const aiMessage = data.choices[0].message;
-    return { statusCode: 200, body: JSON.stringify({ message: aiMessage }), };
-  } catch (error) {
-    console.error("Error calling OpenAI API:", error);
-    return { statusCode: 500, body: JSON.stringify({ error: "AI service is currently unavailable." }), };
-  }
-};
+
+    // --- Function to transition from welcome to chat view ---
+    function startConversation(firstMessage) {
+        welcomeScreen.style.display = 'none'; // Hide the welcome screen
+        chatView.classList.remove('hidden');   // Show the chat view
+        
+        // Start the AI conversation with the user's first choice
+        getAIResponse(firstMessage);
+    }
+
+    let conversationHistory = [];
+    const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
+    const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
+    const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp'; // Vodafone Avatar
+    let selectedKeywords = [];
+
+    function addMessage(sender, text, isHtml = false, isQuestion = false) {
+        const wrapper = document.createElement('div');
+        wrapper.className = `message-wrapper ${sender}`;
+        if (sender === 'concierge') {
+            const avatarImg = document.createElement('img');
+            avatarImg.src = avatarUrl;
+            avatarImg.className = 'chat-avatar';
+            avatarImg.alt = 'TOBi the Assistant';
+            wrapper.appendChild(avatarImg);
+        }
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        if (isQuestion) { bubble.classList.add('question-bubble'); }
+        if (isHtml) { bubble.innerHTML = text; } else { bubble.innerText = text; }
+        wrapper.appendChild(bubble);
+        chatBody.prepend(wrapper);
+    }
+
+    async function getAIResponse(userMessage) {
+        addMessage('user', userMessage);
+        conversationHistory.push({ role: 'user', content: userMessage });
+        clearQuickReplies();
+        showTypingIndicator();
+        try {
+            const response = await fetch('/api/concierge', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: conversationHistory }),
+            });
+            if (!response.ok) throw new Error('Network response was not ok.');
+            const data = await response.json();
+            const aiMessage = data.message;
+            conversationHistory.push(aiMessage);
+            processAIResponse(aiMessage.content);
+        } catch (error) {
+            console.error("Fetch Error:", error);
+            processAIResponse('Sorry, I seem to be having trouble connecting. Please try again later.');
+        }
+    }
+    
+    function showTypingIndicator() {
+        if (document.querySelector('.typing-indicator')) return;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'message-wrapper concierge typing-indicator';
+        wrapper.innerHTML = `<img src="${avatarUrl}" class="chat-avatar" alt="TOBi typing"><div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
+        chatBody.prepend(wrapper);
+    }
+    function removeTypingIndicator() {
+        const indicator = document.querySelector('.typing-indicator');
+        if (indicator) indicator.remove();
+    }
+    function processAIResponse(text) {
+        removeTypingIndicator();
+        if (text.includes("|")) {
+            const parts = text.split('|');
+            const statement = parts[0].trim();
+            const question = parts[1].trim();
+            addMessage('concierge', statement, false, false);
+            setTimeout(() => {
+                showTypingIndicator();
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    handleFinalQuestion(question);
+                }, 300);
+            }, 500);
+        } else {
+            const quoteRegex = /"(.*?)"/s;
+            const matches = text.match(quoteRegex);
+             if (matches && matches[1].length > 10) {
+                addMessage('concierge', "Here's a draft based on your feedback:");
+                createEditableDraft(matches[1]);
+            } else {
+                addMessage('concierge', text, false, false);
+            }
+        }
+    }
+    function handleFinalQuestion(question) {
+        addMessage('concierge', question, false, true);
+        if (question.includes("main reason for your visit today?")) {
+            const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"];
+            createMultiSelectButtons(tier1Options);
+        } else if (question.includes("what else stood out?")) {
+            const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved"];
+            createMultiSelectButtons(tier2Options, true);
+        } else if (question.toLowerCase().includes("would you like me to draft")) {
+             createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
+        }
+    }
+    function createEditableDraft(reviewText) {
+        clearQuickReplies();
+        const wrapper = document.createElement('div');
+        const textArea = document.createElement('textarea');
+        textArea.id = 'review-draft-textarea';
+        textArea.className = 'review-draft-textarea';
+        textArea.value = reviewText;
+        wrapper.appendChild(wrapper);
+        chatBody.prepend(wrapper);
+        addMessage('concierge', 'Feel free to edit it. When you\'re ready, just tap below.', false, true);
+        createPostButtons();
+    }
+    function createQuickReplies(replies, useColumnLayout = false) {
+        clearQuickReplies();
+        if (useColumnLayout) {
+            quickRepliesContainer.classList.add('column-layout');
+        } else {
+            quickRepliesContainer.classList.remove('column-layout');
+        }
+        replies.forEach(replyText => {
+            const button = document.createElement('button');
+            button.className = 'quick-reply-btn';
+            if (replyText.includes("Yes, draft it for me")) {
+                button.classList.add('primary-action');
+            }
+            button.innerText = replyText;
+            button.onclick = () => { getAIResponse(replyText); };
+            quickRepliesContainer.appendChild(button);
+        });
+    }
+    function createMultiSelectButtons(options, shouldAppend = false) {
+        if (!shouldAppend) {
+            clearQuickReplies();
+            quickRepliesContainer.classList.remove('column-layout');
+            selectedKeywords = [];
+        }
+        options.forEach(optionText => {
+            const button = document.createElement('button');
+            button.className = 'quick-reply-btn';
+            button.innerText = optionText;
+            if (optionText === "➡️ More options") {
+                button.onclick = () => {
+                    addMessage('user', 'More options');
+                    button.style.display = 'none';
+                    showTypingIndicator();
+                    setTimeout(() => {
+                        removeTypingIndicator();
+                        handleFinalQuestion("what else stood out?");
+                    }, 400);
+                };
+            } else {
+                button.onclick = () => {
+                    button.classList.toggle('selected');
+                    if (selectedKeywords.includes(optionText)) {
+                        selectedKeywords = selectedKeywords.filter(k => k !== optionText);
+                    } else {
+                        selectedKeywords.push(optionText);
+                    }
+                };
+            }
+            if (shouldAppend) {
+                const continueButton = document.querySelector('.continue-btn');
+                quickRepliesContainer.insertBefore(button, continueButton);
+            } else {
+                quickRepliesContainer.appendChild(button);
+            }
+        });
+        if (!shouldAppend) {
+            const continueButton = document.createElement('button');
+            continueButton.className = 'quick-reply-btn continue-btn';
+            continueButton.innerText = 'Continue';
+            continueButton.onclick = () => {
+                const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No Other Highlights";
+                getAIResponse(combinedMessage);
+            };
+            quickRepliesContainer.appendChild(continueButton);
+        }
+    }
+    function createPostButtons() {
+        clearQuickReplies();
+        quickRepliesContainer.classList.remove('column-layout');
+        const regenerateButton = document.createElement('button');
+        regenerateButton.className = 'quick-reply-btn';
+        regenerateButton.innerText = '🔄 Try another version';
+        regenerateButton.onclick = () => {
+             getAIResponse("That wasn't quite right, please try another version.", true);
+        };
+        const postButton = document.createElement('button');
+        postButton.className = 'quick-reply-btn primary-action';
+        postButton.innerText = '✅ Post to Google';
+        postButton.onclick = () => {
+            const draftText = document.getElementById('review-draft-textarea').value;
+            navigator.clipboard.writeText(draftText).then(() => {
+                window.open(googleReviewUrl, '_blank');
+            });
+        };
+        quickRepliesContainer.appendChild(regenerateButton);
+        quickRepliesContainer.appendChild(postButton);
+    }
+    function clearQuickReplies() {
+        quickRepliesContainer.innerHTML = '';
+    }
+});
