@@ -21,32 +21,52 @@ body {
 .header-icon { height: 32px; width: auto; fill: var(--primary-color); margin-bottom: 10px; }
 .simple-header h1 { font-size: 20px; font-weight: 700; margin: 0; color: var(--text-dark); }
 #content-area { flex: 1; position: relative; overflow: hidden; }
+
 #welcome-screen, #choice-screen, #chat-view { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; }
-#welcome-screen { padding: 30px 20px; text-align: center; animation: fadeIn 0.5s ease-out; box-sizing: border-box; }
+#welcome-screen, #choice-screen { padding: 30px 20px; text-align: center; animation: fadeIn 0.5s ease-out; box-sizing: border-box; }
+
 .welcome-header { margin-bottom: 20px; }
 .welcome-avatar { width: 90px; height: 90px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
 .concierge-name-tag { margin-top: 10px; font-weight: 600; color: var(--text-dark); }
 .initial-bubble { background: #F0F2F5; color: var(--text-dark); padding: 15px 20px; border-radius: 20px; border-bottom-left-radius: 6px; max-width: 90%; margin: 0 auto; line-height: 1.6; font-size: 16px; text-align: center; }
 .initial-choices { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; }
-.choice-button { width: 100%; padding: 18px; border-radius: 12px; border: 1px solid var(--border-color); background-color: #fff; font-size: 16px; font-weight: 500; color: var(--text-dark); cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
+
+/* MODIFIED to support subtext */
+.choice-button {
+    width: 100%;
+    padding: 18px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background-color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-dark);
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    flex-direction: column; /* Stacks text and subtext */
+    align-items: flex-start;
+    gap: 4px; /* Space between text and subtext */
+    transition: all 0.2s;
+}
 .choice-button:hover { border-color: var(--primary-color); box-shadow: 0 4px 15px rgba(230, 0, 0, 0.1); transform: translateY(-2px); }
 
-/* --- NEW STYLES for Choice Screen --- */
-#choice-screen { padding: 30px 20px; text-align: center; animation: fadeIn 0.5s ease-out; display: flex; flex-direction: column; justify-content: center; height: 100%; box-sizing: border-box; }
-.pre-title { font-size: 16px; font-weight: 500; color: #6B7280; margin-bottom: 8px; }
-.main-title { font-size: 24px; font-weight: 700; color: var(--text-dark); margin: 0 0 12px 0; }
-.subtitle { font-size: 16px; color: #4B5563; line-height: 1.6; max-width: 90%; margin: 0 auto 24px auto; }
-.ukrainian-prompt { font-weight: 600; color: var(--text-dark); margin-bottom: 20px; }
-.cta-container { display: flex; flex-direction: column; gap: 15px; width: 100%; }
-.choice-button-large { width: 100%; padding: 18px 20px; border-radius: 12px; border: 2px solid var(--border-color); background-color: #fff; font-size: 16px; font-weight: 600; color: var(--text-dark); cursor: pointer; text-align: left; transition: all 0.2s; display: flex; flex-direction: column; }
-.choice-button-large:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07); }
-.choice-button-large span { font-size: 14px; font-weight: 400; color: #4B5563; margin-top: 4px; }
-.choice-button-large.primary { background-color: var(--primary-color); border-color: var(--primary-color); color: white; }
-.choice-button-large.primary:hover { background-color: #c40000; border-color: #c40000; }
-.choice-button-large.primary span { color: rgba(255, 255, 255, 0.85); }
-.choice-button-large.secondary:hover { border-color: var(--primary-color); }
-/* --- END NEW STYLES --- */
+/* NEW style for subtext inside buttons */
+.choice-button span {
+    font-size: 14px;
+    font-weight: 400;
+    color: #4B5563;
+    line-height: 1.4;
+}
 
+.ukrainian-prompt {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-top: 30px;
+    margin-bottom: -15px; /* Pull the buttons closer */
+}
+
+/* --- CHAT VIEW STYLES --- */
 .chat-body-styled { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column-reverse; background-color: #F9FAFB; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 .message-wrapper { margin-bottom: 12px; display: flex; max-width: 100%; align-items: flex-end; }
