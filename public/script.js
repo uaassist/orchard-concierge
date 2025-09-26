@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 chatBody.innerHTML = confirmationHTML;
                 setTimeout(() => {
                     window.open(googleReviewUrl, '_blank');
-                }, 3000);
+                }, 5000);
             }).catch(err => {
                 console.error('Failed to copy text: ', err);
                 addMessage('concierge', 'Sorry, there was an error copying the text. Please copy it manually.');
@@ -245,3 +245,4 @@ document.addEventListener('DOMContentLoaded', () => {
         quickRepliesContainer.innerHTML = '';
     }
 });
+
