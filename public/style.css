@@ -32,19 +32,20 @@ body {
 .initial-choices { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; }
 
 
-/* --- CORRECTED BUTTON STYLES to match screenshot --- */
+/* --- CORRECTED BUTTON STYLES for Title/Subtitle --- */
 .choice-button {
     width: 100%;
-    min-height: 70px; /* Ensure buttons have enough height */
-    padding: 16px 18px;
+    padding: 18px;
     border-radius: 12px;
     border: 1px solid var(--border-color);
     background-color: #fff;
     cursor: pointer;
     transition: all 0.2s;
+    /* Flexbox for vertical stacking */
     display: flex;
-    align-items: center;
-    justify-content: space-between; /* Pushes the two text divs apart */
+    flex-direction: column;
+    align-items: flex-start; /* Left-align content */
+    gap: 4px; /* Space between title and subtitle */
     box-sizing: border-box;
 }
 
@@ -54,30 +55,32 @@ body {
     transform: translateY(-2px); 
 }
 
-/* Modifier class for the first screen's simple buttons */
+/* This class keeps the first screen's buttons horizontal */
 .choice-button.single-line {
-    justify-content: flex-start; /* Override space-between */
+    flex-direction: row;
+    align-items: center;
     gap: 10px;
     font-size: 16px;
     font-weight: 500;
     color: var(--text-dark);
 }
 
+/* Title style */
 .button-main-text {
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 600; /* Bolder for emphasis */
     color: var(--text-dark);
     line-height: 1.4;
     text-align: left;
 }
 
+/* Subtitle style */
 .button-sub-text {
     font-size: 14px;
-    font-weight: 400;
-    color: #4B5563;
+    font-weight: 400; /* Lighter weight */
+    color: #4B5563; /* Muted color */
     line-height: 1.4;
-    text-align: right;
-    padding-left: 10px; /* Add space between the two columns */
+    text-align: left;
 }
 /* --- END CORRECTED STYLES --- */
 
