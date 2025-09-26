@@ -56,19 +56,31 @@ body {
     flex-direction: column;
 }
 
-/* --- THIS IS THE KEY CHANGE --- */
 #welcome-screen, #choice-screen {
-    padding: 48px 24px; /* More top padding, less on sides */
+    padding: 48px 24px;
     text-align: center;
     animation: fadeIn 0.5s ease-out;
     box-sizing: border-box;
-    /* justify-content: center; <-- THIS LINE IS REMOVED */
 }
 
 .welcome-header { margin-bottom: 24px; }
 .welcome-avatar { width: 80px; height: 80px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
 .concierge-name-tag { margin-top: 16px; font-size: 18px; font-weight: 600; }
-.initial-bubble { background: var(--background-light); padding: 15px 20px; border-radius: 20px; border-bottom-left-radius: 6px; max-width: 100%; margin: 16px auto 0 auto; line-height: 1.6; font-size: 16px; text-align: center; }
+
+/* --- THIS IS THE KEY CHANGE --- */
+.initial-bubble {
+    background: var(--background-light);
+    padding: 15px 20px;
+    border-radius: 20px;
+    border-bottom-left-radius: 6px;
+    max-width: 100%;
+    margin: 16px auto 0 auto;
+    line-height: 1.6;
+    font-size: 18px; /* <-- Increased from 16px */
+    text-align: center;
+}
+/* --- END CHANGE --- */
+
 .initial-choices { margin-top: 32px; display: flex; flex-direction: column; gap: 12px; }
 
 .choice-button {
