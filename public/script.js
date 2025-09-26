@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Element selectors for all three views ---
     const welcomeScreen = document.getElementById('welcome-screen');
-    const choiceScreen = document.getElementById('choice-screen'); // New screen
+    const choiceScreen = document.getElementById('choice-screen');
     const chatView = document.getElementById('chat-view');
     
     const chatBody = document.getElementById('chat-body');
@@ -12,42 +12,34 @@ document.addEventListener('DOMContentLoaded', () => {
     initialChoiceButtons.forEach(button => {
         button.addEventListener('click', () => {
             const userChoice = button.innerText.trim();
-            
-            if (userChoice === '🙂 It was great!') {
-                // If positive, show the new choice screen instead of starting the chat
+            if (userChoice.includes('It was great!')) {
                 welcomeScreen.style.display = 'none';
                 choiceScreen.classList.remove('hidden');
             } else {
-                // For "okay" or "bad" feedback, go directly to the service recovery chat
                 startConversation(userChoice);
             }
         });
     });
 
-    // --- NEW: Event listeners for the two CTA buttons on the choice screen ---
+    // --- Event listeners for the two CTA buttons on the choice screen ---
     const aiDraftBtn = document.getElementById('ai-draft-btn');
     const manualReviewBtn = document.getElementById('manual-review-btn');
 
     aiDraftBtn.addEventListener('click', () => {
-        // Hide the choice screen and start the AI conversation
         choiceScreen.style.display = 'none';
-        startConversation("It was great!"); // We still need to pass the original positive intent to the AI
+        startConversation("It was great!");
     });
 
     manualReviewBtn.addEventListener('click', () => {
-        // Open the Google Review page directly
         window.open(googleReviewUrl, '_blank');
-        // Provide confirmation to the user
         choiceScreen.innerHTML = `<h1 class="main-title">Thank you!</h1><p class="subtitle">We've opened the Google review page for you in a new tab.</p>`;
     });
 
     // --- Function to transition to the chat view ---
     function startConversation(firstMessage) {
-        welcomeScreen.style.display = 'none'; // Ensure welcome screen is hidden
-        choiceScreen.style.display = 'none';  // Ensure choice screen is hidden
-        chatView.classList.remove('hidden');   // Show the chat view
-        
-        // Start the AI conversation with the user's first choice
+        welcomeScreen.style.display = 'none';
+        choiceScreen.style.display = 'none';
+        chatView.classList.remove('hidden');
         getAIResponse(firstMessage);
     }
 
@@ -110,36 +102,29 @@ document.addEventListener('DOMContentLoaded', () => {
         if (indicator) indicator.remove();
     }
 
+    // --- CORRECTED AND SIMPLIFIED processAIResponse function ---
     function processAIResponse(text) {
         removeTypingIndicator();
-    
-        const statementAndRepliesRegex = /^(.*?)\|([^|]+(?:\|[^|]+)*)$/;
-        const match = text.match(statementAndRepliesRegex);
-    
-        if (match) {
-            const statement = match[1].trim();
-            const replies = match[2].split('|').map(item => item.trim());
+
+        if (text.includes("|")) {
+            // This handles messages like "Statement|Question"
+            const parts = text.split('|');
+            const statement = parts[0].trim();
+            const question = parts[1].trim();
             
-            if (statement) {
-                 addMessage('concierge', statement, false, false);
-            }
-            
-            const isSurveyQuestion = replies[0].includes("main reason for your visit") || replies[0].includes("service experience like");
-    
+            addMessage('concierge', statement, false, false); // Add the first bubble
+
+            // Use timeouts for a more natural, conversational feel
             setTimeout(() => {
                 showTypingIndicator();
                 setTimeout(() => {
                     removeTypingIndicator();
-                    if (isSurveyQuestion) {
-                        const questionText = replies.shift();
-                        handleFinalQuestion(questionText); 
-                    } else {
-                        createQuickReplies(replies);
-                    }
+                    handleFinalQuestion(question); // Add the second bubble (the question)
                 }, 300);
             }, 500);
-    
+
         } else {
+            // This handles the final review draft or a simple text message
             const quoteRegex = /"(.*?)"/s;
             const matches = text.match(quoteRegex);
             if (matches && matches[1].length > 10) {
@@ -153,7 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleFinalQuestion(question) {
-        addMessage('concierge', question, false, true);
+        addMessage('concierge', question, false, true); // This adds the question bubble
+        // And this creates the corresponding buttons for that question
         if (question.includes("main reason for your visit today?")) {
             const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup"];
             createMultiSelectButtons(tier1Options, 'purpose');
