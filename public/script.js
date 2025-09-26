@@ -1,49 +1,35 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Element selectors for the two views ---
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const chatView = document.getElementById('chat-view');
+    
     const chatBody = document.getElementById('chat-body');
     const quickRepliesContainer = document.getElementById('quick-replies-container');
+    
+    // --- Event listeners for the initial choice buttons ---
+    const initialChoiceButtons = document.querySelectorAll('.choice-button');
+    initialChoiceButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const userChoice = button.innerText.trim();
+            startConversation(userChoice);
+        });
+    });
+
+    // --- Function to transition from welcome to chat view ---
+    function startConversation(firstMessage) {
+        welcomeScreen.style.display = 'none'; // Hide the welcome screen
+        chatView.classList.remove('hidden');   // Show the chat view
+        
+        // Start the AI conversation with the user's first choice
+        getAIResponse(firstMessage);
+    }
+
     let conversationHistory = [];
     const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
-    const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp';
+    const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp'; // Vodafone Avatar
     let selectedKeywords = [];
 
-    function addMessage(sender, text, isHtml = false, isQuestion = false) { /* ... same as before ... */ }
-    async function getAIResponse(userMessage) { /* ... same as before ... */ }
-    function showTypingIndicator() { /* ... same as before ... */ }
-    function removeTypingIndicator() { /* ... same as before ... */ }
-    function processAIResponse(text) { /* ... same as before ... */ }
-    function handleFinalQuestion(question) { /* ... same as before ... */ }
-    
-    // --- THIS IS THE KEY UPDATED FUNCTION ---
-    function createEditableDraft(reviewText) {
-        clearQuickReplies();
-        
-        // 1. Create and display the editable text area FIRST
-        const wrapper = document.createElement('div');
-        // We give it a message-wrapper class but don't add the 'concierge' class
-        // so it appears more like a system element than a message.
-        wrapper.className = 'message-wrapper'; 
-        
-        const textArea = document.createElement('textarea');
-        textArea.id = 'review-draft-textarea';
-        textArea.className = 'review-draft-textarea';
-        textArea.value = reviewText;
-        
-        wrapper.appendChild(textArea);
-        chatBody.prepend(wrapper);
-
-        // 2. NOW, display the instruction and the buttons
-        addMessage('concierge', 'Feel free to edit it. When you\'re ready, just tap below.', false, true);
-        createPostButtons();
-    }
-    
-    function createQuickReplies(replies, useColumnLayout = false) { /* ... same as before ... */ }
-    function createMultiSelectButtons(options, step) { /* ... same as before ... */ }
-    function createPostButtons() { /* ... same as before ... */ }
-    function clearQuickReplies() { /* ... same as before ... */ }
-    
-    // --- The rest of the functions for completeness ---
-    
     function addMessage(sender, text, isHtml = false, isQuestion = false) {
         const wrapper = document.createElement('div');
         wrapper.className = `message-wrapper ${sender}`;
@@ -61,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.appendChild(bubble);
         chatBody.prepend(wrapper);
     }
+
     async function getAIResponse(userMessage) {
         addMessage('user', userMessage);
         conversationHistory.push({ role: 'user', content: userMessage });
@@ -82,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
             processAIResponse('Sorry, I seem to be having trouble connecting. Please try again later.');
         }
     }
+    
     function showTypingIndicator() {
         if (document.querySelector('.typing-indicator')) return;
         const wrapper = document.createElement('div');
@@ -121,14 +109,26 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleFinalQuestion(question) {
         addMessage('concierge', question, false, true);
         if (question.includes("main reason for your visit today?")) {
-            const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup"];
-            createMultiSelectButtons(tier1Options, 'purpose');
-        } else if (question.includes("what was your service experience like?")) {
+            const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"];
+            createMultiSelectButtons(tier1Options);
+        } else if (question.includes("what else stood out?")) {
             const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved"];
-            createMultiSelectButtons(tier2Options, 'experience');
+            createMultiSelectButtons(tier2Options, true);
         } else if (question.toLowerCase().includes("would you like me to draft")) {
              createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
         }
+    }
+    function createEditableDraft(reviewText) {
+        clearQuickReplies();
+        const wrapper = document.createElement('div');
+        const textArea = document.createElement('textarea');
+        textArea.id = 'review-draft-textarea';
+        textArea.className = 'review-draft-textarea';
+        textArea.value = reviewText;
+        wrapper.appendChild(wrapper);
+        chatBody.prepend(wrapper);
+        addMessage('concierge', 'Feel free to edit it. When you\'re ready, just tap below.', false, true);
+        createPostButtons();
     }
     function createQuickReplies(replies, useColumnLayout = false) {
         clearQuickReplies();
@@ -148,37 +148,53 @@ document.addEventListener('DOMContentLoaded', () => {
             quickRepliesContainer.appendChild(button);
         });
     }
-    function createMultiSelectButtons(options, step) {
-        clearQuickReplies();
-        quickRepliesContainer.classList.remove('column-layout');
-        selectedKeywords = [];
+    function createMultiSelectButtons(options, shouldAppend = false) {
+        if (!shouldAppend) {
+            clearQuickReplies();
+            quickRepliesContainer.classList.remove('column-layout');
+            selectedKeywords = [];
+        }
         options.forEach(optionText => {
             const button = document.createElement('button');
             button.className = 'quick-reply-btn';
             button.innerText = optionText;
-            button.onclick = () => {
-                button.classList.toggle('selected');
-                if (selectedKeywords.includes(optionText)) {
-                    selectedKeywords = selectedKeywords.filter(k => k !== optionText);
-                } else {
-                    selectedKeywords.push(optionText);
-                }
-            };
-            quickRepliesContainer.appendChild(button);
-        });
-        const continueButton = document.createElement('button');
-        continueButton.className = 'quick-reply-btn continue-btn';
-        continueButton.innerText = 'Continue';
-        continueButton.onclick = () => {
-            let combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No specific highlights";
-            if (step === 'purpose') {
-                combinedMessage = `Purpose of visit was: ${combinedMessage}`;
-            } else if (step === 'experience') {
-                combinedMessage = `Service experience was: ${combinedMessage}`;
+            if (optionText === "➡️ More options") {
+                button.onclick = () => {
+                    addMessage('user', 'More options');
+                    button.style.display = 'none';
+                    showTypingIndicator();
+                    setTimeout(() => {
+                        removeTypingIndicator();
+                        handleFinalQuestion("what else stood out?");
+                    }, 400);
+                };
+            } else {
+                button.onclick = () => {
+                    button.classList.toggle('selected');
+                    if (selectedKeywords.includes(optionText)) {
+                        selectedKeywords = selectedKeywords.filter(k => k !== optionText);
+                    } else {
+                        selectedKeywords.push(optionText);
+                    }
+                };
             }
-            getAIResponse(combinedMessage);
-        };
-        quickRepliesContainer.appendChild(continueButton);
+            if (shouldAppend) {
+                const continueButton = document.querySelector('.continue-btn');
+                quickRepliesContainer.insertBefore(button, continueButton);
+            } else {
+                quickRepliesContainer.appendChild(button);
+            }
+        });
+        if (!shouldAppend) {
+            const continueButton = document.createElement('button');
+            continueButton.className = 'quick-reply-btn continue-btn';
+            continueButton.innerText = 'Continue';
+            continueButton.onclick = () => {
+                const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No Other Highlights";
+                getAIResponse(combinedMessage);
+            };
+            quickRepliesContainer.appendChild(continueButton);
+        }
     }
     function createPostButtons() {
         clearQuickReplies();
