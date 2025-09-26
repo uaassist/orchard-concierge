@@ -1,40 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Element selectors for all three views ---
+    // --- Element selectors for all views ---
+    const contentArea = document.getElementById('content-area');
     const welcomeScreen = document.getElementById('welcome-screen');
     const choiceScreen = document.getElementById('choice-screen');
     const chatView = document.getElementById('chat-view');
-    
     const chatBody = document.getElementById('chat-body');
     const quickRepliesContainer = document.getElementById('quick-replies-container');
     
-    // --- CORRECTED: This selector now ONLY targets buttons inside the welcome screen ---
-    const initialChoiceButtons = document.querySelectorAll('#welcome-screen .choice-button');
-    initialChoiceButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const userChoice = button.innerText.trim();
-            
-            // This logic is now safe because it only runs for the first screen's buttons
-            if (userChoice.includes('It was great!')) {
+    // --- SINGLE EVENT LISTENER using Event Delegation ---
+    // This is the guaranteed fix for the duplication bug.
+    contentArea.addEventListener('click', (event) => {
+        const button = event.target.closest('.choice-button');
+        if (!button) return; // Exit if the click was not on a button
+
+        const buttonId = button.id;
+        const buttonText = button.innerText.trim();
+
+        // Route the click based on the button's ID
+        switch (buttonId) {
+            case 'great-btn':
                 welcomeScreen.style.display = 'none';
                 choiceScreen.classList.remove('hidden');
-            } else {
-                startConversation(userChoice);
-            }
-        });
-    });
+                break;
+            
+            case 'okay-btn':
+            case 'bad-btn':
+                startConversation(buttonText);
+                break;
+            
+            case 'ai-draft-btn':
+                choiceScreen.style.display = 'none';
+                startConversation("It was great!");
+                break;
 
-    // --- These specific listeners are correct and do not need to change ---
-    const aiDraftBtn = document.getElementById('ai-draft-btn');
-    const manualReviewBtn = document.getElementById('manual-review-btn');
-
-    aiDraftBtn.addEventListener('click', () => {
-        choiceScreen.style.display = 'none';
-        startConversation("It was great!");
-    });
-
-    manualReviewBtn.addEventListener('click', () => {
-        window.open(googleReviewUrl, '_blank');
-        choiceScreen.innerHTML = `<h1 class="main-title">Thank you!</h1><p class="subtitle">We've opened the Google review page for you in a new tab.</p>`;
+            case 'manual-review-btn':
+                window.open(googleReviewUrl, '_blank');
+                choiceScreen.innerHTML = `<h1 class="main-title">Thank you!</h1><p class="subtitle">We've opened the Google review page for you in a new tab.</p>`;
+                break;
+        }
     });
 
     // --- Function to transition to the chat view ---
@@ -45,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         getAIResponse(firstMessage);
     }
 
-    // --- The rest of the file is unchanged, as the logic was correct ---
+    // --- The rest of the file is unchanged, as the chat logic itself is correct ---
     let conversationHistory = [];
     const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
@@ -156,36 +159,15 @@ document.addEventListener('DOMContentLoaded', () => {
         createPostButtons();
     }
 
-    function createQuickReplies(replies) {
-        clearQuickReplies();
-        quickRepliesContainer.classList.remove('column-layout');
-        replies.forEach(replyText => {
-            const button = document.createElement('button');
-            button.className = 'quick-reply-btn';
-            if (replyText.toLowerCase().includes("yes")) {
-                button.classList.add('primary-action');
-            }
-            button.innerText = replyText;
-            button.onclick = () => { getAIResponse(replyText); };
-            quickRepliesContainer.appendChild(button);
-        });
-    }
-
     function createMultiSelectButtons(options, step) {
         clearQuickReplies();
-        quickRepliesContainer.classList.remove('column-layout');
-        selectedKeywords = [];
+        quickRepliesContainer.innerHTML = ''; // Ensure container is empty
         options.forEach(optionText => {
             const button = document.createElement('button');
             button.className = 'quick-reply-btn';
             button.innerText = optionText;
             button.onclick = () => {
                 button.classList.toggle('selected');
-                if (selectedKeywords.includes(optionText)) {
-                    selectedKeywords = selectedKeywords.filter(k => k !== optionText);
-                } else {
-                    selectedKeywords.push(optionText);
-                }
             };
             quickRepliesContainer.appendChild(button);
         });
@@ -193,6 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
         continueButton.className = 'quick-reply-btn continue-btn';
         continueButton.innerText = 'Continue';
         continueButton.onclick = () => {
+            const selectedButtons = quickRepliesContainer.querySelectorAll('.quick-reply-btn.selected');
+            const selectedKeywords = Array.from(selectedButtons).map(btn => btn.innerText);
             let combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No specific highlights";
             if (step === 'purpose') {
                 combinedMessage = `Purpose of visit was: ${combinedMessage}`;
@@ -206,7 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function createPostButtons() {
         clearQuickReplies();
-        quickRepliesContainer.classList.remove('column-layout');
         const regenerateButton = document.createElement('button');
         regenerateButton.className = 'quick-reply-btn';
         regenerateButton.innerText = '🔄 Try another version';
