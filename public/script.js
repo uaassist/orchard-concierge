@@ -2,11 +2,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Element selectors for the two views ---
     const welcomeScreen = document.getElementById('welcome-screen');
     const chatView = document.getElementById('chat-view');
-    
     const chatBody = document.getElementById('chat-body');
     const quickRepliesContainer = document.getElementById('quick-replies-container');
     
-    // --- Event listeners for the initial choice buttons ---
     const initialChoiceButtons = document.querySelectorAll('.choice-button');
     initialChoiceButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -15,19 +13,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Function to transition from welcome to chat view ---
     function startConversation(firstMessage) {
-        welcomeScreen.style.display = 'none'; // Hide the welcome screen
-        chatView.classList.remove('hidden');   // Show the chat view
-        
-        // Start the AI conversation with the user's first choice
+        welcomeScreen.style.display = 'none';
+        chatView.classList.remove('hidden');
         getAIResponse(firstMessage);
     }
 
     let conversationHistory = [];
     const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
-    const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp'; // Vodafone Avatar
+    const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp';
     let selectedKeywords = [];
 
     function addMessage(sender, text, isHtml = false, isQuestion = false) {
@@ -109,11 +104,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleFinalQuestion(question) {
         addMessage('concierge', question, false, true);
         if (question.includes("main reason for your visit today?")) {
-            const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup", "➡️ More options"];
-            createMultiSelectButtons(tier1Options);
-        } else if (question.includes("what else stood out?")) {
+            const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup"];
+            createMultiSelectButtons(tier1Options, 'purpose');
+        } else if (question.includes("what was your service experience like?")) {
             const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved"];
-            createMultiSelectButtons(tier2Options, true);
+            createMultiSelectButtons(tier2Options, 'experience');
         } else if (question.toLowerCase().includes("would you like me to draft")) {
              createQuickReplies(["✨ Yes, draft it for me!", "No, thanks"]);
         }
@@ -148,53 +143,37 @@ document.addEventListener('DOMContentLoaded', () => {
             quickRepliesContainer.appendChild(button);
         });
     }
-    function createMultiSelectButtons(options, shouldAppend = false) {
-        if (!shouldAppend) {
-            clearQuickReplies();
-            quickRepliesContainer.classList.remove('column-layout');
-            selectedKeywords = [];
-        }
+    function createMultiSelectButtons(options, step) {
+        clearQuickReplies();
+        quickRepliesContainer.classList.remove('column-layout');
+        selectedKeywords = [];
         options.forEach(optionText => {
             const button = document.createElement('button');
             button.className = 'quick-reply-btn';
             button.innerText = optionText;
-            if (optionText === "➡️ More options") {
-                button.onclick = () => {
-                    addMessage('user', 'More options');
-                    button.style.display = 'none';
-                    showTypingIndicator();
-                    setTimeout(() => {
-                        removeTypingIndicator();
-                        handleFinalQuestion("what else stood out?");
-                    }, 400);
-                };
-            } else {
-                button.onclick = () => {
-                    button.classList.toggle('selected');
-                    if (selectedKeywords.includes(optionText)) {
-                        selectedKeywords = selectedKeywords.filter(k => k !== optionText);
-                    } else {
-                        selectedKeywords.push(optionText);
-                    }
-                };
-            }
-            if (shouldAppend) {
-                const continueButton = document.querySelector('.continue-btn');
-                quickRepliesContainer.insertBefore(button, continueButton);
-            } else {
-                quickRepliesContainer.appendChild(button);
-            }
-        });
-        if (!shouldAppend) {
-            const continueButton = document.createElement('button');
-            continueButton.className = 'quick-reply-btn continue-btn';
-            continueButton.innerText = 'Continue';
-            continueButton.onclick = () => {
-                const combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No Other Highlights";
-                getAIResponse(combinedMessage);
+            button.onclick = () => {
+                button.classList.toggle('selected');
+                if (selectedKeywords.includes(optionText)) {
+                    selectedKeywords = selectedKeywords.filter(k => k !== optionText);
+                } else {
+                    selectedKeywords.push(optionText);
+                }
             };
-            quickRepliesContainer.appendChild(continueButton);
-        }
+            quickRepliesContainer.appendChild(button);
+        });
+        const continueButton = document.createElement('button');
+        continueButton.className = 'quick-reply-btn continue-btn';
+        continueButton.innerText = 'Continue';
+        continueButton.onclick = () => {
+            let combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No specific highlights";
+            if (step === 'purpose') {
+                combinedMessage = `Purpose of visit was: ${combinedMessage}`;
+            } else if (step === 'experience') {
+                combinedMessage = `Service experience was: ${combinedMessage}`;
+            }
+            getAIResponse(combinedMessage);
+        };
+        quickRepliesContainer.appendChild(continueButton);
     }
     function createPostButtons() {
         clearQuickReplies();
