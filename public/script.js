@@ -1,22 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Element selectors for all views ---
+    // --- Element selectors ---
     const contentArea = document.getElementById('content-area');
     const welcomeScreen = document.getElementById('welcome-screen');
     const choiceScreen = document.getElementById('choice-screen');
     const chatView = document.getElementById('chat-view');
     const chatBody = document.getElementById('chat-body');
     const quickRepliesContainer = document.getElementById('quick-replies-container');
-    
-    // --- SINGLE EVENT LISTENER using Event Delegation ---
-    // This is the guaranteed fix for the duplication bug.
+    const progressIndicator = document.getElementById('progress-indicator'); // New selector
+
+    // --- Single Event Listener using Event Delegation ---
     contentArea.addEventListener('click', (event) => {
         const button = event.target.closest('.choice-button');
-        if (!button) return; // Exit if the click was not on a button
+        if (!button) return;
 
         const buttonId = button.id;
         const buttonText = button.innerText.trim();
 
-        // Route the click based on the button's ID
         switch (buttonId) {
             case 'great-btn':
                 welcomeScreen.style.display = 'none';
@@ -40,20 +39,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- NEW: Function to update the progress bar ---
+    function updateProgressBar(step) {
+        const segments = progressIndicator.querySelectorAll('.progress-segment');
+        segments.forEach((segment, index) => {
+            if (index < step) {
+                segment.classList.add('active');
+            } else {
+                segment.classList.remove('active');
+            }
+        });
+    }
+
     // --- Function to transition to the chat view ---
     function startConversation(firstMessage) {
         welcomeScreen.style.display = 'none';
         choiceScreen.style.display = 'none';
         chatView.classList.remove('hidden');
+
+        // Show the progress bar when the chat starts
+        if (firstMessage === "It was great!") {
+            progressIndicator.classList.remove('hidden');
+        }
+        
         getAIResponse(firstMessage);
     }
 
-    // --- The rest of the file is unchanged, as the chat logic itself is correct ---
+    // --- Chat logic ---
     let conversationHistory = [];
-    const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
+    const placeId = 'Your_Google_Place_ID_Here';
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
     const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp';
-    let selectedKeywords = [];
 
     function addMessage(sender, text, isHtml = false, isQuestion = false) {
         const wrapper = document.createElement('div');
@@ -138,15 +154,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleFinalQuestion(question) {
         addMessage('concierge', question, false, true);
         if (question.includes("main reason for your visit today?")) {
+            updateProgressBar(1); // Update progress to Step 1
             const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup"];
             createMultiSelectButtons(tier1Options, 'purpose');
         } else if (question.includes("what was your service experience like?")) {
+            updateProgressBar(2); // Update progress to Step 2
             const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved"];
             createMultiSelectButtons(tier2Options, 'experience');
         }
     }
 
     function createEditableDraft(reviewText) {
+        updateProgressBar(3); // Update progress to Step 3 (Final)
         clearQuickReplies();
         const wrapper = document.createElement('div');
         const textArea = document.createElement('textarea');
@@ -161,7 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function createMultiSelectButtons(options, step) {
         clearQuickReplies();
-        quickRepliesContainer.innerHTML = ''; // Ensure container is empty
         options.forEach(optionText => {
             const button = document.createElement('button');
             button.className = 'quick-reply-btn';
