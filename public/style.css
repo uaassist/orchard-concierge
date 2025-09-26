@@ -14,7 +14,7 @@ html {
 
 body {
     font-family: 'Inter', sans-serif;
-    background-color: #fff; /* App background is now white */
+    background-color: #fff;
     margin: 0;
     height: 100%;
     color: var(--text-dark);
@@ -36,14 +36,14 @@ body {
     border-bottom: 1px solid var(--border-color);
     flex-shrink: 0;
 }
-.header-icon { display: none; } /* Hide icon to save space */
+.header-icon { display: none; }
 .simple-header h1 { font-size: 18px; font-weight: 600; margin: 0; }
 
 /* --- CONTENT AREA & VIEW STYLES --- */
 #content-area {
     flex: 1;
     position: relative;
-    overflow-y: auto; /* Allows content area to scroll independently */
+    overflow-y: auto;
 }
 
 #welcome-screen, #choice-screen, #chat-view {
@@ -56,19 +56,20 @@ body {
     flex-direction: column;
 }
 
+/* --- THIS IS THE KEY CHANGE --- */
 #welcome-screen, #choice-screen {
-    padding: 24px;
+    padding: 48px 24px; /* More top padding, less on sides */
     text-align: center;
     animation: fadeIn 0.5s ease-out;
     box-sizing: border-box;
-    justify-content: center; /* Vertically center content */
+    /* justify-content: center; <-- THIS LINE IS REMOVED */
 }
 
-.welcome-header { margin-bottom: 20px; }
+.welcome-header { margin-bottom: 24px; }
 .welcome-avatar { width: 80px; height: 80px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-.concierge-name-tag { margin-top: 10px; font-weight: 600; }
-.initial-bubble { background: var(--background-light); padding: 15px 20px; border-radius: 20px; border-bottom-left-radius: 6px; max-width: 100%; margin: 0 auto; line-height: 1.6; font-size: 16px; text-align: center; }
-.initial-choices { margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
+.concierge-name-tag { margin-top: 16px; font-size: 18px; font-weight: 600; }
+.initial-bubble { background: var(--background-light); padding: 15px 20px; border-radius: 20px; border-bottom-left-radius: 6px; max-width: 100%; margin: 16px auto 0 auto; line-height: 1.6; font-size: 16px; text-align: center; }
+.initial-choices { margin-top: 32px; display: flex; flex-direction: column; gap: 12px; }
 
 .choice-button {
     width: 100%;
@@ -90,10 +91,10 @@ body {
 .button-sub-text { font-size: 14px; font-weight: 400; color: #4B5563; }
 .ukrainian-prompt { font-weight: 600; margin-top: 24px; margin-bottom: -12px; }
 
-/* --- CHAT VIEW STYLES (REFACTORED) --- */
+/* --- CHAT VIEW STYLES --- */
 .chat-body-styled {
     flex: 1;
-    padding: 16px 16px 90px 16px; /* Add bottom padding to avoid overlap with sticky input */
+    padding: 16px 16px 90px 16px;
     overflow-y: auto;
     display: flex;
     flex-direction: column-reverse;
@@ -124,11 +125,11 @@ body {
 /* --- DYNAMIC "CHIP" LAYOUT FOR BUTTONS --- */
 #quick-replies-container {
     display: flex;
-    flex-wrap: wrap; /* This is the key change */
+    flex-wrap: wrap;
     gap: 8px;
 }
 .quick-reply-btn {
-    flex: 1 1 45%; /* Grow, shrink, and try to be 45% of the width */
+    flex: 1 1 45%;
     margin: 0;
     padding: 14px 8px;
     min-height: 50px;
