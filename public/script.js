@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let conversationHistory = [];
-    const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
+    const placeId = 'ChIJBRz8CwvP1EARf5R4VI2HGs4'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
     const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp';
     let selectedKeywords = [];
@@ -200,3 +200,4 @@ document.addEventListener('DOMContentLoaded', () => {
         quickRepliesContainer.innerHTML = '';
     }
 });
+
