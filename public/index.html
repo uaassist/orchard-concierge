@@ -8,11 +8,11 @@
 </head>
 <body>
     <div class="onboarding-container">
+        <!-- SIMPLIFIED HEADER -->
         <div class="simple-header">
              <h1>Vodafone Ukraine</h1>
         </div>
 
-        <!-- NEW: Progress Indicator -->
         <div id="progress-indicator" class="hidden">
             <div class="progress-segment"></div>
             <div class="progress-segment"></div>
@@ -20,11 +20,10 @@
         </div>
 
         <div id="content-area">
-            <!-- All other content remains the same -->
             <div id="welcome-screen">
                 <div class="welcome-header">
                     <img src="https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp" alt="TOBi the Assistant" class="welcome-avatar">
-                    <p class="concierge-name-tag">Hi! I'm TOBi, your AI-powered feedback assistant.</p>
+                    <p class="concierge-name-tag">Hi! I'm TOBi, your digital assistant.</p>
                 </div>
                 <div class="initial-bubble">
                      Please share your feedback on your recent store visit.
@@ -42,13 +41,13 @@
                     <p class="concierge-name-tag">TOBi</p>
                 </div>
                 <div class="initial-bubble">
-                    Perfect. Let's post your feedback on Google. I can write a quick draft to get you started.
+                    Great! Let's share that on Google. I'll write a quick draft for you to make it easy.
                 </div>
-                <p class="ukrainian-prompt">Choose how you want to leave your review:</p>
+                <p class="ukrainian-prompt">Оберіть, як ви хочете залишити свій відгук:</p>
                 <div class="initial-choices">
                     <button id="ai-draft-btn" class="choice-button">
                         <div class="button-main-text">🤖 Get TOBi to draft it for me</div>
-                        <div class="button-sub-text">TOBi writes it. You publish it.</div>
+                        <div class="button-sub-text">Fast, easy, and ready to publish</div>
                     </button>
                     <button id="manual-review-btn" class="choice-button">
                         <div class="button-main-text">📝 I'll write my own review</div>
@@ -59,6 +58,7 @@
 
             <div id="chat-view" class="hidden">
                 <div id="chat-body" class="chat-body-styled"></div>
+                <!-- ID corrected in the JS, this HTML is correct -->
                 <div id="chat-input-area" class="chat-input-area-styled">
                     <div id="quick-replies-container"></div>
                 </div>
@@ -68,4 +68,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
