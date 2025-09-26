@@ -7,11 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatBody = document.getElementById('chat-body');
     const quickRepliesContainer = document.getElementById('quick-replies-container');
     
-    // --- Event listeners for the initial choice buttons ---
-    const initialChoiceButtons = document.querySelectorAll('.choice-button');
+    // --- CORRECTED: This selector now ONLY targets buttons inside the welcome screen ---
+    const initialChoiceButtons = document.querySelectorAll('#welcome-screen .choice-button');
     initialChoiceButtons.forEach(button => {
         button.addEventListener('click', () => {
             const userChoice = button.innerText.trim();
+            
+            // This logic is now safe because it only runs for the first screen's buttons
             if (userChoice.includes('It was great!')) {
                 welcomeScreen.style.display = 'none';
                 choiceScreen.classList.remove('hidden');
@@ -21,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Event listeners for the two CTA buttons on the choice screen ---
+    // --- These specific listeners are correct and do not need to change ---
     const aiDraftBtn = document.getElementById('ai-draft-btn');
     const manualReviewBtn = document.getElementById('manual-review-btn');
 
@@ -43,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         getAIResponse(firstMessage);
     }
 
+    // --- The rest of the file is unchanged, as the logic was correct ---
     let conversationHistory = [];
     const placeId = 'Your_Google_Place_ID_Here'; // <-- PASTE YOUR PLACE ID HERE
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
@@ -101,30 +104,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const indicator = document.querySelector('.typing-indicator');
         if (indicator) indicator.remove();
     }
-
-    // --- CORRECTED AND SIMPLIFIED processAIResponse function ---
+    
     function processAIResponse(text) {
         removeTypingIndicator();
-
         if (text.includes("|")) {
-            // This handles messages like "Statement|Question"
             const parts = text.split('|');
             const statement = parts[0].trim();
             const question = parts[1].trim();
-            
-            addMessage('concierge', statement, false, false); // Add the first bubble
-
-            // Use timeouts for a more natural, conversational feel
+            addMessage('concierge', statement, false, false);
             setTimeout(() => {
                 showTypingIndicator();
                 setTimeout(() => {
                     removeTypingIndicator();
-                    handleFinalQuestion(question); // Add the second bubble (the question)
+                    handleFinalQuestion(question);
                 }, 300);
             }, 500);
-
         } else {
-            // This handles the final review draft or a simple text message
             const quoteRegex = /"(.*?)"/s;
             const matches = text.match(quoteRegex);
             if (matches && matches[1].length > 10) {
@@ -138,8 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleFinalQuestion(question) {
-        addMessage('concierge', question, false, true); // This adds the question bubble
-        // And this creates the corresponding buttons for that question
+        addMessage('concierge', question, false, true);
         if (question.includes("main reason for your visit today?")) {
             const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup"];
             createMultiSelectButtons(tier1Options, 'purpose');
