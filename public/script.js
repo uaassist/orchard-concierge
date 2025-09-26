@@ -6,9 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatView = document.getElementById('chat-view');
     const chatBody = document.getElementById('chat-body');
     const quickRepliesContainer = document.getElementById('quick-replies-container');
-    const progressIndicator = document.getElementById('progress-indicator');
-    const chatInputArea = document.getElementById('chat-input-area');
-    
+    const progressIndicator = document.getElementById('progress-indicator'); // New selector
+
     // --- Single Event Listener using Event Delegation ---
     contentArea.addEventListener('click', (event) => {
         const button = event.target.closest('.choice-button');
@@ -40,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- NEW: Function to update the progress bar ---
     function updateProgressBar(step) {
         const segments = progressIndicator.querySelectorAll('.progress-segment');
         segments.forEach((segment, index) => {
@@ -51,25 +51,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Function to transition to the chat view ---
     function startConversation(firstMessage) {
         welcomeScreen.style.display = 'none';
         choiceScreen.style.display = 'none';
         chatView.classList.remove('hidden');
 
+        // Show the progress bar when the chat starts
         if (firstMessage === "It was great!") {
             progressIndicator.classList.remove('hidden');
         }
         
         getAIResponse(firstMessage);
     }
-    
+
+    // --- Chat logic ---
     let conversationHistory = [];
     const placeId = 'Your_Google_Place_ID_Here';
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
     const avatarUrl = 'https://ucarecdn.com/c679e989-5032-408b-ae8a-83c7d204c67d/Vodafonebot.webp';
-    
-    // --- ALL LOGIC FUNCTIONS RESTORED ---
-    
+
     function addMessage(sender, text, isHtml = false, isQuestion = false) {
         const wrapper = document.createElement('div');
         wrapper.className = `message-wrapper ${sender}`;
@@ -87,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.appendChild(bubble);
         chatBody.prepend(wrapper);
     }
-    
+
     async function getAIResponse(userMessage) {
         addMessage('user', userMessage);
         conversationHistory.push({ role: 'user', content: userMessage });
@@ -109,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
             processAIResponse('Sorry, I seem to be having trouble connecting. Please try again later.');
         }
     }
-
+    
     function showTypingIndicator() {
         if (document.querySelector('.typing-indicator')) return;
         const wrapper = document.createElement('div');
@@ -153,18 +154,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleFinalQuestion(question) {
         addMessage('concierge', question, false, true);
         if (question.includes("main reason for your visit today?")) {
-            updateProgressBar(1);
+            updateProgressBar(1); // Update progress to Step 1
             const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup"];
             createMultiSelectButtons(tier1Options, 'purpose');
         } else if (question.includes("what was your service experience like?")) {
-            updateProgressBar(2);
+            updateProgressBar(2); // Update progress to Step 2
             const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved"];
             createMultiSelectButtons(tier2Options, 'experience');
         }
     }
 
     function createEditableDraft(reviewText) {
-        updateProgressBar(3);
+        updateProgressBar(3); // Update progress to Step 3 (Final)
         clearQuickReplies();
         const wrapper = document.createElement('div');
         const textArea = document.createElement('textarea');
@@ -183,7 +184,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const button = document.createElement('button');
             button.className = 'quick-reply-btn';
             button.innerText = optionText;
-            button.onclick = () => { button.classList.toggle('selected'); };
+            button.onclick = () => {
+                button.classList.toggle('selected');
+            };
             quickRepliesContainer.appendChild(button);
         });
         const continueButton = document.createElement('button');
@@ -195,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let combinedMessage = selectedKeywords.length > 0 ? selectedKeywords.join(', ') : "No specific highlights";
             if (step === 'purpose') {
                 combinedMessage = `Purpose of visit was: ${combinedMessage}`;
-            } else {
+            } else if (step === 'experience') {
                 combinedMessage = `Service experience was: ${combinedMessage}`;
             }
             getAIResponse(combinedMessage);
@@ -216,24 +219,13 @@ document.addEventListener('DOMContentLoaded', () => {
         postButton.innerText = '✅ Post to Google';
         postButton.onclick = () => {
             const draftText = document.getElementById('review-draft-textarea').value;
-            // 1. Perform trusted actions immediately to avoid pop-up blockers
-            navigator.clipboard.writeText(draftText);
-            window.open(googleReviewUrl, '_blank');
-
-            // 2. Then, update the UI
-            chatBody.innerHTML = '';
-            if (chatInputArea) chatInputArea.style.display = 'none';
-            if (progressIndicator) progressIndicator.style.display = 'none';
-            chatBody.style.backgroundColor = '#fff';
-            chatBody.style.flexDirection = 'column';
-            const confirmationHTML = `
-                <div class="final-confirmation-screen">
-                    <div class="final-title">
-                        Review copied!
-                    </div>
-                    <p class="final-subtitle">We've opened Google for you. Just tap ⭐⭐⭐⭐⭐ and paste your review. Thank you!</p>
-                </div>`;
-            chatBody.innerHTML = confirmationHTML;
+            navigator.clipboard.writeText(draftText).then(() => {
+                addMessage('concierge', "Great! Your review has been copied. I'll open Google for you now. Just tap the 5th star and paste your review. Thank you!");
+                setTimeout(() => {
+                    window.open(googleReviewUrl, '_blank');
+                }, 1500);
+            });
+            clearQuickReplies();
         };
         quickRepliesContainer.appendChild(regenerateButton);
         quickRepliesContainer.appendChild(postButton);
