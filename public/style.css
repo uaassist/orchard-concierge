@@ -66,7 +66,7 @@ body {
 .welcome-header { margin-bottom: 24px; }
 .welcome-avatar { width: 80px; height: 80px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
 .concierge-name-tag { margin-top: 16px; font-size: 16px; font-weight: 600; }
-.initial-bubble { background: var(--background-light); padding: 15px 0px; border-radius: 20px; border-bottom-left-radius: 6px; max-width: 100%; margin: 16px auto 0 auto; line-height: 1.6; font-size: 18px; text-align: center; }
+.initial-bubble { background: var(--background-light); padding: 15px 20px; border-radius: 20px; border-bottom-left-radius: 6px; max-width: 100%; margin: 6px auto 0 auto; line-height: 1.6; font-size: 18px; text-align: center; }
 .initial-choices { margin-top: 32px; display: flex; flex-direction: column; gap: 12px; }
 
 /* --- THIS IS THE KEY CHANGE --- */
@@ -160,6 +160,7 @@ body {
 @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(230, 0, 0, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(230, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(230, 0, 0, 0); } }
 .hidden { display: none !important; }
+
 
 
 
