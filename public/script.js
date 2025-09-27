@@ -1,16 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Element selectors ---
+    // --- Element selectors for all views ---
     const contentArea = document.getElementById('content-area');
     const welcomeScreen = document.getElementById('welcome-screen');
     const choiceScreen = document.getElementById('choice-screen');
     const chatView = document.getElementById('chat-view');
     const chatBody = document.getElementById('chat-body');
     const quickRepliesContainer = document.getElementById('quick-replies-container');
-    const progressIndicator = document.getElementById('progress-indicator'); // New selector
+    const progressIndicator = document.getElementById('progress-indicator');
 
     // --- Single Event Listener using Event Delegation ---
     contentArea.addEventListener('click', (event) => {
-        const button = event.target.closest('.choice-button');
+        const button = event.target.closest('button'); // More generic selector
         if (!button) return;
 
         const buttonId = button.id;
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- NEW: Function to update the progress bar ---
+    // --- Function to update the progress bar ---
     function updateProgressBar(step) {
         const segments = progressIndicator.querySelectorAll('.progress-segment');
         segments.forEach((segment, index) => {
@@ -57,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
         choiceScreen.style.display = 'none';
         chatView.classList.remove('hidden');
 
-        // Show the progress bar when the chat starts
         if (firstMessage === "It was great!") {
             progressIndicator.classList.remove('hidden');
         }
@@ -65,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
         getAIResponse(firstMessage);
     }
 
-    // --- Chat logic ---
     let conversationHistory = [];
     const placeId = 'Your_Google_Place_ID_Here';
     const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
@@ -154,18 +152,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleFinalQuestion(question) {
         addMessage('concierge', question, false, true);
         if (question.includes("main reason for your visit today?")) {
-            updateProgressBar(1); // Update progress to Step 1
+            updateProgressBar(1);
             const tier1Options = ["📱 New Phone/Device", "🔄 Plan Upgrade/Change", "🔧 Technical Support", "💳 Bill Payment", "👤 New Account Setup"];
             createMultiSelectButtons(tier1Options, 'purpose');
         } else if (question.includes("what was your service experience like?")) {
-            updateProgressBar(2); // Update progress to Step 2
+            updateProgressBar(2);
             const tier2Options = ["⭐ Helpful Staff", "💨 Fast Service", "🏬 Clean Store", "👍 Easy Process", "🤝 Problem Solved"];
             createMultiSelectButtons(tier2Options, 'experience');
         }
     }
 
     function createEditableDraft(reviewText) {
-        updateProgressBar(3); // Update progress to Step 3 (Final)
+        updateProgressBar(3);
         clearQuickReplies();
         const wrapper = document.createElement('div');
         const textArea = document.createElement('textarea');
@@ -184,9 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const button = document.createElement('button');
             button.className = 'quick-reply-btn';
             button.innerText = optionText;
-            button.onclick = () => {
-                button.classList.toggle('selected');
-            };
+            button.onclick = () => { button.classList.toggle('selected'); };
             quickRepliesContainer.appendChild(button);
         });
         const continueButton = document.createElement('button');
@@ -206,27 +202,40 @@ document.addEventListener('DOMContentLoaded', () => {
         quickRepliesContainer.appendChild(continueButton);
     }
 
+    // --- THIS FUNCTION CONTAINS THE KEY CHANGE ---
     function createPostButtons() {
         clearQuickReplies();
-        const regenerateButton = document.createElement('button');
-        regenerateButton.className = 'quick-reply-btn';
-        regenerateButton.innerText = '🔄 Try another version';
-        regenerateButton.onclick = () => {
-             getAIResponse("That wasn't quite right, please try another version.", true);
-        };
+        
         const postButton = document.createElement('button');
         postButton.className = 'quick-reply-btn primary-action';
         postButton.innerText = '✅ Post to Google';
         postButton.onclick = () => {
             const draftText = document.getElementById('review-draft-textarea').value;
             navigator.clipboard.writeText(draftText).then(() => {
-                addMessage('concierge', "Great! Your review has been copied. I'll open Google for you now. Just tap the 5th star and paste your review. Thank you!");
-                setTimeout(() => {
+                // Step 1: Show the confirmation message
+                addMessage('concierge', "Great! Your review has been copied. Just tap below to go to Google, tap the 5th star, and paste. Thank you!");
+                
+                // Step 2: Replace the old buttons with a single "Continue" button
+                clearQuickReplies();
+                const continueToGoogleBtn = document.createElement('button');
+                continueToGoogleBtn.className = 'quick-reply-btn continue-btn'; // Use existing styles
+                continueToGoogleBtn.innerText = 'Continue to Google →';
+                continueToGoogleBtn.onclick = () => {
+                    // This click is direct and will not be blocked
                     window.open(googleReviewUrl, '_blank');
-                }, 1500);
+                };
+                quickRepliesContainer.appendChild(continueToGoogleBtn);
             });
-            clearQuickReplies();
         };
+
+        const regenerateButton = document.createElement('button');
+        regenerateButton.className = 'quick-reply-btn';
+        regenerateButton.innerText = '🔄 Try another version';
+        regenerateButton.onclick = () => {
+             getAIResponse("That wasn't quite right, please try another version.", true);
+        };
+
+        // Add the buttons in the correct initial order
         quickRepliesContainer.appendChild(regenerateButton);
         quickRepliesContainer.appendChild(postButton);
     }
