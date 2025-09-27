@@ -2,7 +2,6 @@
 
 :root {
     --primary-color: #E60000;
-    --primary-color-glow: rgba(230, 0, 0, 0.6); /* Semi-transparent red for the glow */
     --text-dark: #1D2B3A;
     --border-color: #DDE2E7;
     --background-light: #F9FAFB;
@@ -12,9 +11,12 @@ body { font-family: 'Inter', sans-serif; background-color: #fff; margin: 0; heig
 .onboarding-container { width: 100%; height: 100%; background-color: #fff; display: flex; flex-direction: column; overflow: hidden; }
 .simple-header { text-align: center; padding: 16px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
 .simple-header h1 { font-size: 18px; font-weight: 600; margin: 0; }
+
+/* --- UPDATED PROGRESS INDICATOR --- */
 #progress-indicator { display: flex; gap: 8px; padding: 8px 24px; }
 .progress-segment { flex: 1; height: 6px; border-radius: 3px; background-color: #E5E7EB; transition: background-color 0.4s ease-in-out; }
 .progress-segment.active { background-color: var(--primary-color); }
+
 #content-area { flex: 1; position: relative; overflow-y: auto; }
 #welcome-screen, #choice-screen, #chat-view { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; }
 #welcome-screen, #choice-screen { padding: 48px 24px; text-align: center; animation: fadeIn 0.5s ease-out; box-sizing: border-box; }
@@ -29,6 +31,8 @@ body { font-family: 'Inter', sans-serif; background-color: #fff; margin: 0; heig
 .button-main-text { font-size: 16px; font-weight: 600; color: var(--text-dark); }
 .button-sub-text { font-size: 14px; font-weight: 400; color: #4B5563; }
 .ukrainian-prompt { font-weight: 600; margin-top: 24px; margin-bottom: -12px; }
+
+/* --- UPDATED CHAT STYLES --- */
 .chat-body-styled { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column-reverse; background-color: var(--background-light); }
 @keyframes fadeIn { from { opacity: 0; } to: { opacity: 1; } }
 .message-wrapper { margin-bottom: 12px; display: flex; max-width: 100%; align-items: flex-end; }
@@ -49,10 +53,8 @@ body { font-family: 'Inter', sans-serif; background-color: #fff; margin: 0; heig
 .quick-reply-btn.primary-action .button-main-text { color: white; }
 .quick-reply-btn.primary-action .button-sub-text { color: rgba(255, 255, 255, 0.85); }
 
-/* --- REVIEW DRAFT AREA STYLES --- */
+/* --- NEW: STYLES FOR THE PROMINENT REVIEW DRAFT AREA --- */
 .review-draft-container {
-    position: relative;
-    overflow: hidden; /* --- CHANGE 1: This is now essential to clip the glow --- */
     background-color: #fff;
     border: 1px solid var(--border-color);
     border-radius: 12px;
@@ -60,35 +62,23 @@ body { font-family: 'Inter', sans-serif; background-color: #fff; margin: 0; heig
     margin-bottom: 12px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
-.review-draft-textarea { width: 100%; height: 150px; padding: 0; border: none; background: transparent; font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.6; resize: none; outline: none; z-index: 1; position: relative; }
+.review-draft-textarea {
+    width: 100%;
+    height: 150px; /* Taller by default */
+    padding: 0;
+    border: none;
+    background: transparent;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    resize: none; /* Disable resizing */
+    outline: none; /* Remove focus ring */
+}
+/* --- END NEW STYLES --- */
+
 .typing-indicator .bubble { display: flex; align-items: center; padding: 12px 15px; }
 .dot { width: 8px; height: 8px; margin: 0 2px; background-color: #9CA3AF; border-radius: 50%; animation: bounce 1.3s infinite ease-in-out; }
 .dot:nth-child(2) { animation-delay: 0.1s; } .dot:nth-child(3) { animation-delay: 0.2s; }
 @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(230, 0, 0, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(230, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(230, 0, 0, 0); } }
 .hidden { display: none !important; }
-
-/* --- AMBIENT LIGHTING ANIMATION --- */
-/* --- CHANGE 2: The pseudo-element is now a large, soft gradient --- */
-.review-draft-container::before {
-    content: '';
-    position: absolute;
-    width: 100px; /* Larger size for a more diffuse light */
-    height: 100px;
-    /* This gradient creates a soft light source, from semi-transparent red to nothing */
-    background: radial-gradient(circle, var(--primary-color-glow) 0%, rgba(230, 0, 0, 0) 70%);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    animation: perimeter-glow 5s linear infinite; /* Slowed down slightly for a calmer feel */
-    z-index: 0;
-}
-
-/* --- CHANGE 3: The keyframe animation path is unchanged, but the effect is now different --- */
-@keyframes perimeter-glow {
-    0% { top: 0; left: 0; }
-    25% { top: 0; left: 100%; }
-    50% { top: 100%; left: 100%; }
-    75% { top: 100%; left: 0; }
-    100% { top: 0; left: 0; }
-}
-/* --- END ANIMATION --- */
