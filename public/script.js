@@ -162,16 +162,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- UPDATED to create the new review container ---
     function createEditableDraft(reviewText) {
         updateProgressBar(3);
         clearQuickReplies();
-        const wrapper = document.createElement('div');
+        
+        const container = document.createElement('div');
+        container.className = 'review-draft-container';
+
         const textArea = document.createElement('textarea');
         textArea.id = 'review-draft-textarea';
         textArea.className = 'review-draft-textarea';
         textArea.value = reviewText;
-        wrapper.appendChild(textArea);
-        chatBody.prepend(wrapper);
+        
+        container.appendChild(textArea);
+        chatBody.prepend(container);
+
         addMessage('concierge', 'You can edit the text if you like. When ready, just tap below.', false, true);
         createPostButtons();
     }
@@ -202,12 +208,10 @@ document.addEventListener('DOMContentLoaded', () => {
         quickRepliesContainer.appendChild(continueButton);
     }
 
-    // --- THIS FUNCTION CONTAINS THE FINAL, SUPERIOR LOGIC ---
     function createPostButtons() {
         clearQuickReplies();
         
         const postButton = document.createElement('button');
-        // Use a more descriptive class and make it look like a title/subtitle button
         postButton.className = 'quick-reply-btn primary-action choice-button'; 
         postButton.innerHTML = `
             <div class="button-main-text">✅ Open Google to post</div>
@@ -216,15 +220,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         postButton.onclick = () => {
             const draftText = document.getElementById('review-draft-textarea').value;
-            
-            // Re-ordered for reliability: open the window first!
-            // This is a direct result of the user's click and will not be blocked.
             window.open(googleReviewUrl, '_blank');
-
-            // Then, perform the copy action.
             navigator.clipboard.writeText(draftText);
-
-            // Clean up the UI in the original tab.
             clearQuickReplies();
             addMessage('concierge', "Thank you for your feedback!");
         };
