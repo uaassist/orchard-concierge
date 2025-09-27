@@ -11,27 +11,9 @@ body { font-family: 'Inter', sans-serif; background-color: #fff; margin: 0; heig
 .onboarding-container { width: 100%; height: 100%; background-color: #fff; display: flex; flex-direction: column; overflow: hidden; }
 .simple-header { text-align: center; padding: 16px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
 .simple-header h1 { font-size: 18px; font-weight: 600; margin: 0; }
-
-/* --- NEW: PROGRESS INDICATOR STYLES --- */
-#progress-indicator {
-    display: flex;
-    gap: 4px;
-    padding: 8px 24px;
-    background-color: #fff;
-    flex-shrink: 0;
-}
-.progress-segment {
-    flex: 1;
-    height: 4px;
-    border-radius: 2px;
-    background-color: #E5E7EB; /* Default inactive color */
-    transition: background-color 0.4s ease-in-out;
-}
-.progress-segment.active {
-    background-color: var(--primary-color);
-}
-/* --- END NEW STYLES --- */
-
+#progress-indicator { display: flex; gap: 4px; padding: 8px 24px; background-color: #fff; flex-shrink: 0; }
+.progress-segment { flex: 1; height: 4px; border-radius: 2px; background-color: #E5E7EB; transition: background-color 0.4s ease-in-out; }
+.progress-segment.active { background-color: var(--primary-color); }
 #content-area { flex: 1; position: relative; overflow-y: auto; }
 #welcome-screen, #choice-screen, #chat-view { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; }
 #welcome-screen, #choice-screen { padding: 48px 24px; text-align: center; animation: fadeIn 0.5s ease-out; box-sizing: border-box; }
@@ -43,14 +25,11 @@ body { font-family: 'Inter', sans-serif; background-color: #fff; margin: 0; heig
 .choice-button { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--primary-color); background-color: #fff; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; box-sizing: border-box; }
 .choice-button:hover { border-color: var(--border-color); }
 .choice-button.single-line { flex-direction: row; align-items: center; gap: 10px; font-size: 16px; font-weight: 500; }
-.button-main-text { font-size: 16px; font-weight: 600; }
+.button-main-text { font-size: 16px; font-weight: 600; color: var(--text-dark); }
 .button-sub-text { font-size: 14px; font-weight: 400; color: #4B5563; }
 .ukrainian-prompt { font-weight: 600; margin-top: 24px; margin-bottom: -12px; }
 
-/* Chat view adjusted for progress bar */
-#chat-view {
-    /* The progress bar is outside this view, so this view doesn't need to change much */
-}
+/* --- CHAT VIEW STYLES --- */
 .chat-body-styled { flex: 1; padding: 16px 16px 90px 16px; overflow-y: auto; display: flex; flex-direction: column-reverse; background-color: var(--background-light); }
 @keyframes fadeIn { from { opacity: 0; } to: { opacity: 1; } }
 .message-wrapper { margin-bottom: 12px; display: flex; max-width: 100%; align-items: flex-end; }
@@ -68,6 +47,17 @@ body { font-family: 'Inter', sans-serif; background-color: #fff; margin: 0; heig
 .continue-btn { flex-basis: 100%; background-color: var(--primary-color); color: white; font-weight: 600; padding: 16px; border: none; }
 .quick-reply-btn.primary-action { background-color: var(--primary-color); color: white; border-color: var(--primary-color); font-weight: 600; animation: pulse 1.5s infinite; }
 .quick-reply-btn.primary-action:hover { background-color: #c40000; border-color: #c40000; animation: none; }
+
+/* --- THIS IS THE FIX --- */
+/* This rule specifically targets the text divs inside the red button */
+.quick-reply-btn.primary-action .button-main-text {
+    color: white;
+}
+.quick-reply-btn.primary-action .button-sub-text {
+    color: rgba(255, 255, 255, 0.85); /* Slightly transparent white for a softer look */
+}
+/* --- END FIX --- */
+
 .review-draft-textarea { width: 100%; box-sizing: border-box; height: 120px; margin: 10px 0 0 0; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color); font-family: 'Inter', sans-serif; font-size: 16px; resize: vertical; }
 .typing-indicator .bubble { display: flex; align-items: center; padding: 12px 15px; }
 .dot { width: 8px; height: 8px; margin: 0 2px; background-color: #9CA3AF; border-radius: 50%; animation: bounce 1.3s infinite ease-in-out; }
