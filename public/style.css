@@ -2,6 +2,7 @@
 
 :root {
     --primary-color: #E60000;
+    --primary-color-glow: rgba(230, 0, 0, 0.6); /* Semi-transparent red for the glow */
     --text-dark: #1D2B3A;
     --border-color: #DDE2E7;
     --background-light: #F9FAFB;
@@ -50,8 +51,8 @@ body { font-family: 'Inter', sans-serif; background-color: #fff; margin: 0; heig
 
 /* --- REVIEW DRAFT AREA STYLES --- */
 .review-draft-container {
-    position: relative; /* REQUIRED for the animation */
-    overflow: hidden; /* This clips the rotating gradient */
+    position: relative;
+    overflow: hidden; /* --- CHANGE 1: This is now essential to clip the glow --- */
     background-color: #fff;
     border: 1px solid var(--border-color);
     border-radius: 12px;
@@ -59,7 +60,7 @@ body { font-family: 'Inter', sans-serif; background-color: #fff; margin: 0; heig
     margin-bottom: 12px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
-.review-draft-textarea { width: 100%; height: 150px; padding: 0; border: none; background: transparent; font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.6; resize: none; outline: none; }
+.review-draft-textarea { width: 100%; height: 150px; padding: 0; border: none; background: transparent; font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.6; resize: none; outline: none; z-index: 1; position: relative; }
 .typing-indicator .bubble { display: flex; align-items: center; padding: 12px 15px; }
 .dot { width: 8px; height: 8px; margin: 0 2px; background-color: #9CA3AF; border-radius: 50%; animation: bounce 1.3s infinite ease-in-out; }
 .dot:nth-child(2) { animation-delay: 0.1s; } .dot:nth-child(3) { animation-delay: 0.2s; }
@@ -67,44 +68,27 @@ body { font-family: 'Inter', sans-serif; background-color: #fff; margin: 0; heig
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(230, 0, 0, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(230, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(230, 0, 0, 0); } }
 .hidden { display: none !important; }
 
-/* --- THIS IS THE NEW ANIMATION --- */
-/* 1. The Rotating Gradient Element */
+/* --- AMBIENT LIGHTING ANIMATION --- */
+/* --- CHANGE 2: The pseudo-element is now a large, soft gradient --- */
 .review-draft-container::before {
     content: '';
     position: absolute;
-    z-index: 0; /* Sit behind the textarea */
-
-    /* Make it much larger than the parent to create the sweep effect */
-    width: 200%;
-    height: 200%;
-    top: -50%;
-    left: -50%;
-    
-    /* The magic: A conic gradient creates a 'slice' of color */
-    background: conic-gradient(
-        from 0deg,
-        transparent 0%,
-        transparent 80%,
-        var(--primary-color) 95%,
-        transparent 100%
-    );
-
-    /* This spins the entire element */
-    animation: rotate-border 4s linear infinite;
-}
-/* We also need to make sure the textarea is on top of the animation */
-.review-draft-textarea {
-    position: relative;
-    z-index: 1;
+    width: 100px; /* Larger size for a more diffuse light */
+    height: 100px;
+    /* This gradient creates a soft light source, from semi-transparent red to nothing */
+    background: radial-gradient(circle, var(--primary-color-glow) 0%, rgba(230, 0, 0, 0) 70%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: perimeter-glow 5s linear infinite; /* Slowed down slightly for a calmer feel */
+    z-index: 0;
 }
 
-/* 2. The Rotation Animation */
-@keyframes rotate-border {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+/* --- CHANGE 3: The keyframe animation path is unchanged, but the effect is now different --- */
+@keyframes perimeter-glow {
+    0% { top: 0; left: 0; }
+    25% { top: 0; left: 100%; }
+    50% { top: 100%; left: 100%; }
+    75% { top: 100%; left: 0; }
+    100% { top: 0; left: 0; }
 }
-/* --- END NEW ANIMATION --- */
+/* --- END ANIMATION --- */
