@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Single Event Listener using Event Delegation ---
     contentArea.addEventListener('click', (event) => {
-        const button = event.target.closest('button'); // More generic selector
+        const button = event.target.closest('button');
         if (!button) return;
 
         const buttonId = button.id;
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
         textArea.value = reviewText;
         wrapper.appendChild(textArea);
         chatBody.prepend(wrapper);
-        addMessage('concierge', 'Feel free to edit it. When you\'re ready, just tap below.', false, true);
+        addMessage('concierge', 'You can edit the text if you like. When ready, just tap below.', false, true);
         createPostButtons();
     }
 
@@ -202,30 +202,31 @@ document.addEventListener('DOMContentLoaded', () => {
         quickRepliesContainer.appendChild(continueButton);
     }
 
-    // --- THIS FUNCTION CONTAINS THE KEY CHANGE ---
+    // --- THIS FUNCTION CONTAINS THE FINAL, SUPERIOR LOGIC ---
     function createPostButtons() {
         clearQuickReplies();
         
         const postButton = document.createElement('button');
-        postButton.className = 'quick-reply-btn primary-action';
-        postButton.innerText = '✅ Post to Google';
+        // Use a more descriptive class and make it look like a title/subtitle button
+        postButton.className = 'quick-reply-btn primary-action choice-button'; 
+        postButton.innerHTML = `
+            <div class="button-main-text">✅ Open Google to post</div>
+            <div class="button-sub-text">Your review is copied—just paste & rate</div>
+        `;
+        
         postButton.onclick = () => {
             const draftText = document.getElementById('review-draft-textarea').value;
-            navigator.clipboard.writeText(draftText).then(() => {
-                // Step 1: Show the confirmation message
-                addMessage('concierge', "Great! Your review has been copied. Just tap below to go to Google, tap the 5th star, and paste. Thank you!");
-                
-                // Step 2: Replace the old buttons with a single "Continue" button
-                clearQuickReplies();
-                const continueToGoogleBtn = document.createElement('button');
-                continueToGoogleBtn.className = 'quick-reply-btn continue-btn'; // Use existing styles
-                continueToGoogleBtn.innerText = 'Continue to Google →';
-                continueToGoogleBtn.onclick = () => {
-                    // This click is direct and will not be blocked
-                    window.open(googleReviewUrl, '_blank');
-                };
-                quickRepliesContainer.appendChild(continueToGoogleBtn);
-            });
+            
+            // Re-ordered for reliability: open the window first!
+            // This is a direct result of the user's click and will not be blocked.
+            window.open(googleReviewUrl, '_blank');
+
+            // Then, perform the copy action.
+            navigator.clipboard.writeText(draftText);
+
+            // Clean up the UI in the original tab.
+            clearQuickReplies();
+            addMessage('concierge', "Thank you for your feedback!");
         };
 
         const regenerateButton = document.createElement('button');
@@ -235,7 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
              getAIResponse("That wasn't quite right, please try another version.", true);
         };
 
-        // Add the buttons in the correct initial order
         quickRepliesContainer.appendChild(regenerateButton);
         quickRepliesContainer.appendChild(postButton);
     }
